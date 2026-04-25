@@ -18,6 +18,7 @@
         button:hover { background: #085e68; }
         .btn-outline { background: white; color: #0a7e8c; border: 1px solid #0a7e8c; }
         .btn-outline:hover { background: #e6f4f5; }
+        .loading { opacity: 0.6; pointer-events: none; }
         table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
         th, td { border: 1px solid #dee2e6; padding: 12px 8px; text-align: center; vertical-align: middle; }
         th { background: #f8f9fa; font-weight: 600; position: sticky; top: 0; }
@@ -25,6 +26,7 @@
         .readonly-cell { background: #f8f9fa; font-weight: 500; color: #2c3e2f; }
         .action-buttons { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem; }
         .info { font-size: 0.85rem; color: #6c757d; margin-top: 1rem; text-align: center; }
+        .error-message { color: #d32f2f; background: #ffebee; padding: 0.5rem; border-radius: 8px; margin-bottom: 1rem; display: none; }
     </style>
 </head>
 <body>
@@ -40,6 +42,8 @@
         <button id="loadDateBtn" class="btn-outline">↻ Load existing data</button>
     </div>
 
+    <div id="errorMsg" class="error-message"></div>
+
     <div style="overflow-x: auto;">
         <table id="inventoryTable">
             <thead>
@@ -53,7 +57,9 @@
                     <th>Remaining<br><span style="font-weight:normal;">(Yest+In–Dist)</span></th>
                 </tr>
                 </thead>
-                <tbody id="tableBody"></tbody>
+                <tbody id="tableBody">
+                    <tr><td colspan="7">Loading products...</td></tr>
+                </tbody>
         </table>
     </div>
 
@@ -62,22 +68,15 @@
         <button id="resetBtn" class="btn-outline">⟳ Reset form</button>
         <a href="janeth-dashboard.html" target="_blank"><button type="button" class="btn-outline">📊 Go to Dashboard</button></a>
     </div>
-    <div class="info">✅ All data is saved locally in your browser (localStorage). No backend required for now.</div>
+    <div class="info">✅ Connected to MySQL database via backend API.</div>
 </div>
 
 <script>
-    // ----- Product master (will later come from DB)
-    const PRODUCTS = [
-        { id: 1, name: "Product A" },
-        { id: 2, name: "Product B" },
-        { id: 3, name: "Product C" },
-        { id: 4, name: "Product D" }
-    ];
+    // Global state
+    let PRODUCTS = [];      // will be fetched from backend
+    let records = [];       // current displayed data
 
-    // ----- Global state
-    let records = [];  // each element: { productId, productName, yesterday, stockIn, distributed, sold }
-
-    // Helper: compute unsold & remaining for a record
+    // Helper: compute unsold & remaining
     function computeDerived(rec) {
         const totalStock = rec.yesterday + rec.stockIn;
         const remaining = totalStock - rec.distributed;
@@ -85,7 +84,7 @@
         return { remaining, unsold };
     }
 
-    // Initialize records from product list (reset values to zero)
+    // Initialize empty records from product list (all zeros)
     function initEmptyRecords() {
         records = PRODUCTS.map(p => ({
             productId: p.id,
@@ -97,16 +96,20 @@
         }));
     }
 
-    // Render table based on current records
+    // Render the table from current records
     function renderTable() {
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
+        if (!records.length) {
+            tbody.innerHTML = '<tr><td colspan="7">No products available</td></tr>';
+            return;
+        }
 
-        records.forEach((rec, idx) => {
+        records.forEach((rec) => {
             const { remaining, unsold } = computeDerived(rec);
             const row = tbody.insertRow();
 
-            // Product name (static)
+            // Product name (readonly)
             const cellProd = row.insertCell(0);
             cellProd.textContent = rec.productName;
             cellProd.style.fontWeight = '600';
@@ -165,16 +168,51 @@
         });
     }
 
-    // Save current records to localStorage for the selected date
-    function saveToLocalStorage() {
+    // Show error message
+    function showError(msg) {
+        const errDiv = document.getElementById('errorMsg');
+        errDiv.textContent = msg;
+        errDiv.style.display = 'block';
+        setTimeout(() => { errDiv.style.display = 'none'; }, 4000);
+    }
+
+    // Fetch product list from backend
+    async function fetchProducts() {
+        try {
+            const response = await fetch('../backend/janeth.php?products=1');
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            const data = await response.json();
+            if (data.products && Array.isArray(data.products)) {
+                PRODUCTS = data.products.map(p => ({ id: p.id, name: p.name }));
+                initEmptyRecords();
+                renderTable();
+            } else {
+                throw new Error('Invalid products response');
+            }
+        } catch (err) {
+            console.error(err);
+            showError('Failed to load products. Using fallback.');
+            // Fallback static list
+            PRODUCTS = [
+                { id: 1, name: "Product A" },
+                { id: 2, name: "Product B" },
+                { id: 3, name: "Product C" },
+                { id: 4, name: "Product D" }
+            ];
+            initEmptyRecords();
+            renderTable();
+        }
+    }
+
+    // Save current records to backend
+    async function saveToBackend() {
         const date = document.getElementById('recordDate').value;
         if (!date) {
-            alert('Please select a date');
-            return false;
+            showError('Please select a date');
+            return;
         }
 
-        const dataToStore = {
-            branch: 'Janeth',
+        const payload = {
             date: date,
             records: records.map(rec => ({
                 product_id: rec.productId,
@@ -185,65 +223,62 @@
             }))
         };
 
-        // Get existing storage for Janeth
-        const storageKey = `janeth_data_${date}`;
-        localStorage.setItem(storageKey, JSON.stringify(dataToStore.records));
-        
-        // Also keep a master list of saved dates
-        let savedDates = JSON.parse(localStorage.getItem('janeth_saved_dates') || '[]');
-        if (!savedDates.includes(date)) {
-            savedDates.push(date);
-            localStorage.setItem('janeth_saved_dates', JSON.stringify(savedDates));
+        try {
+            const response = await fetch('../backend/janeth.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            if (data.success) {
+                alert(data.message);
+            } else {
+                showError('Save error: ' + (data.error || 'Unknown error'));
+            }
+        } catch (err) {
+            console.error(err);
+            showError('Network error while saving');
         }
-
-        alert(`✅ Data saved for ${date}`);
-        return true;
     }
 
-    // Load data for the selected date from localStorage
-    function loadFromLocalStorage() {
+    // Load data for selected date from backend
+    async function loadFromBackend() {
         const date = document.getElementById('recordDate').value;
-        const storageKey = `janeth_data_${date}`;
-        const savedRecords = localStorage.getItem(storageKey);
-        
-        if (!savedRecords) {
-            if (confirm(`No data found for ${date}. Do you want to start fresh?`)) {
-                initEmptyRecords();
-                renderTable();
-            }
+        if (!date) {
+            showError('Please select a date');
             return;
         }
 
-        const parsed = JSON.parse(savedRecords);
-        // Match saved records with product list (some products might be missing in old data)
-        const newRecords = PRODUCTS.map(prod => {
-            const found = parsed.find(p => p.product_id === prod.id);
-            if (found) {
-                return {
-                    productId: prod.id,
-                    productName: prod.name,
-                    yesterday: found.yesterday_qty || 0,
-                    stockIn: found.stock_in || 0,
-                    distributed: found.distributed || 0,
-                    sold: found.sold || 0
-                };
+        try {
+            const response = await fetch(`../backend/janeth.php?date=${date}`);
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            const data = await response.json();
+            if (data.records) {
+                // transform records into our internal format
+                const newRecords = data.records.map(r => ({
+                    productId: r.product_id,
+                    productName: r.product_name,
+                    yesterday: r.yesterday_qty,
+                    stockIn: r.stock_in,
+                    distributed: r.distributed,
+                    sold: r.sold
+                }));
+                records = newRecords;
+                renderTable();
+                alert(`Loaded data for ${date}`);
             } else {
-                return {
-                    productId: prod.id,
-                    productName: prod.name,
-                    yesterday: 0,
-                    stockIn: 0,
-                    distributed: 0,
-                    sold: 0
-                };
+                if (confirm(`No data found for ${date}. Start with empty form?`)) {
+                    initEmptyRecords();
+                    renderTable();
+                }
             }
-        });
-        records = newRecords;
-        renderTable();
-        alert(`Loaded data for ${date}`);
+        } catch (err) {
+            console.error(err);
+            showError('Failed to load data from server');
+        }
     }
 
-    // Reset all fields to zero for current form (without auto-saving)
+    // Reset current form to all zeros (without saving)
     function resetForm() {
         if (confirm('Clear all entries on this screen? Unsaved changes will be lost.')) {
             initEmptyRecords();
@@ -252,13 +287,15 @@
     }
 
     // Event listeners
-    document.getElementById('saveBtn').addEventListener('click', saveToLocalStorage);
+    document.getElementById('saveBtn').addEventListener('click', saveToBackend);
     document.getElementById('resetBtn').addEventListener('click', resetForm);
-    document.getElementById('loadDateBtn').addEventListener('click', loadFromLocalStorage);
-    
-    // Initial load
-    initEmptyRecords();
-    renderTable();
+    document.getElementById('loadDateBtn').addEventListener('click', loadFromBackend);
+
+    // Initial load: fetch products and then (optionally) load today's data if any
+    fetchProducts().then(() => {
+        // auto-load existing data for the default date (optional)
+        // loadFromBackend(); // uncomment if you want auto-load on page load
+    });
 </script>
 </body>
 </html>
