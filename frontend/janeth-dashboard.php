@@ -15,7 +15,6 @@ $user_role = $_SESSION['role'];
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        /* ========== (same CSS as your previous working dashboard, no changes needed) ========== */
         :root {
             --bg: #0d1117;
             --surface: #161b24;
@@ -55,7 +54,7 @@ $user_role = $_SESSION['role'];
                 radial-gradient(ellipse 60% 40% at 90% 110%, rgba(245,166,35,0.05) 0%, transparent 60%);
         }
 
-        .dashboard { max-width: 1600px; margin: 0 auto; }
+        .dashboard { max-width: 1400px; margin: 0 auto; }
 
         /* Header */
         .header {
@@ -65,7 +64,6 @@ $user_role = $_SESSION['role'];
             padding-bottom: 1.25rem;
             border-bottom: 1px solid var(--border);
         }
-
         .logo { display: flex; align-items: center; gap: 0.75rem; }
         .logo-icon {
             width: 40px; height: 40px;
@@ -93,10 +91,7 @@ $user_role = $_SESSION['role'];
             font-size: 0.65rem; font-weight: 700; color: #0d1117;
         }
         .user-name { font-size: 0.8rem; font-weight: 500; }
-        .role-tag {
-            font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em;
-            text-transform: uppercase; color: var(--text-faint);
-        }
+        .role-tag { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint); }
 
         /* Buttons */
         .btn {
@@ -131,19 +126,8 @@ $user_role = $_SESSION['role'];
             font-family: 'Sora', sans-serif; font-size: 0.8rem;
             padding: 0.45rem 0.85rem; outline: none; transition: 0.18s;
         }
-        input[type="text"]:focus, select:focus {
-            border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-dim);
-        }
+        input[type="text"]:focus, select:focus { border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-dim); }
         select option { background: #1e2633; }
-
-        .checkbox-label {
-            display: flex; align-items: center; gap: 0.4rem;
-            font-size: 0.78rem; color: var(--text-muted); cursor: pointer;
-        }
-        .checkbox-label input[type="checkbox"] {
-            accent-color: var(--teal); width: 14px; height: 14px;
-            padding: 0; background: none; border: none;
-        }
 
         /* Low-stock alert */
         .lowstock-alert {
@@ -158,14 +142,13 @@ $user_role = $_SESSION['role'];
         }
         .lowstock-alert.show { display: flex; }
 
-        /* Stat cards */
+        /* Stat cards – now 2 cards + best seller */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 1rem; margin-bottom: 1.25rem;
         }
-        @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 480px) { .stats-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 700px) { .stats-grid { grid-template-columns: 1fr; } }
 
         .stat-card {
             background: var(--surface); border: 1px solid var(--border);
@@ -174,41 +157,21 @@ $user_role = $_SESSION['role'];
             transition: 0.2s; cursor: default; overflow: hidden;
         }
         .stat-card:hover { border-color: var(--teal); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
-
         .stat-info { min-width: 0; flex: 1; }
-
-        .stat-label {
-            font-size: 0.67rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.08em; color: var(--text-faint); margin-bottom: 0.45rem;
-        }
+        .stat-label { font-size: 0.67rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-faint); margin-bottom: 0.45rem; }
         .stat-number {
-            font-size: clamp(1.2rem, 2.5vw, 2rem);
+            font-size: clamp(1rem, 2.2vw, 1.75rem);
             font-weight: 700; line-height: 1.2;
             font-family: 'DM Mono', monospace;
-            color: var(--text);
-            overflow-x: auto;
-            white-space: normal;
-            word-break: break-word;
-            max-width: 100%;
+            color: var(--text); word-break: break-word;
         }
         .stat-number.accent { color: var(--accent); }
         .stat-number.teal   { color: var(--teal); }
         .stat-number.green  { color: var(--success); }
-
-        .stat-name {
-            font-size: 0.82rem; font-weight: 600; color: var(--text); line-height: 1.3;
-            margin-top: 0.25rem;
-        }
-
-        .stat-icon {
-            width: 36px; height: 36px;
-            border-radius: 10px; display: flex;
-            align-items: center; justify-content: center;
-            font-size: 1rem; flex-shrink: 0;
-        }
+        .stat-name { font-size: 0.82rem; font-weight: 600; color: var(--text); line-height: 1.3; margin-top: 0.25rem; }
+        .stat-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
         .stat-icon.blue  { background: var(--teal-dim); }
         .stat-icon.amber { background: var(--accent-dim); }
-        .stat-icon.green { background: var(--success-dim); }
         .stat-icon.star  { background: rgba(251,191,36,0.1); }
 
         /* Chart */
@@ -217,16 +180,29 @@ $user_role = $_SESSION['role'];
             border-radius: var(--radius); padding: 1.25rem;
             margin-bottom: 1.25rem;
         }
-        .chart-title {
-            font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.08em; color: var(--text-faint); margin-bottom: 1rem;
+        .chart-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;
         }
-        .chart-container {
-            position: relative; height: 240px; width: 100%;
+        .chart-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-faint); }
+
+        /* Chart category toggle */
+        .chart-tabs { display: flex; gap: 0.4rem; }
+        .chart-tab {
+            padding: 0.3rem 0.85rem; border-radius: 50px;
+            font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em;
+            cursor: pointer; border: 1px solid var(--border);
+            background: var(--surface-2); color: var(--text-muted);
+            font-family: 'Sora', sans-serif; transition: 0.15s;
         }
+        .chart-tab.active-chicken { background: rgba(251,191,36,0.15); color: var(--chicken); border-color: rgba(251,191,36,0.3); }
+        .chart-tab.active-frozen  { background: rgba(96,165,250,0.12); color: var(--frozen);  border-color: rgba(96,165,250,0.25); }
+        .chart-tab:hover:not(.active-chicken):not(.active-frozen) { border-color: var(--teal); color: var(--teal); }
+
+        .chart-container { position: relative; height: 240px; width: 100%; }
         .chart-container canvas { max-height: 240px; }
 
-        /* Table */
+        /* Product table with category tabs */
         .table-wrap {
             background: var(--surface); border: 1px solid var(--border);
             border-radius: var(--radius); overflow: hidden; margin-bottom: 1.25rem;
@@ -234,73 +210,70 @@ $user_role = $_SESSION['role'];
         .table-header-bar {
             display: flex; justify-content: space-between; align-items: center;
             padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border);
-            background: var(--surface-2);
+            background: var(--surface-2); flex-wrap: wrap; gap: 0.75rem;
         }
         .table-title { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; }
         .record-count { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--text-faint); }
 
-        .table-scroll { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 820px; }
+        /* Category tabs inside table */
+        .cat-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); }
+        .cat-tab {
+            padding: 0.7rem 1.5rem; font-size: 0.78rem; font-weight: 700;
+            cursor: pointer; border: none; font-family: 'Sora', sans-serif;
+            background: transparent; color: var(--text-muted); transition: 0.15s;
+            border-bottom: 2px solid transparent; margin-bottom: -1px;
+            letter-spacing: 0.04em;
+        }
+        .cat-tab:hover { color: var(--text); }
+        .cat-tab.active-chicken { color: var(--chicken); border-bottom-color: var(--chicken); }
+        .cat-tab.active-frozen  { color: var(--frozen);  border-bottom-color: var(--frozen); }
 
+        .table-scroll { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
         thead tr { border-bottom: 1px solid var(--border); }
         th {
-            padding: 0.7rem 1rem; text-align: center;
+            padding: 0.7rem 1rem; text-align: right;
             font-size: 0.67rem; font-weight: 700; text-transform: uppercase;
             letter-spacing: 0.09em; color: var(--text-faint); background: var(--surface-2);
             white-space: nowrap; cursor: pointer; user-select: none; transition: 0.15s;
         }
         th:hover { color: var(--teal); }
-        th:first-child, th:nth-child(2) { text-align: left; }
+        th:first-child { text-align: left; }
+        th:nth-child(2) { text-align: right; }
 
         tbody tr { border-bottom: 1px solid var(--border); transition: background 0.14s; }
         tbody tr:last-child { border-bottom: none; }
         tbody tr:hover { background: var(--surface-2); }
-        tbody tr.zero-row { opacity: 0.45; }
 
-        td {
-            padding: 0.65rem 1rem; font-size: 0.81rem;
-            color: var(--text); text-align: center; vertical-align: middle;
+        td { padding: 0.65rem 1rem; font-size: 0.81rem; color: var(--text); text-align: right; vertical-align: middle; }
+        td:first-child { text-align: left; }
+
+        .mono { font-family: 'DM Mono', monospace; font-size: 0.8rem; font-weight: 600; }
+        .peso-sold  { color: var(--success); }
+        .peso-rem   { color: var(--accent); }
+        .qty-sold   { color: var(--teal); }
+        .qty-rem-green  { color: var(--success); }
+        .qty-rem-yellow { color: var(--warning); }
+        .qty-rem-red    { color: var(--danger); }
+        .qty-rem-gray   { color: var(--text-faint); }
+
+        /* Totals row */
+        .totals-bar {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            border-top: 1px solid var(--border);
         }
-        td:first-child, td:nth-child(2) { text-align: left; }
-
-        .badge {
-            display: inline-flex; align-items: center; gap: 0.3rem;
-            padding: 0.22rem 0.65rem; border-radius: 50px;
-            font-size: 0.67rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+        .total-cell {
+            padding: 1rem 1.25rem;
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 0.5rem;
         }
-        .badge-chicken { background: rgba(251,191,36,0.12); color: var(--chicken); border: 1px solid rgba(251,191,36,0.2); }
-        .badge-frozen  { background: rgba(96,165,250,0.1);  color: var(--frozen);  border: 1px solid rgba(96,165,250,0.2); }
-
-        .status-pill {
-            display: inline-flex; align-items: center; gap: 0.3rem;
-            padding: 0.22rem 0.65rem; border-radius: 50px;
-            font-size: 0.67rem; font-weight: 700; letter-spacing: 0.04em;
-        }
-        .status-healthy  { background: var(--success-dim);  color: var(--success); border: 1px solid rgba(52,211,153,0.2); }
-        .status-low      { background: var(--warning-dim);  color: var(--warning); border: 1px solid rgba(251,191,36,0.2); }
-        .status-critical { background: var(--danger-dim);   color: var(--danger);  border: 1px solid rgba(248,113,113,0.2); }
-        .status-out      { background: rgba(100,116,139,0.12); color: #64748b;     border: 1px solid rgba(100,116,139,0.2); }
-
-        .stock-val { font-family: 'DM Mono', monospace; font-size: 0.8rem; font-weight: 600; }
-        .stock-green  { color: var(--success); }
-        .stock-yellow { color: var(--warning); }
-        .stock-red    { color: var(--danger); }
-
-        .sold-val { font-family: 'DM Mono', monospace; font-weight: 700; color: var(--text); }
-        .nosales-badge {
-            display: inline-flex; align-items: center; gap: 0.2rem;
-            font-size: 0.62rem; font-weight: 600; color: var(--text-faint);
-            background: var(--surface-3); border-radius: 50px;
-            padding: 0.15rem 0.5rem; margin-left: 0.35rem;
-        }
-
-        .view-btn {
-            background: var(--surface-3); border: 1px solid var(--border);
-            color: var(--text-muted); font-size: 0.7rem; font-weight: 600;
-            font-family: 'Sora', sans-serif; padding: 0.25rem 0.65rem;
-            border-radius: 50px; cursor: pointer; transition: 0.15s;
-        }
-        .view-btn:hover { border-color: var(--teal); color: var(--teal); }
+        .total-cell:first-child { border-right: 1px solid var(--border); }
+        .total-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-faint); }
+        .total-amount { font-family: 'DM Mono', monospace; font-size: 1.1rem; font-weight: 700; }
+        .total-amount.sold-color { color: var(--success); }
+        .total-amount.rem-color  { color: var(--accent); }
 
         /* Pagination */
         .pagination {
@@ -317,7 +290,6 @@ $user_role = $_SESSION['role'];
         }
         .page-btn:hover { border-color: var(--teal); color: var(--teal); }
         .page-btn.active { background: var(--accent); color: #0d1117; border-color: var(--accent); }
-        .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
         .footer {
             text-align: center; font-size: 0.7rem;
@@ -325,10 +297,7 @@ $user_role = $_SESSION['role'];
             margin-top: 0.5rem; padding-bottom: 1rem;
         }
 
-        .state-row td {
-            padding: 3rem; text-align: center;
-            color: var(--text-faint); font-size: 0.85rem;
-        }
+        .state-row td { padding: 3rem; text-align: center; color: var(--text-faint); font-size: 0.85rem; }
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -338,6 +307,8 @@ $user_role = $_SESSION['role'];
         @media (max-width: 640px) {
             body { padding: 1rem; }
             .controls { flex-direction: column; align-items: stretch; }
+            .totals-bar { grid-template-columns: 1fr; }
+            .total-cell:first-child { border-right: none; border-bottom: 1px solid var(--border); }
         }
     </style>
 </head>
@@ -375,14 +346,6 @@ $user_role = $_SESSION['role'];
         </div>
         <div class="controls-group">
             <input type="text" id="searchInput" placeholder="🔍 Search product…" style="width:180px;">
-            <select id="categoryFilter">
-                <option value="all">All Categories</option>
-                <option value="Chicken">🐔 Chicken</option>
-                <option value="Frozen">❄️ Frozen</option>
-            </select>
-            <label class="checkbox-label">
-                <input type="checkbox" id="hideZeroRows"> Hide zero rows
-            </label>
         </div>
         <div class="controls-group">
             <button class="btn btn-ghost" id="exportBtn">📎 Export CSV</button>
@@ -395,28 +358,21 @@ $user_role = $_SESSION['role'];
         ⚠️ <span id="lowStockMsg"></span>
     </div>
 
-    <!-- Stats -->
+    <!-- Stats: Total Sales (₱), Best Seller -->
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-info">
                 <div class="stat-label">Total Sales</div>
-                <div class="stat-number teal" id="totalSold">0</div>
+                <div class="stat-number teal" id="totalSoldPeso">₱0.00</div>
             </div>
-            <div class="stat-icon blue">📈</div>
+            <div class="stat-icon blue">💰</div>
         </div>
         <div class="stat-card">
             <div class="stat-info">
-                <div class="stat-label">Remaining Stock</div>
-                <div class="stat-number accent" id="totalRemaining">0</div>
+                <div class="stat-label">Remaining Value</div>
+                <div class="stat-number accent" id="totalRemainingPeso">₱0.00</div>
             </div>
             <div class="stat-icon amber">🏷️</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-info">
-                <div class="stat-label">Total Available</div>
-                <div class="stat-number green" id="totalStock">0</div>
-            </div>
-            <div class="stat-icon green">📦</div>
         </div>
         <div class="stat-card">
             <div class="stat-info">
@@ -427,39 +383,63 @@ $user_role = $_SESSION['role'];
         </div>
     </div>
 
-    <!-- Chart -->
+    <!-- Chart with Chicken/Frozen tab -->
     <div class="chart-card">
-        <div class="chart-title">📊 Sales per product (units sold)</div>
+        <div class="chart-header">
+            <div class="chart-title">📊 Sales per product (₱ sold)</div>
+            <div class="chart-tabs">
+                <button class="chart-tab active-chicken" id="chartTabChicken" onclick="switchChartTab('Chicken')">🐔 Chicken</button>
+                <button class="chart-tab" id="chartTabFrozen"  onclick="switchChartTab('Frozen')">❄️ Frozen</button>
+            </div>
+        </div>
         <div class="chart-container">
             <canvas id="salesChart"></canvas>
         </div>
     </div>
 
-    <!-- Table -->
+    <!-- Product Records Table with Chicken/Frozen tabs -->
     <div class="table-wrap">
         <div class="table-header-bar">
             <span class="table-title">Product Records</span>
             <span class="record-count" id="recordCount">— items</span>
         </div>
+
+        <!-- Category tabs -->
+        <div class="cat-tabs">
+            <button class="cat-tab active-chicken" id="tabChicken" onclick="switchTableTab('Chicken')">🐔 Chicken</button>
+            <button class="cat-tab" id="tabFrozen" onclick="switchTableTab('Frozen')">❄️ Frozen</button>
+        </div>
+
         <div class="table-scroll">
             <table id="dataTable">
                 <thead>
                     <tr>
-                        <th data-sort="category">Category</th>
-                        <th data-sort="name">Product</th>
-                        <th data-sort="yesterday">Yesterday</th>
-                        <th data-sort="stockin">Stock In</th>
-                        <th data-sort="remaining">Remaining</th>
-                        <th data-sort="sold">Sold</th>
-                        <th data-sort="status">Status</th>
-                        <th></th>
+                        <th>Product</th>
+                        <th>Price (₱)</th>
+                        <th>Qty Sold</th>
+                        <th>Sold (₱)</th>
+                        <th>Qty Remaining</th>
+                        <th>Remaining (₱)</th>
                     </tr>
                 </thead>
                 <tbody id="dashboardBody">
-                    <tr class="state-row"><td colspan="8">Select a date and click Load</td></tr>
+                    <tr class="state-row"><td colspan="6">Select a date and click Load</td></tr>
                 </tbody>
             </table>
         </div>
+
+        <!-- Totals bar -->
+        <div class="totals-bar">
+            <div class="total-cell">
+                <span class="total-label">Total Sold (₱)</span>
+                <span class="total-amount sold-color" id="tableTotalSold">₱0.00</span>
+            </div>
+            <div class="total-cell">
+                <span class="total-label">Total Remaining (₱)</span>
+                <span class="total-amount rem-color" id="tableTotalRemaining">₱0.00</span>
+            </div>
+        </div>
+
         <div id="paginationControls" class="pagination"></div>
     </div>
 
@@ -471,29 +451,38 @@ $user_role = $_SESSION['role'];
 
 <script>
     const API_BASE = window.location.origin + '/Janeth_Business/Janeth-Chicken-Business/backend/janeth.php';
-    let fullRecords = [], filteredRecords = [], currentPage = 1, rowsPerPage = 15;
-    let currentSort = { column: 'id', direction: 'asc' };   // default sort by product_id ascending
+    let fullRecords = [];
+    let currentTableTab = 'Chicken';
+    let currentChartTab = 'Chicken';
+    let currentPage = 1;
+    const rowsPerPage = 15;
     let salesChart = null;
+
+    function formatPeso(val) {
+        const n = parseFloat(val) || 0;
+        return '₱' + n.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function formatNum(val) {
+        const n = parseFloat(val) || 0;
+        return (n % 1 === 0) ? n.toString() : n.toFixed(2);
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m]));
+    }
 
     function updateLastUpdated() {
         document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
     }
 
     function showError(msg) {
-        const tbody = document.getElementById('dashboardBody');
-        tbody.innerHTML = `<tr class="state-row"><td colspan="8">⚠️ ${msg}</td></tr>`;
-        document.getElementById('totalSold').textContent = '0';
-        document.getElementById('totalRemaining').textContent = '0';
-        document.getElementById('totalStock').textContent = '0';
+        document.getElementById('dashboardBody').innerHTML = `<tr class="state-row"><td colspan="6">⚠️ ${msg}</td></tr>`;
+        ['totalSoldPeso','totalRemainingPeso'].forEach(id => document.getElementById(id).textContent = '₱0.00');
         document.getElementById('bestSeller').textContent = '—';
         document.getElementById('recordCount').textContent = '0 items';
-    }
-
-    function getStatus(remaining) {
-        if (remaining === 0)                    return { text: 'Out of Stock', cls: 'status-out' };
-        if (remaining >= 1 && remaining <= 3)   return { text: 'Critical',     cls: 'status-critical' };
-        if (remaining >= 4 && remaining <= 10)  return { text: 'Low Stock',    cls: 'status-low' };
-        return { text: 'Healthy', cls: 'status-healthy' };
+        document.getElementById('tableTotalSold').textContent = '₱0.00';
+        document.getElementById('tableTotalRemaining').textContent = '₱0.00';
     }
 
     function updateLowStockWidget(records) {
@@ -508,111 +497,159 @@ $user_role = $_SESSION['role'];
         }
     }
 
-    function sortRecords(records) {
-        const { column, direction } = currentSort;
-        return [...records].sort((a, b) => {
-            let vA, vB;
-            if      (column === 'id')        { vA = a.product_id; vB = b.product_id; }
-            else if (column === 'category')  { vA = a.product_category; vB = b.product_category; }
-            else if (column === 'name')      { vA = a.product_name; vB = b.product_name; }
-            else if (column === 'yesterday') { vA = a.yesterday_qty; vB = b.yesterday_qty; }
-            else if (column === 'stockin')   { vA = a.stock_in; vB = b.stock_in; }
-            else if (column === 'remaining') { vA = a.remaining_qty; vB = b.remaining_qty; }
-            else if (column === 'sold')      { vA = a.sold; vB = b.sold; }
-            else if (column === 'status')    { vA = getStatus(a.remaining_qty).text; vB = getStatus(b.remaining_qty).text; }
-            else return 0;
-            if (vA < vB) return direction === 'asc' ? -1 : 1;
-            if (vA > vB) return direction === 'asc' ? 1 : -1;
-            return 0;
-        });
+    function getQtyClass(remaining) {
+        if (remaining === 0)                  return 'qty-rem-gray';
+        if (remaining <= 3)                   return 'qty-rem-red';
+        if (remaining <= 10)                  return 'qty-rem-yellow';
+        return 'qty-rem-green';
     }
 
-    function applyFiltersAndRender() {
-        const term     = document.getElementById('searchInput').value.toLowerCase();
-        const cat      = document.getElementById('categoryFilter').value;
-        const hideZero = document.getElementById('hideZeroRows').checked;
+    function getSearchTerm() {
+        return document.getElementById('searchInput').value.toLowerCase();
+    }
 
-        let filtered = fullRecords.filter(rec => {
-            if (!rec.product_name.toLowerCase().includes(term)) return false;
-            if (cat !== 'all' && rec.product_category !== cat) return false;
-            if (hideZero) {
-                const total = rec.yesterday_qty + rec.stock_in;
-                if (total === 0 && rec.sold === 0 && rec.remaining_qty === 0) return false;
-            }
-            return true;
+    function getFilteredByTab(tab) {
+        const term = getSearchTerm();
+        return fullRecords.filter(r =>
+            r.product_category === tab &&
+            r.product_name.toLowerCase().includes(term)
+        );
+    }
+
+    function renderAll() {
+        // Global stats over ALL records
+        const term = getSearchTerm();
+        const visible = fullRecords.filter(r => r.product_name.toLowerCase().includes(term));
+
+        let totalSoldPeso = 0, totalRemPeso = 0, best = { name: '—', sold_peso: 0 };
+        visible.forEach(r => {
+            const price = parseFloat(r.price) || 0;
+            const soldPeso = r.sold * price;
+            const remPeso  = r.remaining_qty * price;
+            totalSoldPeso += soldPeso;
+            totalRemPeso  += remPeso;
+            if (soldPeso > best.sold_peso) best = { name: r.product_name, sold_peso: soldPeso };
         });
 
-        filtered = sortRecords(filtered);
-        filteredRecords = filtered;
+        document.getElementById('totalSoldPeso').textContent = formatPeso(totalSoldPeso);
+        document.getElementById('totalRemainingPeso').textContent = formatPeso(totalRemPeso);
 
-        let totalSold = 0, totalRemaining = 0, totalStock = 0;
-        let best = { name: '—', sold: 0 };
-        filtered.forEach(r => {
-            totalSold      += r.sold;
-            totalRemaining += r.remaining_qty;
-            totalStock     += r.yesterday_qty + r.stock_in;
-            if (r.sold > best.sold) best = { name: r.product_name, sold: r.sold };
-        });
-
-        document.getElementById('totalSold').textContent = formatNumber(totalSold);
-        document.getElementById('totalRemaining').textContent = formatNumber(totalRemaining);
-        document.getElementById('totalStock').textContent = formatNumber(totalStock);
         const bs = document.getElementById('bestSeller');
         if (best.name !== '—') {
-            bs.innerHTML = `<span style="font-family:'DM Mono',monospace;font-size:1.2rem;font-weight:700;color:var(--accent)">${formatNumber(best.sold)}</span><br><span style="font-size:0.78rem;color:var(--text-muted)">${escapeHtml(best.name)}</span>`;
+            bs.innerHTML = `<span style="font-family:'DM Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--accent)">${formatPeso(best.sold_peso)}</span><br><span style="font-size:0.78rem;color:var(--text-muted)">${escapeHtml(best.name)}</span>`;
         } else {
             bs.textContent = '—';
         }
 
-        document.getElementById('recordCount').textContent = `${filtered.length} item${filtered.length !== 1 ? 's' : ''}`;
-
-        updateChart(filtered.filter(r => r.sold > 0));
-        updateLowStockWidget(filtered);
-
-        const totalPages = Math.ceil(filtered.length / rowsPerPage);
-        if (currentPage > totalPages) currentPage = Math.max(1, totalPages);
-        const start = (currentPage - 1) * rowsPerPage;
-        renderTableRows(filtered.slice(start, start + rowsPerPage));
-        renderPagination(totalPages);
+        updateLowStockWidget(visible);
+        renderChart(currentChartTab);
+        renderTable(currentTableTab);
     }
 
-    function formatNumber(value) {
-        if (value === undefined || value === null) return '0';
-        let num = parseFloat(value);
-        if (isNaN(num)) return '0';
-        return (num % 1 === 0) ? num.toString() : num.toFixed(2);
-    }
+    function renderChart(tab) {
+        const records = getFilteredByTab(tab).filter(r => r.sold > 0);
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        if (salesChart) salesChart.destroy();
 
-    function renderTableRows(rows) {
-        const tbody = document.getElementById('dashboardBody');
-        if (!rows.length) {
-            tbody.innerHTML = '<tr class="state-row"><td colspan="8">No matching records found.</td></tr>';
+        if (!records.length) {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            ctx.font = "14px Sora, sans-serif";
+            ctx.fillStyle = "#3d4d63";
+            ctx.textAlign = "center";
+            ctx.fillText(`No ${tab} sales data for this period`, ctx.canvas.width / 2, 100);
             return;
         }
-        tbody.innerHTML = rows.map(rec => {
-            const sold       = rec.sold;
-            const remaining  = rec.remaining_qty;
-            const totalAvail = rec.yesterday_qty + rec.stock_in;
-            const status     = getStatus(remaining);
-            const isZero     = totalAvail === 0 && sold === 0 && remaining === 0;
-            const noSales    = sold === 0 && totalAvail > 0;
 
-            const stockCls = remaining === 0 ? 'stock-red' : remaining <= 3 ? 'stock-red' : remaining <= 10 ? 'stock-yellow' : 'stock-green';
-            const catLabel = rec.product_category === 'Chicken' ? '🐔 Chicken' : '❄️ Frozen';
-            const catCls   = rec.product_category === 'Chicken' ? 'badge-chicken' : 'badge-frozen';
-            const noSalesBadge = noSales ? '<span class="nosales-badge">⚠️ No sales</span>' : '';
+        const isChicken = tab === 'Chicken';
+        const color     = isChicken ? 'rgba(251,191,36,0.75)' : 'rgba(96,165,250,0.75)';
+        const border    = isChicken ? 'rgba(251,191,36,1)'    : 'rgba(96,165,250,1)';
 
-            return `<tr${isZero ? ' class="zero-row"' : ''}>
-                <td><span class="badge ${catCls}">${catLabel}</span></td>
+        const labels = records.map(r => r.product_name.length > 18 ? r.product_name.slice(0, 16) + '…' : r.product_name);
+        const data   = records.map(r => ((parseFloat(r.price) || 0) * r.sold).toFixed(2));
+
+        salesChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Sales (₱)',
+                    data,
+                    backgroundColor: color,
+                    borderColor: border,
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    barPercentage: 0.65,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { labels: { color: '#6b7a93', font: { family: 'Sora', size: 11 } } },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => ' ₱' + parseFloat(ctx.parsed.y).toLocaleString('en-PH', { minimumFractionDigits: 2 })
+                        }
+                    }
+                },
+                scales: {
+                    x: { ticks: { color: '#6b7a93', font: { family: 'Sora', size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' } },
+                    y: {
+                        ticks: {
+                            color: '#6b7a93', font: { family: 'DM Mono', size: 10 },
+                            callback: v => '₱' + v.toLocaleString('en-PH')
+                        },
+                        grid: { color: 'rgba(255,255,255,0.04)' },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    function renderTable(tab) {
+        const records = getFilteredByTab(tab);
+        document.getElementById('recordCount').textContent = `${records.length} item${records.length !== 1 ? 's' : ''}`;
+
+        // Compute tab totals
+        let tabSold = 0, tabRem = 0;
+        records.forEach(r => {
+            const price = parseFloat(r.price) || 0;
+            tabSold += r.sold * price;
+            tabRem  += r.remaining_qty * price;
+        });
+        document.getElementById('tableTotalSold').textContent = formatPeso(tabSold);
+        document.getElementById('tableTotalRemaining').textContent = formatPeso(tabRem);
+
+        if (!records.length) {
+            document.getElementById('dashboardBody').innerHTML = '<tr class="state-row"><td colspan="6">No records found.</td></tr>';
+            document.getElementById('paginationControls').innerHTML = '';
+            return;
+        }
+
+        const totalPages = Math.ceil(records.length / rowsPerPage);
+        if (currentPage > totalPages) currentPage = 1;
+        const start = (currentPage - 1) * rowsPerPage;
+        const pageRecords = records.slice(start, start + rowsPerPage);
+
+        const tbody = document.getElementById('dashboardBody');
+        tbody.innerHTML = pageRecords.map(rec => {
+            const price    = parseFloat(rec.price) || 0;
+            const soldPeso = rec.sold * price;
+            const remPeso  = rec.remaining_qty * price;
+            const qcls     = getQtyClass(rec.remaining_qty);
+
+            return `<tr>
                 <td><strong style="font-size:0.83rem">${escapeHtml(rec.product_name)}</strong></td>
-                <td><span class="stock-val">${rec.yesterday_qty}</span></td>
-                <td><span class="stock-val">${rec.stock_in}</span></td>
-                <td><span class="stock-val ${stockCls}">${remaining}</span></td>
-                <td><span class="sold-val">${formatNumber(sold)}</span>${noSalesBadge}</td>
-                <td><span class="status-pill ${status.cls}">${status.text}</span></td>
-                <td><button class="view-btn" onclick="alert('📋 History for ${escapeHtml(rec.product_name)} (coming soon)')">View</button></td>
+                <td><span class="mono">${formatPeso(price)}</span></td>
+                <td><span class="mono qty-sold">${formatNum(rec.sold)}</span></td>
+                <td><span class="mono peso-sold">${formatPeso(soldPeso)}</span></td>
+                <td><span class="mono ${qcls}">${rec.remaining_qty}</span></td>
+                <td><span class="mono peso-rem">${formatPeso(remPeso)}</span></td>
             </tr>`;
         }).join('');
+
+        renderPagination(totalPages);
     }
 
     function renderPagination(totalPages) {
@@ -633,71 +670,27 @@ $user_role = $_SESSION['role'];
         c.innerHTML = html;
     }
 
-    function changePage(p) { currentPage = p; applyFiltersAndRender(); }
+    function changePage(p) { currentPage = p; renderTable(currentTableTab); }
 
-    function updateChart(records) {
-        const ctx = document.getElementById('salesChart').getContext('2d');
-        if (salesChart) salesChart.destroy();
-        if (!records.length) {
-            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-            ctx.font = "14px Sora, sans-serif";
-            ctx.fillStyle = "#3d4d63";
-            ctx.textAlign = "center";
-            ctx.fillText("No sales data for this period", ctx.canvas.width / 2, 100);
-            return;
-        }
-        const labels = records.map(r => r.product_name.length > 18 ? r.product_name.slice(0, 16) + '…' : r.product_name);
-        const data   = records.map(r => r.sold);
+    function switchTableTab(tab) {
+        currentTableTab = tab;
+        currentPage = 1;
+        document.getElementById('tabChicken').className = 'cat-tab' + (tab === 'Chicken' ? ' active-chicken' : '');
+        document.getElementById('tabFrozen').className  = 'cat-tab' + (tab === 'Frozen'  ? ' active-frozen'  : '');
+        renderTable(tab);
+    }
 
-        salesChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels,
-                datasets: [{
-                    label: 'Units Sold',
-                    data,
-                    backgroundColor: records.map(r =>
-                        r.product_category === 'Chicken'
-                            ? 'rgba(251,191,36,0.7)'
-                            : 'rgba(96,165,250,0.7)'
-                    ),
-                    borderColor: records.map(r =>
-                        r.product_category === 'Chicken'
-                            ? 'rgba(251,191,36,1)'
-                            : 'rgba(96,165,250,1)'
-                    ),
-                    borderWidth: 1,
-                    borderRadius: 6,
-                    barPercentage: 0.65,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        labels: { color: '#6b7a93', font: { family: 'Sora', size: 11 } }
-                    }
-                },
-                scales: {
-                    x: {
-                        ticks: { color: '#6b7a93', font: { family: 'Sora', size: 10 } },
-                        grid: { color: 'rgba(255,255,255,0.04)' }
-                    },
-                    y: {
-                        ticks: { color: '#6b7a93', font: { family: 'DM Mono', size: 10 } },
-                        grid: { color: 'rgba(255,255,255,0.04)' },
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
+    function switchChartTab(tab) {
+        currentChartTab = tab;
+        document.getElementById('chartTabChicken').className = 'chart-tab' + (tab === 'Chicken' ? ' active-chicken' : '');
+        document.getElementById('chartTabFrozen').className  = 'chart-tab' + (tab === 'Frozen'  ? ' active-frozen'  : '');
+        renderChart(tab);
     }
 
     async function loadDashboard() {
         const date = document.getElementById('dateSelect').value;
         if (!date) return showError('Please select a date');
-        document.getElementById('dashboardBody').innerHTML = '<tr class="state-row"><td colspan="8">⏳ Loading data…</td></tr>';
+        document.getElementById('dashboardBody').innerHTML = '<tr class="state-row"><td colspan="6">⏳ Loading data…</td></tr>';
         const btn = document.getElementById('loadDashboardBtn');
         btn.disabled = true;
         try {
@@ -706,12 +699,11 @@ $user_role = $_SESSION['role'];
             const data = await res.json();
             if (!data.records || !data.records.length) {
                 showError(`No records found for ${date}.`);
-                fullRecords = []; filteredRecords = [];
-                applyFiltersAndRender();
+                fullRecords = [];
             } else {
                 fullRecords = data.records;
                 currentPage = 1;
-                applyFiltersAndRender();
+                renderAll();
                 updateLastUpdated();
             }
         } catch (err) {
@@ -735,13 +727,8 @@ $user_role = $_SESSION['role'];
                     o.value = d; o.textContent = d;
                     sel.appendChild(o);
                 });
-                // Try to get last used date from localStorage (set by input page)
                 let lastDate = localStorage.getItem('janeth_last_date');
-                if (lastDate && data.dates.includes(lastDate)) {
-                    sel.value = lastDate;
-                } else {
-                    sel.value = data.dates[0];
-                }
+                sel.value = (lastDate && data.dates.includes(lastDate)) ? lastDate : data.dates[0];
                 await loadDashboard();
             } else {
                 sel.innerHTML = '<option>No saved data</option>';
@@ -754,36 +741,21 @@ $user_role = $_SESSION['role'];
     }
 
     function exportToCSV() {
-        if (!filteredRecords.length) return alert('No data to export');
+        if (!fullRecords.length) return alert('No data to export');
         const date = document.getElementById('dateSelect').value;
-        const rows = [['Category','Product','Yesterday','Stock In','Remaining','Sold'],
-            ...filteredRecords.map(r => [r.product_category, r.product_name, r.yesterday_qty, r.stock_in, r.remaining_qty, r.sold])];
+        const rows = [['Category','Product','Price','Qty Sold','Sold (PHP)','Qty Remaining','Remaining (PHP)'],
+            ...fullRecords.map(r => {
+                const price = parseFloat(r.price) || 0;
+                return [r.product_category, r.product_name, price.toFixed(2),
+                        r.sold, (r.sold * price).toFixed(2),
+                        r.remaining_qty, (r.remaining_qty * price).toFixed(2)];
+            })];
         const uri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(rows.map(r => r.join(',')).join('\n'));
         Object.assign(document.createElement('a'), { href: uri, download: `inventory_${date}.csv` }).click();
     }
 
-    function escapeHtml(s) { return String(s).replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m])); }
-
-    // Sort headers
-    document.querySelectorAll('th[data-sort]').forEach(th => {
-        th.addEventListener('click', () => {
-            const col = th.getAttribute('data-sort');
-            if (currentSort.column === col) {
-                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-            } else {
-                currentSort.column = col;
-                currentSort.direction = 'asc';
-            }
-            currentPage = 1;
-            applyFiltersAndRender();
-            // (Optional) visually indicate sort direction
-        });
-    });
-
     document.getElementById('loadDashboardBtn').addEventListener('click', loadDashboard);
-    document.getElementById('searchInput').addEventListener('input',    () => { currentPage=1; applyFiltersAndRender(); });
-    document.getElementById('categoryFilter').addEventListener('change',() => { currentPage=1; applyFiltersAndRender(); });
-    document.getElementById('hideZeroRows').addEventListener('change',  () => { currentPage=1; applyFiltersAndRender(); });
+    document.getElementById('searchInput').addEventListener('input', () => { currentPage = 1; renderAll(); });
     document.getElementById('exportBtn').addEventListener('click', exportToCSV);
 
     loadDateSelector();
