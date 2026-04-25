@@ -14,7 +14,6 @@ $user_role = $_SESSION['role'];
     <title>Janeth – Daily Entry</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        /* (CSS unchanged – same as your latest working version) */
         :root {
             --bg: #0d1117;
             --surface: #161b24;
@@ -95,12 +94,6 @@ $user_role = $_SESSION['role'];
         .btn-teal:hover { background: rgba(41,182,200,0.18); }
         .btn-pdf { background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.25); color: #f87171; }
         .btn-pdf:hover { background: rgba(248,113,113,0.22); }
-        .toggle-switch { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--surface-2); border-radius: 50px; padding: 0.25rem 0.75rem 0.25rem 0.85rem; border: 1px solid var(--border); }
-        .toggle-switch label { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); cursor: pointer; }
-        .toggle-switch input { width: 32px; height: 16px; appearance: none; background: var(--surface-3); border-radius: 32px; position: relative; cursor: pointer; transition: 0.2s; }
-        .toggle-switch input:checked { background: var(--teal); }
-        .toggle-switch input::before { content: ''; width: 12px; height: 12px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: 0.2s; }
-        .toggle-switch input:checked::before { left: 18px; }
 
         /* Date Hero */
         .date-hero {
@@ -116,12 +109,14 @@ $user_role = $_SESSION['role'];
         .date-hero-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem; font-family: 'DM Mono', monospace; }
         .date-hero-right { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
 
+        /* Yesterday source chip */
         .prev-chip {
             display: inline-flex; align-items: center; gap: 0.4rem;
             padding: 0.28rem 0.75rem; border-radius: 50px;
             font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em;
             background: var(--teal-dim); border: 1px solid rgba(41,182,200,0.25); color: var(--teal);
         }
+
         input[type="date"], input[type="text"], select {
             background: var(--surface-2); border: 1px solid var(--border);
             border-radius: var(--radius-sm); color: var(--text);
@@ -140,6 +135,7 @@ $user_role = $_SESSION['role'];
         .status-empty  { background: var(--accent-dim); border: 1px solid rgba(245,166,35,0.25); color: var(--accent); }
         .status-none   { background: var(--surface-2); border: 1px solid var(--border); color: var(--text-muted); }
 
+        /* Auto-save chip */
         .autosave-chip {
             display: inline-flex; align-items: center; gap: 0.35rem;
             padding: 0.25rem 0.7rem; border-radius: 50px;
@@ -150,10 +146,11 @@ $user_role = $_SESSION['role'];
         .autosave-chip.saving { border-color: rgba(41,182,200,0.3); color: var(--teal); background: var(--teal-dim); }
         .autosave-chip.saved  { border-color: rgba(52,211,153,0.25); color: var(--success); background: rgba(52,211,153,0.08); }
         .autosave-chip.error  { border-color: rgba(248,113,113,0.25); color: var(--danger); background: rgba(248,113,113,0.08); }
-        .autosave-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+        .autosave-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
         .autosave-chip.saving .autosave-dot { animation: blink 0.8s infinite; }
         @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
 
+        /* Controls */
         .controls {
             display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;
             background: var(--surface); border: 1px solid var(--border);
@@ -161,6 +158,7 @@ $user_role = $_SESSION['role'];
         }
         .controls-sep { flex: 1; }
 
+        /* Table sections */
         .table-wrap {
             background: var(--surface); border: 1px solid var(--border);
             border-radius: var(--radius); overflow: hidden; margin-bottom: 1.5rem;
@@ -190,11 +188,13 @@ $user_role = $_SESSION['role'];
         td:first-child { text-align: left; }
         .prod-name { font-weight: 600; font-size: 0.83rem; }
 
+        /* Yesterday cell */
         .yesterday-cell {
             display: inline-flex; align-items: center; gap: 0.4rem;
             font-family: 'DM Mono', monospace; font-size: 0.82rem;
             font-weight: 700; color: var(--teal);
         }
+        /* Small badge showing the source date */
         .yesterday-source {
             font-size: 0.58rem; font-weight: 600; letter-spacing: 0.04em;
             padding: 0.12rem 0.45rem; border-radius: 50px;
@@ -219,6 +219,7 @@ $user_role = $_SESSION['role'];
         .price-cell       { font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--accent); }
         .total-value-cell { font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--accent); }
 
+        /* Total row */
         .total-row td {
             background: rgba(245,166,35,0.06) !important;
             border-top: 1px solid rgba(245,166,35,0.18) !important;
@@ -232,8 +233,10 @@ $user_role = $_SESSION['role'];
             font-weight: 600 !important; text-transform: uppercase; letter-spacing: 0.07em;
             padding-right: 1.5rem !important;
         }
+
         .empty-section { padding: 2.5rem; text-align: center; color: var(--text-faint); font-size: 0.85rem; }
 
+        /* Modal */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.65);
             backdrop-filter: blur(8px); display: none;
@@ -252,6 +255,7 @@ $user_role = $_SESSION['role'];
         .modal-message { font-size: 0.92rem; color: var(--text); margin-bottom: 1.5rem; line-height: 1.5; font-weight: 500; }
         .modal-buttons { display: flex; gap: 0.75rem; justify-content: center; }
 
+        /* Print / PDF */
         @media print {
             body { background: #fff !important; color: #111 !important; padding: 0.75rem; }
             .header, .controls, .modal-overlay { display: none !important; }
@@ -342,7 +346,7 @@ $user_role = $_SESSION['role'];
         </div>
     </div>
 
-    <!-- Controls with Auto-save toggle -->
+    <!-- Controls -->
     <div class="controls">
         <input type="text" id="searchInput" placeholder="🔍 Search product…" style="width:200px">
         <select id="categoryFilter">
@@ -351,14 +355,10 @@ $user_role = $_SESSION['role'];
             <option value="Frozen">❄️ Frozen</option>
         </select>
         <div class="controls-sep"></div>
-        <div class="toggle-switch">
-            <span>⚡ Auto-save</span>
-            <input type="checkbox" id="autoSaveToggle">
-            <label for="autoSaveToggle"></label>
-        </div>
         <a href="janeth-dashboard.php" class="btn btn-ghost">📊 Dashboard</a>
         <button id="resetBtn" class="btn btn-ghost">⟳ Reset</button>
         <button id="exportPdfBtn" class="btn btn-pdf">📄 Export PDF</button>
+        <button id="saveBtn" class="btn btn-primary">💾 Save</button>
     </div>
 
     <!-- CHICKEN section -->
@@ -423,61 +423,6 @@ $user_role = $_SESSION['role'];
     let masterRecords  = [];
     let navGrid        = [];
 
-    let autoSaveTimer   = null;
-    let autoSaveEnabled = false;
-
-    /* ── Toggle ── */
-    const toggle = document.getElementById('autoSaveToggle');
-    toggle.addEventListener('change', () => {
-        autoSaveEnabled = toggle.checked;
-        if (!autoSaveEnabled) {
-            document.getElementById('autosaveLabel').textContent = 'Auto-save off';
-            document.getElementById('autosaveChip').className = 'autosave-chip';
-        } else {
-            document.getElementById('autosaveLabel').textContent = 'Auto-save on';
-            document.getElementById('autosaveChip').className = 'autosave-chip saved';
-            setTimeout(() => {
-                if (document.getElementById('autosaveChip').className.includes('saved'))
-                    document.getElementById('autosaveChip').className = 'autosave-chip';
-            }, 1500);
-        }
-    });
-
-    function setAutoSaveStatus(state) {
-        const chip  = document.getElementById('autosaveChip');
-        const label = document.getElementById('autosaveLabel');
-        chip.className = 'autosave-chip' + (state ? ' ' + state : '');
-        label.textContent = { saving:'Saving…', saved:'Saved ✓', error:'Save failed' }[state] ?? (autoSaveEnabled ? 'Auto-save on' : 'Auto-save off');
-    }
-
-    function scheduleAutoSave() {
-        if (!autoSaveEnabled) return;
-        clearTimeout(autoSaveTimer);
-        setAutoSaveStatus('saving');
-        autoSaveTimer = setTimeout(doSave, 1400);
-    }
-
-    async function doSave() {
-        const date = document.getElementById('recordDate').value;
-        if (!date) { setAutoSaveStatus('error'); return; }
-        const payload = {
-            date,
-            records: masterRecords.map(r => ({
-                product_id:    r.productId,
-                yesterday_qty: r.yesterday,
-                stock_in:      r.stockIn,
-                remaining_qty: r.remaining
-            }))
-        };
-        try {
-            const res  = await fetch(API_BASE, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-            const data = await res.json();
-            if (data.success) { setStatus('loaded'); setAutoSaveStatus('saved'); }
-            else setAutoSaveStatus('error');
-            setTimeout(() => setAutoSaveStatus(''), 2800);
-        } catch { setAutoSaveStatus('error'); setTimeout(() => setAutoSaveStatus(''), 2800); }
-    }
-
     /* ── Modal ── */
     function showModal(message, onConfirm, onCancel = null, icon = '💬') {
         document.getElementById('modalMessage').innerText = message;
@@ -497,21 +442,49 @@ $user_role = $_SESSION['role'];
         setTimeout(() => document.getElementById('modalOverlay').classList.remove('active'), 2200);
     }
 
+    /* ── Auto-save ── */
+    let autoSaveTimer   = null;
+    let autoSaveEnabled = false;
+
+    function setAutoSaveStatus(state) {
+        const chip  = document.getElementById('autosaveChip');
+        const label = document.getElementById('autosaveLabel');
+        chip.className = 'autosave-chip' + (state ? ' ' + state : '');
+        label.textContent = { saving:'Saving…', saved:'Saved ✓', error:'Save failed' }[state] ?? 'Auto-save off';
+    }
+    function scheduleAutoSave() {
+        if (!autoSaveEnabled) return;
+        clearTimeout(autoSaveTimer);
+        setAutoSaveStatus('saving');
+        autoSaveTimer = setTimeout(doSave, 1400);
+    }
+    async function doSave() {
+        const date = document.getElementById('recordDate').value;
+        if (!date) { setAutoSaveStatus('error'); return; }
+        const payload = {
+            date,
+            records: masterRecords.map(r => ({
+                product_id:    r.productId,
+                yesterday_qty: r.yesterday,   // ← always the prev-day remaining value
+                stock_in:      r.stockIn,
+                remaining_qty: r.remaining
+            }))
+        };
+        try {
+            const res  = await fetch(API_BASE, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+            const data = await res.json();
+            if (data.success) { setStatus('loaded'); setAutoSaveStatus('saved'); }
+            else setAutoSaveStatus('error');
+            setTimeout(() => setAutoSaveStatus(''), 2800);
+        } catch { setAutoSaveStatus('error'); setTimeout(() => setAutoSaveStatus(''), 2800); }
+    }
+
     /* ── Date helpers ── */
     function prevDate(dateStr) {
-        if (!dateStr) return '';
         const [y, m, d] = dateStr.split('-').map(Number);
-        const daysInMonth = (year, month) => new Date(year, month, 0).getDate();
-        let prevYear = y, prevMonth = m, prevDay = d - 1;
-        if (prevDay < 1) {
-            prevMonth -= 1;
-            if (prevMonth < 1) {
-                prevYear -= 1;
-                prevMonth = 12;
-            }
-            prevDay = daysInMonth(prevYear, prevMonth);
-        }
-        return `${prevYear}-${String(prevMonth).padStart(2,'0')}-${String(prevDay).padStart(2,'0')}`;
+        const dt = new Date(y, m - 1, d);
+        dt.setDate(dt.getDate() - 1);
+        return dt.toISOString().split('T')[0];
     }
 
     function setStatus(type) {
@@ -542,7 +515,6 @@ $user_role = $_SESSION['role'];
         updateHeroDate(v);
         setStatus('none');
         autoSaveEnabled = false;
-        toggle.checked = false;
         setAutoSaveStatus('');
         document.getElementById('prevChip').style.display = 'none';
     });
@@ -565,16 +537,22 @@ $user_role = $_SESSION['role'];
         if (next) { next.el.focus(); next.el.select(); }
     });
 
-    /* ── Row building (same as before) ── */
+    /* ── Build a single row ── */
     function buildRow(rec, globalIndex, rowIndex) {
         const tr = document.createElement('tr');
+
+        // Product name
         const tdName = document.createElement('td');
         tdName.innerHTML = `<span class="prod-name">${escapeHtml(rec.productName)}</span>`;
         tr.appendChild(tdName);
+
+        // Price
         const tdPrice = document.createElement('td');
         tdPrice.className = 'price-cell';
         tdPrice.textContent = `₱ ${Number(rec.price).toFixed(2)}`;
         tr.appendChild(tdPrice);
+
+        // Yesterday — read-only display of masterRecords[globalIndex].yesterday
         const tdYesterday = document.createElement('td');
         const yVal = masterRecords[globalIndex].yesterday;
         const fromPrev = masterRecords[globalIndex].yesterdayFromPrev;
@@ -586,6 +564,8 @@ $user_role = $_SESSION['role'];
                 <span class="yesterday-source">${fromPrev ? prevSrc : 'manual'}</span>
             </span>`;
         tr.appendChild(tdYesterday);
+
+        // Helper: editable input
         const makeInput = (field, colId) => {
             const td  = document.createElement('td');
             const inp = document.createElement('input');
@@ -608,15 +588,21 @@ $user_role = $_SESSION['role'];
             td.appendChild(inp);
             return td;
         };
+
+        // col IDs: stockIn=0, remaining=1
         tr.appendChild(makeInput('stockIn',   0));
         tr.appendChild(makeInput('remaining', 1));
+
+        // Stock In Total
         const tdTotal = document.createElement('td');
         tdTotal.className = 'total-value-cell';
         tdTotal.textContent = `₱ ${(rec.stockIn * rec.price).toFixed(2)}`;
         tr.appendChild(tdTotal);
+
         return tr;
     }
 
+    /* ── Chicken grand total row ── */
     function getChickenTotal() {
         return masterRecords.filter(r => r.category === 'Chicken').reduce((s, r) => s + r.stockIn * r.price, 0);
     }
@@ -627,45 +613,77 @@ $user_role = $_SESSION['role'];
     function buildChickenTotalRow() {
         const tr = document.createElement('tr');
         tr.className = 'total-row';
-        tr.innerHTML = `<td colspan="5" class="total-label">Total Chicken Stock In</td><td id="chickenTotalCell">₱ ${getChickenTotal().toFixed(2)}</td>`;
+        tr.innerHTML = `
+            <td colspan="5" class="total-label">Total Chicken Stock In</td>
+            <td id="chickenTotalCell">₱ ${getChickenTotal().toFixed(2)}</td>
+        `;
         return tr;
     }
 
+    /* ── Render both sections ── */
     function renderSections() {
         const term = document.getElementById('searchInput').value.toLowerCase();
         const cat  = document.getElementById('categoryFilter').value;
+
         const tagged   = masterRecords.map((r, i) => ({ ...r, _gi: i }));
-        const filtered = tagged.filter(r => r.productName.toLowerCase().includes(term) && (cat === 'all' || r.category === cat));
+        const filtered = tagged.filter(r =>
+            r.productName.toLowerCase().includes(term) && (cat === 'all' || r.category === cat)
+        );
         const chickens = filtered.filter(r => r.category === 'Chicken');
         const frozens  = filtered.filter(r => r.category === 'Frozen');
+
         const renderInto = (tbodyId, items, showTotal, countId) => {
             const tbody   = document.getElementById(tbodyId);
             const countEl = document.getElementById(countId);
             tbody.innerHTML = '';
-            if (!items.length) { tbody.innerHTML = `<tr><td colspan="6" class="empty-section">No products found.</td></tr>`; countEl.textContent = '0 items'; return; }
-            items.forEach((rec, rowIdx) => tbody.appendChild(buildRow(rec, rec._gi, rowIdx)));
+            if (!items.length) {
+                tbody.innerHTML = `<tr><td colspan="6" class="empty-section">No products found.</td></tr>`;
+                countEl.textContent = '0 items';
+                return;
+            }
+            items.forEach((rec, rowIdx) => {
+                tbody.appendChild(buildRow(rec, rec._gi, rowIdx));
+            });
             if (showTotal) tbody.appendChild(buildChickenTotalRow());
             countEl.textContent = `${items.length} item${items.length !== 1 ? 's' : ''}`;
         };
+
         renderInto('chickenBody', chickens, true,  'chickenCount');
         renderInto('frozenBody',  frozens,  false, 'frozenCount');
         rebuildNavGrid();
     }
 
+    /* ── Apply prev-day remaining to masterRecords ── */
+    // prevMap: Map<product_id (number|string), remainingQty>
+    // prevDateStr: e.g. "2026-04-01"
     function applyPrevRemaining(prevMap, prevDateStr) {
         masterRecords.forEach(r => {
+            // Try both number and string keys to be safe
             const val = prevMap.get(r.productId) ?? prevMap.get(String(r.productId)) ?? prevMap.get(Number(r.productId));
-            if (val !== undefined) { r.yesterday = val; r.yesterdayFromPrev = true; r.prevDateLabel = prevDateStr; }
-            else { r.yesterdayFromPrev = false; r.prevDateLabel = ''; }
+            if (val !== undefined) {
+                r.yesterday         = val;
+                r.yesterdayFromPrev = true;
+                r.prevDateLabel     = prevDateStr;
+            } else {
+                r.yesterdayFromPrev = false;
+                r.prevDateLabel     = '';
+            }
         });
     }
 
+    /* ── Init empty ── */
     function initEmpty(prevMap = null, prevDateStr = '') {
-        masterRecords = masterProducts.map(p => ({ ...p, yesterday: 0, stockIn: 0, remaining: 0, yesterdayFromPrev: false, prevDateLabel: '' }));
+        masterRecords = masterProducts.map(p => ({
+            productId: p.productId, productName: p.productName,
+            category: p.category, price: p.price,
+            yesterday: 0, stockIn: 0, remaining: 0,
+            yesterdayFromPrev: false, prevDateLabel: ''
+        }));
         if (prevMap) applyPrevRemaining(prevMap, prevDateStr);
         renderSections();
     }
 
+    /* ── Fetch previous day's remaining ── */
     async function fetchPrevRemaining(date) {
         const prev = prevDate(date);
         try {
@@ -673,7 +691,11 @@ $user_role = $_SESSION['role'];
             if (!res.ok) return { map: null, dateStr: prev };
             const data = await res.json();
             if (data.records && data.records.length) {
-                const map = new Map(data.records.map(r => [Number(r.product_id), parseFloat(r.remaining_qty) || 0]));
+                // Build map keyed by product_id as NUMBER for consistent lookup
+                const map = new Map(
+                    data.records.map(r => [Number(r.product_id), parseFloat(r.remaining_qty) || 0])
+                );
+                // Show chip
                 document.getElementById('prevDateLabel').textContent = prev;
                 document.getElementById('prevChip').style.display = 'inline-flex';
                 return { map, dateStr: prev };
@@ -683,57 +705,87 @@ $user_role = $_SESSION['role'];
         return { map: null, dateStr: prev };
     }
 
+    /* ── Load from backend ── */
     async function loadBackend() {
         const date = document.getElementById('recordDate').value;
         if (!date) return showAlert('Please select a date first.', true);
         updateHeroDate(date);
+
+        // Always fetch prev day remaining first
         const { map: prevMap, dateStr: prevDateStr } = await fetchPrevRemaining(date);
+
         try {
             const res  = await fetch(`${API_BASE}?date=${date}`);
             if (!res.ok) throw new Error();
             const data = await res.json();
+
             if (data.records && data.records.length) {
+                // Build masterRecords from saved data
                 const savedMap = new Map(data.records.map(r => [Number(r.product_id), {
                     yesterday: parseFloat(r.yesterday_qty) || 0,
                     stockIn:   parseFloat(r.stock_in)      || 0,
                     remaining: parseFloat(r.remaining_qty) || 0
                 }]));
+
                 masterRecords = masterProducts.map(p => ({
-                    ...p,
-                    yesterday: savedMap.get(Number(p.productId))?.yesterday ?? 0,
-                    stockIn:   savedMap.get(Number(p.productId))?.stockIn   ?? 0,
-                    remaining: savedMap.get(Number(p.productId))?.remaining ?? 0,
-                    yesterdayFromPrev: false, prevDateLabel: ''
+                    productId:          p.productId,
+                    productName:        p.productName,
+                    category:           p.category,
+                    price:              p.price,
+                    yesterday:          savedMap.get(Number(p.productId))?.yesterday ?? 0,
+                    stockIn:            savedMap.get(Number(p.productId))?.stockIn   ?? 0,
+                    remaining:          savedMap.get(Number(p.productId))?.remaining ?? 0,
+                    yesterdayFromPrev:  false,
+                    prevDateLabel:      ''
                 }));
+
+                // Override yesterday with prev day remaining (source of truth)
                 if (prevMap) applyPrevRemaining(prevMap, prevDateStr);
+
                 renderSections();
                 setStatus('loaded');
-                autoSaveEnabled = false;
-                toggle.checked = false;
-                setAutoSaveStatus('');
+                autoSaveEnabled = true;
+                setAutoSaveStatus('saved');
+                setTimeout(() => setAutoSaveStatus(''), 2000);
+
             } else {
+                // No data for this date — prompt to start fresh
                 showModal(`No data for ${date}. Start with empty form?`, () => {
                     initEmpty(prevMap, prevDateStr);
                     setStatus('empty');
-                    autoSaveEnabled = false;
-                    toggle.checked = false;
+                    autoSaveEnabled = true;
                     setAutoSaveStatus('');
                 }, null, '📭');
             }
         } catch { showAlert('Failed to load data.', true); }
     }
 
+    /* ── Manual save ── */
+    async function saveBackend() {
+        const date = document.getElementById('recordDate').value;
+        if (!date) return showAlert('Please select a date first.', true);
+        clearTimeout(autoSaveTimer);
+        await doSave();
+        autoSaveEnabled = true;
+    }
+
     function escapeHtml(s) {
         return String(s).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
     }
 
+    /* ── Fetch products ── */
     async function fetchProducts() {
         try {
             const res  = await fetch(`${API_BASE}?products=1`);
             const data = await res.json();
             if (data.products) {
                 masterProducts = data.products
-                    .map(p => ({ productId: Number(p.id), productName: p.name, category: p.category, price: parseFloat(p.price) || 0 }))
+                    .map(p => ({
+                        productId:   Number(p.id),
+                        productName: p.name,
+                        category:    p.category,
+                        price:       parseFloat(p.price) || 0
+                    }))
                     .sort((a, b) => a.productId - b.productId);
                 initEmpty();
             } else throw new Error();
@@ -744,13 +796,23 @@ $user_role = $_SESSION['role'];
         }
     }
 
+    /* ── Wire events ── */
+    document.getElementById('saveBtn').onclick       = saveBackend;
     document.getElementById('loadDateBtn').onclick   = loadBackend;
-    document.getElementById('resetBtn').onclick      = () => showModal('Clear all entries? Unsaved changes will be lost.', () => { initEmpty(); setStatus('empty'); autoSaveEnabled = false; toggle.checked = false; setAutoSaveStatus(''); showAlert('Form reset.'); }, null, '⚠️');
-    document.getElementById('exportPdfBtn').onclick  = () => { if (!document.getElementById('recordDate').value) return showAlert('Please select a date first.', true); window.print(); };
+    document.getElementById('exportPdfBtn').onclick  = () => {
+        if (!document.getElementById('recordDate').value) return showAlert('Please select a date first.', true);
+        window.print();
+    };
     document.getElementById('logoutBtn').onclick     = () => showModal('Sign out?', () => { window.location.href = '../backend/logout.php'; }, null, '👋');
+    document.getElementById('resetBtn').onclick      = () => showModal(
+        'Clear all entries? Unsaved changes will be lost.',
+        () => { initEmpty(); setStatus('empty'); autoSaveEnabled = false; setAutoSaveStatus(''); showAlert('Form reset.'); },
+        null, '⚠️'
+    );
     document.getElementById('searchInput').oninput     = () => renderSections();
     document.getElementById('categoryFilter').onchange = () => renderSections();
 
+    /* ── Init ── */
     const savedDate = localStorage.getItem('janeth_last_date') || new Date().toISOString().split('T')[0];
     document.getElementById('recordDate').value = savedDate;
     updateHeroDate(savedDate);
