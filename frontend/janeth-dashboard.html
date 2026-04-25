@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Janeth – Dashboard</title>
+    <style>
+        body { font-family: system-ui, sans-serif; background: #f0f2f5; margin: 0; padding: 2rem 1rem; }
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 24px; padding: 1.5rem; box-shadow: 0 8px 20px rgba(0,0,0,0.05); }
+        h1 { margin: 0 0 0.25rem; color: #1a4d5f; }
+        .summary-cards { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1.5rem 0; }
+        .card { background: #e9f0f2; padding: 1rem 1.5rem; border-radius: 20px; flex: 1; min-width: 150px; text-align: center; }
+        .card h3 { margin: 0; font-size: 0.9rem; font-weight: normal; color: #2c5a66; }
+        .card .number { font-size: 2rem; font-weight: bold; margin: 0.5rem 0 0; color: #0a7e8c; }
+        table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+        th, td { border: 1px solid #dee2e6; padding: 10px 6px; text-align: center; }
+        th { background: #f8f9fa; }
+        .date-selector { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem; }
+        select, button, input { padding: 0.4rem 0.8rem; border-radius: 8px; border: 1px solid #ccc; }
+        button { background: #0a7e8c; color: white; border: none; cursor: pointer; }
+        button:hover { background: #085e68; }
+        .btn-outline { background: white; color: #0a7e8c; border: 1px solid #0a7e8c; }
+        .back-link { margin-top: 1rem; display: inline-block; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📊 Janeth – Dashboard</h1>
+    <p>View and analyze saved inventory & sales records</p>
+
+    <div class="date-selector">
+        <label>📅 Select date:</label>
+        <select id="dateSelect"></select>
+        <button id="loadDashboardBtn">Load</button>
+        <a href="janeth-input.html"><button type="button" class="btn-outline">✏️ Go to Entry</button></a>
+    </div>
+
+    <div class="summary-cards" id="summaryCards">
+        <div class="card"><h3>Total Distributed</h3><div class="number" id="totalDistributed">0</div></div>
+        <div class="card"><h3>Total Sold</h3><div class="number" id="totalSold">0</div></div>
+        <div class="card"><h3>Total Unsold</h3><div class="number" id="totalUnsold">0</div></div>
+        <div class="card"><h3>Total Remaining</h3><div class="number" id="totalRemaining">0</div></div>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table id="dashboardTable">
+            <thead>
+                <tr><th>Product</th><th>Yesterday</th><th>Stock In</th><th>Distributed</th><th>Sold</th><th>Unsold</th><th>Remaining</th></tr>
+            </thead>
+            <tbody id="dashboardBody">
+                <tr><td colspan="7">Select a date to view data</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Product master (must match the one in input page)
+    const PRODUCTS = [
+        { id: 1, name: "Product A" },
+        { id: 2, name: "Product B" },
+        { id: 3, name: "Product C" },
+        { id: 4, name: "Product D" }
+    ];
+
+    function loadDateSelector() {
+        const savedDates = JSON.parse(localStorage.getItem('janeth_saved_dates') || '[]');
+        const select = document.getElementById('dateSelect');
+        select.innerHTML = '';
+        if (savedDates.length === 0) {
+            const option = document.createElement('option');
+            option.textContent = 'No saved data yet';
+            select.appendChild(option);
+            return;
+        }
+        savedDates.sort().reverse(); // newest first
+        savedDates.forEach(date => {
+            const option = document.createElement('option');
+            option.value = date;
+            option.textContent = date;
+            select.appendChild(option);
+        });
+    }
+
+    function loadDashboard() {
+        const selectedDate = document.getElementById('dateSelect').value;
+        if (!selectedDate) return;
+
+        const storageKey = `janeth_data_${selectedDate}`;
+        const raw = localStorage.getItem(storageKey);
+        if (!raw) {
+            document.getElementById('dashboardBody').innerHTML = '<tr><td colspan="7">No data for this date</td></tr>';
+            document.getElementById('totalDistributed').innerText = '0';
+            document.getElementById('totalSold').innerText = '0';
+            document.getElementById('totalUnsold').innerText = '0';
+            document.getElementById('totalRemaining').innerText = '0';
+            return;
+        }
+
+        const savedRecords = JSON.parse(raw);
+        // Merge with product list to have full product names and default zeros
+        const fullRecords = PRODUCTS.map(prod => {
+            const match = savedRecords.find(r => r.product_id === prod.id);
+            return {
+                productName: prod.name,
+                yesterday: match ? match.yesterday_qty : 0,
+                stockIn: match ? match.stock_in : 0,
+                distributed: match ? match.distributed : 0,
+                sold: match ? match.sold : 0
+            };
+        });
+
+        // Compute totals and prepare rows
+        let totalDist = 0, totalSold = 0, totalUnsold = 0, totalRemaining = 0;
+        const rowsHtml = fullRecords.map(rec => {
+            const totalStock = rec.yesterday + rec.stockIn;
+            const remaining = totalStock - rec.distributed;
+            const unsold = rec.distributed - rec.sold;
+            totalDist += rec.distributed;
+            totalSold += rec.sold;
+            totalUnsold += unsold;
+            totalRemaining += remaining;
+
+            return `<tr>
+                        <td>${rec.productName}</td>
+                        <td>${rec.yesterday}</td>
+                        <td>${rec.stockIn}</td>
+                        <td>${rec.distributed}</td>
+                        <td>${rec.sold}</td>
+                        <td>${unsold}</td>
+                        <td>${remaining}</td>
+                     </tr>`;
+        }).join('');
+
+        document.getElementById('dashboardBody').innerHTML = rowsHtml;
+        document.getElementById('totalDistributed').innerText = totalDist;
+        document.getElementById('totalSold').innerText = totalSold;
+        document.getElementById('totalUnsold').innerText = totalUnsold;
+        document.getElementById('totalRemaining').innerText = totalRemaining;
+    }
+
+    // Initial load
+    loadDateSelector();
+    document.getElementById('loadDashboardBtn').addEventListener('click', loadDashboard);
+    // Auto-load if there's at least one date
+    const select = document.getElementById('dateSelect');
+    if (select.options.length > 0 && select.options[0].value) {
+        loadDashboard();
+    }
+</script>
+</body>
+</html>

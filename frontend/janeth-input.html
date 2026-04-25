@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Janeth – Daily Entry</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: system-ui, 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 2rem 1rem; }
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); padding: 1.5rem; }
+        h1 { font-size: 1.8rem; margin: 0 0 0.25rem; color: #1a4d5f; }
+        .branch-badge { background: #e9ecef; display: inline-block; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.8rem; margin-bottom: 1.5rem; }
+        .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+        .date-box { display: flex; gap: 0.5rem; align-items: baseline; }
+        .date-box label { font-weight: 600; }
+        input[type="date"] { padding: 0.4rem 0.8rem; border-radius: 8px; border: 1px solid #ccc; font-size: 1rem; }
+        button { background: #0a7e8c; color: white; border: none; padding: 0.5rem 1.2rem; border-radius: 40px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        button:hover { background: #085e68; }
+        .btn-outline { background: white; color: #0a7e8c; border: 1px solid #0a7e8c; }
+        .btn-outline:hover { background: #e6f4f5; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { border: 1px solid #dee2e6; padding: 12px 8px; text-align: center; vertical-align: middle; }
+        th { background: #f8f9fa; font-weight: 600; position: sticky; top: 0; }
+        td input { width: 100px; padding: 8px; text-align: center; border: 1px solid #ced4da; border-radius: 8px; font-size: 0.9rem; }
+        .readonly-cell { background: #f8f9fa; font-weight: 500; color: #2c3e2f; }
+        .action-buttons { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem; }
+        .info { font-size: 0.85rem; color: #6c757d; margin-top: 1rem; text-align: center; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📦 Janeth – Inventory & Sales</h1>
+    <div class="branch-badge">📍 Branch: Janeth</div>
+
+    <div class="toolbar">
+        <div class="date-box">
+            <label>📅 Date:</label>
+            <input type="date" id="recordDate" value="2026-04-25">
+        </div>
+        <button id="loadDateBtn" class="btn-outline">↻ Load existing data</button>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table id="inventoryTable">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Yesterday Qty</th>
+                    <th>Stock In</th>
+                    <th>Distributed</th>
+                    <th>Sold</th>
+                    <th>Unsold<br><span style="font-weight:normal;">(Dist–Sold)</span></th>
+                    <th>Remaining<br><span style="font-weight:normal;">(Yest+In–Dist)</span></th>
+                </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+    <div class="action-buttons">
+        <button id="saveBtn">💾 Save record</button>
+        <button id="resetBtn" class="btn-outline">⟳ Reset form</button>
+        <a href="janeth-dashboard.html" target="_blank"><button type="button" class="btn-outline">📊 Go to Dashboard</button></a>
+    </div>
+    <div class="info">✅ All data is saved locally in your browser (localStorage). No backend required for now.</div>
+</div>
+
+<script>
+    // ----- Product master (will later come from DB)
+    const PRODUCTS = [
+        { id: 1, name: "Product A" },
+        { id: 2, name: "Product B" },
+        { id: 3, name: "Product C" },
+        { id: 4, name: "Product D" }
+    ];
+
+    // ----- Global state
+    let records = [];  // each element: { productId, productName, yesterday, stockIn, distributed, sold }
+
+    // Helper: compute unsold & remaining for a record
+    function computeDerived(rec) {
+        const totalStock = rec.yesterday + rec.stockIn;
+        const remaining = totalStock - rec.distributed;
+        const unsold = rec.distributed - rec.sold;
+        return { remaining, unsold };
+    }
+
+    // Initialize records from product list (reset values to zero)
+    function initEmptyRecords() {
+        records = PRODUCTS.map(p => ({
+            productId: p.id,
+            productName: p.name,
+            yesterday: 0,
+            stockIn: 0,
+            distributed: 0,
+            sold: 0
+        }));
+    }
+
+    // Render table based on current records
+    function renderTable() {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+
+        records.forEach((rec, idx) => {
+            const { remaining, unsold } = computeDerived(rec);
+            const row = tbody.insertRow();
+
+            // Product name (static)
+            const cellProd = row.insertCell(0);
+            cellProd.textContent = rec.productName;
+            cellProd.style.fontWeight = '600';
+
+            // Helper to create number input
+            function makeNumberInput(value, onInput) {
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.value = value;
+                input.step = '1';
+                input.addEventListener('input', (e) => {
+                    let newVal = parseInt(e.target.value, 10);
+                    if (isNaN(newVal)) newVal = 0;
+                    onInput(newVal);
+                });
+                return input;
+            }
+
+            // Yesterday
+            const cellYest = row.insertCell(1);
+            cellYest.appendChild(makeNumberInput(rec.yesterday, (newVal) => {
+                rec.yesterday = newVal;
+                renderTable(); // re-render to update computed columns
+            }));
+
+            // Stock In
+            const cellStockIn = row.insertCell(2);
+            cellStockIn.appendChild(makeNumberInput(rec.stockIn, (newVal) => {
+                rec.stockIn = newVal;
+                renderTable();
+            }));
+
+            // Distributed
+            const cellDist = row.insertCell(3);
+            cellDist.appendChild(makeNumberInput(rec.distributed, (newVal) => {
+                rec.distributed = newVal;
+                renderTable();
+            }));
+
+            // Sold
+            const cellSold = row.insertCell(4);
+            cellSold.appendChild(makeNumberInput(rec.sold, (newVal) => {
+                rec.sold = newVal;
+                renderTable();
+            }));
+
+            // Unsold (readonly)
+            const cellUnsold = row.insertCell(5);
+            cellUnsold.textContent = unsold;
+            cellUnsold.className = 'readonly-cell';
+
+            // Remaining (readonly)
+            const cellRemaining = row.insertCell(6);
+            cellRemaining.textContent = remaining;
+            cellRemaining.className = 'readonly-cell';
+        });
+    }
+
+    // Save current records to localStorage for the selected date
+    function saveToLocalStorage() {
+        const date = document.getElementById('recordDate').value;
+        if (!date) {
+            alert('Please select a date');
+            return false;
+        }
+
+        const dataToStore = {
+            branch: 'Janeth',
+            date: date,
+            records: records.map(rec => ({
+                product_id: rec.productId,
+                yesterday_qty: rec.yesterday,
+                stock_in: rec.stockIn,
+                distributed: rec.distributed,
+                sold: rec.sold
+            }))
+        };
+
+        // Get existing storage for Janeth
+        const storageKey = `janeth_data_${date}`;
+        localStorage.setItem(storageKey, JSON.stringify(dataToStore.records));
+        
+        // Also keep a master list of saved dates
+        let savedDates = JSON.parse(localStorage.getItem('janeth_saved_dates') || '[]');
+        if (!savedDates.includes(date)) {
+            savedDates.push(date);
+            localStorage.setItem('janeth_saved_dates', JSON.stringify(savedDates));
+        }
+
+        alert(`✅ Data saved for ${date}`);
+        return true;
+    }
+
+    // Load data for the selected date from localStorage
+    function loadFromLocalStorage() {
+        const date = document.getElementById('recordDate').value;
+        const storageKey = `janeth_data_${date}`;
+        const savedRecords = localStorage.getItem(storageKey);
+        
+        if (!savedRecords) {
+            if (confirm(`No data found for ${date}. Do you want to start fresh?`)) {
+                initEmptyRecords();
+                renderTable();
+            }
+            return;
+        }
+
+        const parsed = JSON.parse(savedRecords);
+        // Match saved records with product list (some products might be missing in old data)
+        const newRecords = PRODUCTS.map(prod => {
+            const found = parsed.find(p => p.product_id === prod.id);
+            if (found) {
+                return {
+                    productId: prod.id,
+                    productName: prod.name,
+                    yesterday: found.yesterday_qty || 0,
+                    stockIn: found.stock_in || 0,
+                    distributed: found.distributed || 0,
+                    sold: found.sold || 0
+                };
+            } else {
+                return {
+                    productId: prod.id,
+                    productName: prod.name,
+                    yesterday: 0,
+                    stockIn: 0,
+                    distributed: 0,
+                    sold: 0
+                };
+            }
+        });
+        records = newRecords;
+        renderTable();
+        alert(`Loaded data for ${date}`);
+    }
+
+    // Reset all fields to zero for current form (without auto-saving)
+    function resetForm() {
+        if (confirm('Clear all entries on this screen? Unsaved changes will be lost.')) {
+            initEmptyRecords();
+            renderTable();
+        }
+    }
+
+    // Event listeners
+    document.getElementById('saveBtn').addEventListener('click', saveToLocalStorage);
+    document.getElementById('resetBtn').addEventListener('click', resetForm);
+    document.getElementById('loadDateBtn').addEventListener('click', loadFromLocalStorage);
+    
+    // Initial load
+    initEmptyRecords();
+    renderTable();
+</script>
+</body>
+</html>
