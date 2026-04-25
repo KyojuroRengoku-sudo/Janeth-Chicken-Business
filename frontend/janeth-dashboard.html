@@ -21,6 +21,8 @@
         button:hover { background: #085e68; }
         .btn-outline { background: white; color: #0a7e8c; border: 1px solid #0a7e8c; }
         .back-link { margin-top: 1rem; display: inline-block; }
+        .loading, .error { text-align: center; padding: 2rem; color: #6c757d; }
+        .error { color: #d32f2f; }
     </style>
 </head>
 <body>
@@ -30,7 +32,9 @@
 
     <div class="date-selector">
         <label>📅 Select date:</label>
-        <select id="dateSelect"></select>
+        <select id="dateSelect">
+            <option value="">Loading dates...</option>
+        </select>
         <button id="loadDashboardBtn">Load</button>
         <a href="janeth-input.html"><button type="button" class="btn-outline">✏️ Go to Entry</button></a>
     </div>
@@ -48,105 +52,126 @@
                 <tr><th>Product</th><th>Yesterday</th><th>Stock In</th><th>Distributed</th><th>Sold</th><th>Unsold</th><th>Remaining</th></tr>
             </thead>
             <tbody id="dashboardBody">
-                <tr><td colspan="7">Select a date to view data</td></tr>
+                <tr><td colspan="7">Select a date and click Load</td></tr>
             </tbody>
         </table>
     </div>
 </div>
 
 <script>
-    // Product master (must match the one in input page)
-    const PRODUCTS = [
-        { id: 1, name: "Product A" },
-        { id: 2, name: "Product B" },
-        { id: 3, name: "Product C" },
-        { id: 4, name: "Product D" }
-    ];
+    // Helper to show error message in the table
+    function showError(message) {
+        const tbody = document.getElementById('dashboardBody');
+        tbody.innerHTML = `<tr><td colspan="7" style="color: #d32f2f;">⚠️ ${message}</td></tr>`;
+        // Reset totals
+        document.getElementById('totalDistributed').innerText = '0';
+        document.getElementById('totalSold').innerText = '0';
+        document.getElementById('totalUnsold').innerText = '0';
+        document.getElementById('totalRemaining').innerText = '0';
+    }
 
-    function loadDateSelector() {
-        const savedDates = JSON.parse(localStorage.getItem('janeth_saved_dates') || '[]');
+    // Load the list of available dates from the backend
+    async function loadDateSelector() {
         const select = document.getElementById('dateSelect');
-        select.innerHTML = '';
-        if (savedDates.length === 0) {
-            const option = document.createElement('option');
-            option.textContent = 'No saved data yet';
-            select.appendChild(option);
+        select.innerHTML = '<option value="">Loading dates...</option>';
+        try {
+            const response = await fetch('../backend/janeth.php?list_dates=1');
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            const data = await response.json();
+            if (data.dates && data.dates.length > 0) {
+                select.innerHTML = '';
+                data.dates.forEach(date => {
+                    const option = document.createElement('option');
+                    option.value = date;
+                    option.textContent = date;
+                    select.appendChild(option);
+                });
+                // Optionally auto-load the most recent date (first one)
+                if (data.dates.length > 0) {
+                    select.value = data.dates[0];
+                    loadDashboard();
+                }
+            } else {
+                select.innerHTML = '<option value="">No saved data yet</option>';
+                showError('No records found. Go to Entry page to add data.');
+            }
+        } catch (err) {
+            console.error(err);
+            select.innerHTML = '<option value="">Error loading dates</option>';
+            showError('Failed to load dates from server. Is the backend running?');
+        }
+    }
+
+    // Load and display the dashboard for the selected date
+    async function loadDashboard() {
+        const date = document.getElementById('dateSelect').value;
+        if (!date || date === '') {
+            showError('Please select a valid date');
             return;
         }
-        savedDates.sort().reverse(); // newest first
-        savedDates.forEach(date => {
-            const option = document.createElement('option');
-            option.value = date;
-            option.textContent = date;
-            select.appendChild(option);
+
+        const tbody = document.getElementById('dashboardBody');
+        tbody.innerHTML = '<tr><td colspan="7">Loading data...</td></tr>';
+
+        try {
+            const response = await fetch(`../backend/janeth.php?date=${date}`);
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            const data = await response.json();
+
+            if (!data.records || data.records.length === 0) {
+                showError(`No records found for ${date}`);
+                return;
+            }
+
+            // Process records
+            let totalDist = 0, totalSold = 0, totalUnsold = 0, totalRemaining = 0;
+            const rowsHtml = data.records.map(rec => {
+                const totalStock = rec.yesterday_qty + rec.stock_in;
+                const remaining = totalStock - rec.distributed;
+                const unsold = rec.distributed - rec.sold;
+                totalDist += rec.distributed;
+                totalSold += rec.sold;
+                totalUnsold += unsold;
+                totalRemaining += remaining;
+
+                return `<tr>
+                            <td>${escapeHtml(rec.product_name)}</td>
+                            <td>${rec.yesterday_qty}</td>
+                            <td>${rec.stock_in}</td>
+                            <td>${rec.distributed}</td>
+                            <td>${rec.sold}</td>
+                            <td>${unsold}</td>
+                            <td>${remaining}</td>
+                        </tr>`;
+            }).join('');
+
+            tbody.innerHTML = rowsHtml;
+            document.getElementById('totalDistributed').innerText = totalDist;
+            document.getElementById('totalSold').innerText = totalSold;
+            document.getElementById('totalUnsold').innerText = totalUnsold;
+            document.getElementById('totalRemaining').innerText = totalRemaining;
+
+        } catch (err) {
+            console.error(err);
+            showError('Failed to load data from server');
+        }
+    }
+
+    // Simple escape to prevent XSS (product names from DB are safe, but just in case)
+    function escapeHtml(str) {
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
         });
     }
 
-    function loadDashboard() {
-        const selectedDate = document.getElementById('dateSelect').value;
-        if (!selectedDate) return;
-
-        const storageKey = `janeth_data_${selectedDate}`;
-        const raw = localStorage.getItem(storageKey);
-        if (!raw) {
-            document.getElementById('dashboardBody').innerHTML = '<tr><td colspan="7">No data for this date</td></tr>';
-            document.getElementById('totalDistributed').innerText = '0';
-            document.getElementById('totalSold').innerText = '0';
-            document.getElementById('totalUnsold').innerText = '0';
-            document.getElementById('totalRemaining').innerText = '0';
-            return;
-        }
-
-        const savedRecords = JSON.parse(raw);
-        // Merge with product list to have full product names and default zeros
-        const fullRecords = PRODUCTS.map(prod => {
-            const match = savedRecords.find(r => r.product_id === prod.id);
-            return {
-                productName: prod.name,
-                yesterday: match ? match.yesterday_qty : 0,
-                stockIn: match ? match.stock_in : 0,
-                distributed: match ? match.distributed : 0,
-                sold: match ? match.sold : 0
-            };
-        });
-
-        // Compute totals and prepare rows
-        let totalDist = 0, totalSold = 0, totalUnsold = 0, totalRemaining = 0;
-        const rowsHtml = fullRecords.map(rec => {
-            const totalStock = rec.yesterday + rec.stockIn;
-            const remaining = totalStock - rec.distributed;
-            const unsold = rec.distributed - rec.sold;
-            totalDist += rec.distributed;
-            totalSold += rec.sold;
-            totalUnsold += unsold;
-            totalRemaining += remaining;
-
-            return `<tr>
-                        <td>${rec.productName}</td>
-                        <td>${rec.yesterday}</td>
-                        <td>${rec.stockIn}</td>
-                        <td>${rec.distributed}</td>
-                        <td>${rec.sold}</td>
-                        <td>${unsold}</td>
-                        <td>${remaining}</td>
-                     </tr>`;
-        }).join('');
-
-        document.getElementById('dashboardBody').innerHTML = rowsHtml;
-        document.getElementById('totalDistributed').innerText = totalDist;
-        document.getElementById('totalSold').innerText = totalSold;
-        document.getElementById('totalUnsold').innerText = totalUnsold;
-        document.getElementById('totalRemaining').innerText = totalRemaining;
-    }
-
-    // Initial load
-    loadDateSelector();
+    // Event listeners
     document.getElementById('loadDashboardBtn').addEventListener('click', loadDashboard);
-    // Auto-load if there's at least one date
-    const select = document.getElementById('dateSelect');
-    if (select.options.length > 0 && select.options[0].value) {
-        loadDashboard();
-    }
+
+    // Initialize
+    loadDateSelector();
 </script>
 </body>
 </html>
