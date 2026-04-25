@@ -19,10 +19,10 @@ function sendResponse($data, $status = 200) {
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Get all products (with category)
     if (isset($_GET['products'])) {
-        $stmt = $pdo->query("SELECT id, name, category FROM products ORDER BY category, name");
-        $products = $stmt->fetchAll();
-        sendResponse(['products' => $products]);
-    }
+    $stmt = $pdo->query("SELECT id, name, category, price FROM products ORDER BY category, name");
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    sendResponse(['products' => $products]);
+}
     
     // Get list of dates with records
     if (isset($_GET['list_dates'])) {
@@ -38,18 +38,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             sendResponse(['error' => 'Invalid date format'], 400);
         }
         $stmt = $pdo->prepare("
-            SELECT 
-                p.id AS product_id,
-                p.name AS product_name,
-                p.category AS product_category,
-                COALESCE(jr.yesterday_qty, 0) AS yesterday_qty,
-                COALESCE(jr.stock_in, 0) AS stock_in,
-                COALESCE(jr.remaining_qty, 0) AS remaining_qty,
-                COALESCE(jr.sold, 0) AS sold
-            FROM products p
-            LEFT JOIN janeth_records jr ON jr.product_id = p.id AND jr.record_date = ?
-            ORDER BY p.category, p.name
-        ");
+    SELECT 
+        p.id AS product_id,
+        p.name AS product_name,
+        p.category AS product_category,
+        p.price AS price,
+        COALESCE(jr.yesterday_qty, 0) AS yesterday_qty,
+        COALESCE(jr.stock_in, 0) AS stock_in,
+        COALESCE(jr.remaining_qty, 0) AS remaining_qty,
+        COALESCE(jr.sold, 0) AS sold
+    FROM products p
+    LEFT JOIN janeth_records jr ON jr.product_id = p.id AND jr.record_date = ?
+    ORDER BY p.category, p.name
+");
+
         $stmt->execute([$date]);
         $records = $stmt->fetchAll();
         sendResponse(['records' => $records]);
