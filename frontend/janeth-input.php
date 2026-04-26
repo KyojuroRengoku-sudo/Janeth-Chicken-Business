@@ -1,817 +1,811 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id'])) {
-    header('Location: login.html');
-    exit;
-}
+if (!isset($_SESSION['user_id'])) { header('Location: login.html'); exit; }
 $user_role = $_SESSION['role'];
+$username  = $_SESSION['username'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Janeth – Daily Entry</title>
+    <title>Daily Entry · Janeth's Business</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        /* (same CSS as the previous working version – no changes needed) */
         :root {
-            --bg: #0d1117;
-            --surface: #161b24;
-            --surface-2: #1e2633;
-            --surface-3: #252d3a;
-            --border: rgba(255,255,255,0.07);
-            --accent: #f5a623;
-            --accent-dim: rgba(245,166,35,0.12);
-            --accent-glow: rgba(245,166,35,0.25);
-            --teal: #29b6c8;
-            --teal-dim: rgba(41,182,200,0.1);
-            --text: #e8edf5;
-            --text-muted: #6b7a93;
-            --text-faint: #3d4d63;
-            --danger: #f87171;
-            --success: #34d399;
-            --chicken: #fbbf24;
-            --frozen: #60a5fa;
-            --radius: 14px;
-            --radius-sm: 8px;
+            --bg:#0a0e17; --surface:#111827; --surface-2:#1a2234; --surface-3:#222d42;
+            --border:rgba(255,255,255,0.07); --border-hi:rgba(255,255,255,0.12);
+            --accent:#f5a623; --accent-dim:rgba(245,166,35,.12); --accent-glow:rgba(245,166,35,.25);
+            --teal:#29b6c8; --teal-dim:rgba(41,182,200,.1);
+            --text:#e8edf5; --text-muted:#6b7a93; --text-faint:#3d4d63;
+            --danger:#f87171; --success:#34d399;
+            --chicken:#fbbf24; --frozen:#60a5fa; --expense:#a78bfa;
+            --radius:14px; --radius-sm:9px;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Sora', sans-serif;
-            background: var(--bg); color: var(--text);
-            min-height: 100vh; padding: 1.5rem;
-            background-image:
-                radial-gradient(ellipse 80% 50% at 10% -10%, rgba(41,182,200,0.07) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 40% at 90% 110%, rgba(245,166,35,0.05) 0%, transparent 60%);
-        }
-        .container { max-width: 1480px; margin: 0 auto; }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:1.5rem;
+             background-image:radial-gradient(ellipse 70% 50% at 10% -10%,rgba(41,182,200,.06) 0%,transparent 60%),
+                              radial-gradient(ellipse 60% 40% at 90% 110%,rgba(245,166,35,.04) 0%,transparent 60%);}
+        .container{max-width:1520px;margin:0 auto;}
 
-        .header {
-            display: flex; justify-content: space-between; align-items: center;
-            flex-wrap: wrap; gap: 1rem; margin-bottom: 1.75rem;
-            padding-bottom: 1.25rem; border-bottom: 1px solid var(--border);
-        }
-        .logo { display: flex; align-items: center; gap: 0.75rem; }
-        .logo-icon {
-            width: 40px; height: 40px;
-            background: linear-gradient(135deg, var(--teal), #1a9aab);
-            border-radius: 10px; display: flex; align-items: center; justify-content: center;
-            font-size: 1.1rem; box-shadow: 0 4px 16px rgba(41,182,200,0.3);
-        }
-        .logo-text { display: flex; flex-direction: column; }
-        .logo-title { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.02em; }
-        .logo-sub { font-size: 0.68rem; color: var(--text-muted); font-weight: 400; letter-spacing: 0.06em; text-transform: uppercase; }
-        .header-right { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
-        .user-chip {
-            display: flex; align-items: center; gap: 0.6rem;
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: 50px; padding: 0.35rem 0.9rem 0.35rem 0.5rem;
-        }
-        .user-avatar {
-            width: 26px; height: 26px;
-            background: linear-gradient(135deg, var(--accent), #e8920f);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 0.65rem; font-weight: 700; color: #0d1117;
-        }
-        .user-name { font-size: 0.8rem; font-weight: 500; }
+        /* ── Header ── */
+        .header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;
+                margin-bottom:1.75rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border);}
+        .logo{display:flex;align-items:center;gap:.75rem;}
+        .logo-icon{width:40px;height:40px;background:linear-gradient(135deg,var(--teal),#1a9aab);border-radius:10px;
+                   display:flex;align-items:center;justify-content:center;font-size:1.1rem;box-shadow:0 4px 16px rgba(41,182,200,.3);}
+        .logo-text{display:flex;flex-direction:column;}
+        .logo-title{font-size:1.1rem;font-weight:700;letter-spacing:-.02em;}
+        .logo-sub{font-size:.67rem;color:var(--text-muted);font-weight:400;letter-spacing:.07em;text-transform:uppercase;}
+        .header-right{display:flex;align-items:center;gap:.65rem;flex-wrap:wrap;}
+        .user-chip{display:flex;align-items:center;gap:.55rem;background:var(--surface);border:1px solid var(--border);
+                   border-radius:50px;padding:.3rem .85rem .3rem .45rem;}
+        .user-avatar{width:24px;height:24px;background:linear-gradient(135deg,var(--accent),#e8920f);border-radius:50%;
+                     display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;color:#0a0e17;}
+        .user-name{font-size:.78rem;font-weight:500;}
+        .role-badge{font-size:.6rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:.15rem .55rem;
+                    border-radius:50px;background:var(--accent-dim);color:var(--accent);border:1px solid rgba(245,166,35,.2);}
 
-        .btn {
-            display: inline-flex; align-items: center; gap: 0.4rem;
-            padding: 0.45rem 1rem; border-radius: 50px;
-            font-size: 0.78rem; font-weight: 600; font-family: 'Sora', sans-serif;
-            cursor: pointer; border: none; transition: all 0.18s ease;
-            text-decoration: none; white-space: nowrap; letter-spacing: 0.01em;
-        }
-        .btn-primary { background: linear-gradient(135deg, var(--accent), #e8920f); color: #0d1117; box-shadow: 0 3px 12px var(--accent-glow); }
-        .btn-primary:hover { box-shadow: 0 6px 20px rgba(245,166,35,0.4); transform: translateY(-1px); }
-        .btn-ghost { background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); }
-        .btn-ghost:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-dim); }
-        .btn-danger { background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.2); color: var(--danger); }
-        .btn-danger:hover { background: rgba(248,113,113,0.2); }
-        .btn-teal { background: var(--teal-dim); border: 1px solid rgba(41,182,200,0.2); color: var(--teal); }
-        .btn-teal:hover { background: rgba(41,182,200,0.18); }
-        .btn-pdf { background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.25); color: #f87171; }
-        .btn-pdf:hover { background: rgba(248,113,113,0.22); }
-        .toggle-switch { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--surface-2); border-radius: 50px; padding: 0.25rem 0.75rem 0.25rem 0.85rem; border: 1px solid var(--border); }
-        .toggle-switch label { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); cursor: pointer; }
-        .toggle-switch input { width: 32px; height: 16px; appearance: none; background: var(--surface-3); border-radius: 32px; position: relative; cursor: pointer; transition: 0.2s; }
-        .toggle-switch input:checked { background: var(--teal); }
-        .toggle-switch input::before { content: ''; width: 12px; height: 12px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: 0.2s; }
-        .toggle-switch input:checked::before { left: 18px; }
+        /* Buttons */
+        .btn{display:inline-flex;align-items:center;gap:.4rem;padding:.42rem 1rem;border-radius:50px;
+             font-size:.76rem;font-weight:600;font-family:'Sora',sans-serif;cursor:pointer;border:none;
+             transition:.18s;text-decoration:none;white-space:nowrap;letter-spacing:.01em;}
+        .btn-primary{background:linear-gradient(135deg,var(--accent),#e8920f);color:#0a0e17;box-shadow:0 3px 12px var(--accent-glow);}
+        .btn-primary:hover{box-shadow:0 6px 20px rgba(245,166,35,.4);transform:translateY(-1px);}
+        .btn-ghost{background:var(--surface);border:1px solid var(--border);color:var(--text-muted);}
+        .btn-ghost:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-dim);}
+        .btn-teal{background:var(--teal-dim);border:1px solid rgba(41,182,200,.2);color:var(--teal);}
+        .btn-teal:hover{background:rgba(41,182,200,.18);}
+        .btn-danger{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:var(--danger);}
+        .btn-danger:hover{background:rgba(248,113,113,.2);}
+        .btn-save{background:linear-gradient(135deg,var(--teal),#1a9aab);color:#0a0e17;font-weight:700;
+                  box-shadow:0 3px 12px rgba(41,182,200,.3);}
+        .btn-save:hover{box-shadow:0 6px 20px rgba(41,182,200,.4);transform:translateY(-1px);}
 
-        .date-hero {
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: var(--radius); padding: 1.75rem 2rem;
-            margin-bottom: 1.25rem; display: flex; align-items: center;
-            gap: 2rem; flex-wrap: wrap;
-        }
-        .date-hero-left { flex: 1; min-width: 220px; }
-        .date-hero-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); font-weight: 600; margin-bottom: 0.4rem; }
-        .date-hero-big { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
-        .date-hero-big .day-num { color: var(--accent); }
-        .date-hero-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem; font-family: 'DM Mono', monospace; }
-        .date-hero-right { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+        /* ── Date hero ── */
+        .date-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+                   padding:1.5rem 2rem;margin-bottom:1.1rem;display:flex;align-items:center;gap:2rem;flex-wrap:wrap;}
+        .date-hero-left{flex:1;min-width:200px;}
+        .hero-label{font-size:.67rem;text-transform:uppercase;letter-spacing:.12em;color:var(--text-muted);font-weight:600;margin-bottom:.4rem;}
+        .hero-big{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;letter-spacing:-.03em;line-height:1;}
+        .hero-big .day-num{color:var(--accent);}
+        .hero-sub{font-size:.75rem;color:var(--text-muted);margin-top:.3rem;font-family:'DM Mono',monospace;}
+        .date-hero-right{display:flex;align-items:center;gap:.65rem;flex-wrap:wrap;}
 
-        .prev-chip {
-            display: inline-flex; align-items: center; gap: 0.4rem;
-            padding: 0.28rem 0.75rem; border-radius: 50px;
-            font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em;
-            background: var(--teal-dim); border: 1px solid rgba(41,182,200,0.25); color: var(--teal);
-        }
-        input[type="date"], input[type="text"], select {
-            background: var(--surface-2); border: 1px solid var(--border);
-            border-radius: var(--radius-sm); color: var(--text);
-            font-family: 'Sora', sans-serif; font-size: 0.8rem;
-            padding: 0.45rem 0.85rem; outline: none; transition: 0.18s;
-        }
-        input:focus, select:focus { border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-dim); }
-        select option { background: #1e2633; }
+        /* Status chip */
+        .status-chip{display:inline-flex;align-items:center;gap:.4rem;padding:.28rem .8rem;border-radius:50px;
+                     font-size:.68rem;font-weight:700;letter-spacing:.05em;}
+        .s-loaded{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);color:var(--success);}
+        .s-empty {background:var(--accent-dim);border:1px solid rgba(245,166,35,.25);color:var(--accent);}
+        .s-none  {background:var(--surface-2);border:1px solid var(--border);color:var(--text-muted);}
 
-        .status-chip {
-            display: inline-flex; align-items: center; gap: 0.4rem;
-            padding: 0.3rem 0.85rem; border-radius: 50px;
-            font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em;
-        }
-        .status-loaded { background: rgba(52,211,153,0.12); border: 1px solid rgba(52,211,153,0.25); color: var(--success); }
-        .status-empty  { background: var(--accent-dim); border: 1px solid rgba(245,166,35,0.25); color: var(--accent); }
-        .status-none   { background: var(--surface-2); border: 1px solid var(--border); color: var(--text-muted); }
+        /* Autosave chip */
+        .as-chip{display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .7rem;border-radius:50px;
+                 font-size:.67rem;font-weight:600;letter-spacing:.04em;transition:.3s;
+                 background:var(--surface-2);border:1px solid var(--border);color:var(--text-faint);}
+        .as-chip.saving{border-color:rgba(41,182,200,.3);color:var(--teal);background:var(--teal-dim);}
+        .as-chip.saved {border-color:rgba(52,211,153,.25);color:var(--success);background:rgba(52,211,153,.08);}
+        .as-chip.error {border-color:rgba(248,113,113,.25);color:var(--danger);background:rgba(248,113,113,.08);}
+        .as-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+        .as-chip.saving .as-dot{animation:blink .8s infinite;}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 
-        .autosave-chip {
-            display: inline-flex; align-items: center; gap: 0.35rem;
-            padding: 0.25rem 0.7rem; border-radius: 50px;
-            font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em;
-            transition: all 0.3s;
-            background: var(--surface-2); border: 1px solid var(--border); color: var(--text-faint);
-        }
-        .autosave-chip.saving { border-color: rgba(41,182,200,0.3); color: var(--teal); background: var(--teal-dim); }
-        .autosave-chip.saved  { border-color: rgba(52,211,153,0.25); color: var(--success); background: rgba(52,211,153,0.08); }
-        .autosave-chip.error  { border-color: rgba(248,113,113,0.25); color: var(--danger); background: rgba(248,113,113,0.08); }
-        .autosave-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-        .autosave-chip.saving .autosave-dot { animation: blink 0.8s infinite; }
-        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+        /* ── Controls bar ── */
+        .controls{display:flex;flex-wrap:wrap;gap:.65rem;align-items:center;
+                  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+                  padding:.8rem 1.2rem;margin-bottom:1.1rem;}
+        .controls-sep{flex:1;}
+        input[type="text"],input[type="date"],input[type="number"],select{
+            background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);
+            color:var(--text);font-family:'Sora',sans-serif;font-size:.78rem;
+            padding:.42rem .85rem;outline:none;transition:.18s;}
+        input:focus,select:focus{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-dim);}
+        select option{background:#1a2234;}
 
-        .controls {
-            display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: var(--radius); padding: 0.85rem 1.25rem; margin-bottom: 1.25rem;
-        }
-        .controls-sep { flex: 1; }
+        /* Toggle switch */
+        .toggle-sw{display:inline-flex;align-items:center;gap:.45rem;background:var(--surface-2);
+                   border-radius:50px;padding:.22rem .7rem .22rem .8rem;border:1px solid var(--border);}
+        .toggle-sw label{font-size:.68rem;font-weight:600;color:var(--text-muted);cursor:pointer;}
+        .toggle-sw input{width:30px;height:15px;appearance:none;background:var(--surface-3);border-radius:30px;
+                         position:relative;cursor:pointer;transition:.2s;}
+        .toggle-sw input:checked{background:var(--teal);}
+        .toggle-sw input::before{content:'';width:11px;height:11px;background:#fff;border-radius:50%;
+                                 position:absolute;top:2px;left:2px;transition:.2s;}
+        .toggle-sw input:checked::before{left:17px;}
 
-        .table-wrap {
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: var(--radius); overflow: hidden; margin-bottom: 1.5rem;
-        }
-        .section-header {
-            display: flex; align-items: center; gap: 1rem;
-            padding: 1rem 1.25rem; border-bottom: 1px solid var(--border);
-            background: var(--surface-2);
-        }
-        .section-icon { font-size: 1.3rem; }
-        .section-title { font-size: 0.9rem; font-weight: 700; }
-        .section-count { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--text-faint); margin-left: auto; }
-        .table-scroll { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 760px; }
-        thead tr { border-bottom: 1px solid var(--border); }
-        th {
-            padding: 0.65rem 1rem; text-align: center;
-            font-size: 0.67rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.09em; color: var(--text-faint);
-            background: var(--surface-2); white-space: nowrap;
-        }
-        th:first-child { text-align: left; }
-        tbody tr { border-bottom: 1px solid var(--border); transition: background 0.14s; }
-        tbody tr:last-child { border-bottom: none; }
-        tbody tr:hover:not(.total-row) { background: var(--surface-2); }
-        td { padding: 0.6rem 1rem; font-size: 0.82rem; color: var(--text); text-align: center; vertical-align: middle; }
-        td:first-child { text-align: left; }
-        .prod-name { font-weight: 600; font-size: 0.83rem; }
+        /* ── Tables ── */
+        .section-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+                      overflow:hidden;margin-bottom:1rem;}
+        .section-hd{display:flex;align-items:center;gap:.75rem;padding:.9rem 1.2rem;
+                    border-bottom:1px solid var(--border);background:var(--surface-2);}
+        .section-icon{font-size:1.2rem;}
+        .section-title{font-size:.88rem;font-weight:700;}
+        .section-count{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--text-faint);margin-left:auto;}
+        .tbl-scroll{overflow-x:auto;}
+        table{width:100%;border-collapse:collapse;min-width:780px;}
+        thead tr{border-bottom:1px solid var(--border);}
+        th{padding:.62rem 1rem;text-align:center;font-size:.65rem;font-weight:700;text-transform:uppercase;
+           letter-spacing:.09em;color:var(--text-faint);background:var(--surface-2);white-space:nowrap;}
+        th:first-child{text-align:left;}
+        tbody tr{border-bottom:1px solid var(--border);transition:background .12s;}
+        tbody tr:last-child:not(.total-row){border-bottom:none;}
+        tbody tr:hover:not(.total-row){background:var(--surface-2);}
+        td{padding:.58rem 1rem;font-size:.81rem;color:var(--text);text-align:center;vertical-align:middle;}
+        td:first-child{text-align:left;}
+        .prod-name{font-weight:600;font-size:.82rem;}
 
-        .yesterday-cell {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'DM Mono', monospace;
-            font-size: 0.82rem;
-            font-weight: 700;
-            color: var(--teal);
-        }
-        .yesterday-cell.manual { color: var(--text-muted); }
+        /* Editable num input */
+        .num-input{width:88px;background:var(--surface-3);border:1px solid var(--border);border-radius:var(--radius-sm);
+                   color:var(--text);font-family:'DM Mono',monospace;font-size:.82rem;
+                   padding:.36rem .6rem;text-align:center;outline:none;transition:.15s;}
+        .num-input:focus{border-color:var(--teal);background:rgba(41,182,200,.05);box-shadow:0 0 0 3px var(--teal-dim);}
+        .num-input:hover{border-color:var(--border-hi);}
 
-        .num-input {
-            width: 90px; background: var(--surface-3); border: 1px solid var(--border);
-            border-radius: var(--radius-sm); color: var(--text);
-            font-family: 'DM Mono', monospace; font-size: 0.82rem;
-            padding: 0.38rem 0.6rem; text-align: center; outline: none; transition: 0.15s;
-        }
-        .num-input:focus { border-color: var(--teal); background: rgba(41,182,200,0.05); box-shadow: 0 0 0 3px var(--teal-dim); }
-        .num-input:hover { border-color: var(--text-faint); }
+        /* Price input (editable by staff) */
+        .price-input{width:96px;background:var(--surface-3);border:1px solid rgba(245,166,35,.2);
+                     border-radius:var(--radius-sm);color:var(--accent);font-family:'DM Mono',monospace;
+                     font-size:.8rem;padding:.34rem .6rem;text-align:center;outline:none;transition:.15s;}
+        .price-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
+        .price-ro{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--accent);}
 
-        .price-cell       { font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--accent); }
-        .total-value-cell { font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--accent); }
+        .yest-cell{font-family:'DM Mono',monospace;font-size:.82rem;font-weight:700;color:var(--teal);}
+        .yest-cell.manual{color:var(--text-muted);}
+        .sold-cell{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--success);}
+        .total-cell-val{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--accent);}
 
-        .total-row td {
-            background: rgba(245,166,35,0.06) !important;
-            border-top: 1px solid rgba(245,166,35,0.18) !important;
-            color: var(--accent) !important;
-            font-family: 'DM Mono', monospace;
-            font-size: 0.85rem; font-weight: 700;
-        }
-        .total-row .total-label {
-            text-align: right !important; color: var(--text-muted) !important;
-            font-family: 'Sora', sans-serif !important; font-size: 0.73rem !important;
-            font-weight: 600 !important; text-transform: uppercase; letter-spacing: 0.07em;
-            padding-right: 1.5rem !important;
-        }
-        .empty-section { padding: 2.5rem; text-align: center; color: var(--text-faint); font-size: 0.85rem; }
+        /* Sold warning badge */
+        .sold-warn{color:var(--danger);}
+        .sold-ok  {color:var(--success);}
 
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.65);
-            backdrop-filter: blur(8px); display: none;
-            justify-content: center; align-items: center; z-index: 1000;
-        }
-        .modal-overlay.active { display: flex; }
-        .modal {
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: var(--radius); padding: 2rem 2.25rem;
-            max-width: 380px; width: 90%; text-align: center;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.5);
-            animation: popIn 0.2s cubic-bezier(0.34,1.56,0.64,1);
-        }
-        @keyframes popIn { from{opacity:0;transform:scale(0.9) translateY(12px)} to{opacity:1;transform:scale(1) translateY(0)} }
-        .modal-icon { font-size: 2rem; margin-bottom: 0.75rem; }
-        .modal-message { font-size: 0.92rem; color: var(--text); margin-bottom: 1.5rem; line-height: 1.5; font-weight: 500; }
-        .modal-buttons { display: flex; gap: 0.75rem; justify-content: center; }
+        /* Total row */
+        .total-row td{background:rgba(245,166,35,.06)!important;border-top:1px solid rgba(245,166,35,.18)!important;
+                      color:var(--accent)!important;font-family:'DM Mono',monospace;font-size:.83rem;font-weight:700;}
+        .total-row .total-label{text-align:right!important;color:var(--text-muted)!important;
+                                font-family:'Sora',sans-serif!important;font-size:.7rem!important;
+                                font-weight:600!important;text-transform:uppercase;letter-spacing:.07em;padding-right:1.5rem!important;}
+        .empty-section{padding:2.5rem;text-align:center;color:var(--text-faint);font-size:.83rem;}
 
-        @media print {
-            body { background: #fff !important; color: #111 !important; padding: 0.75rem; }
-            .header, .controls, .modal-overlay { display: none !important; }
-            .date-hero { background: #fff !important; border: none !important; box-shadow: none !important; padding: 0 0 0.75rem; margin-bottom: 0.5rem; flex-direction: column; gap: 0.25rem; }
-            .date-hero-right { display: none !important; }
-            .date-hero-big { color: #111 !important; font-size: 2rem !important; }
-            .date-hero-big .day-num { color: #b8720f !important; }
-            .date-hero-sub { color: #666 !important; }
-            .status-chip, .autosave-chip, .prev-chip { display: none !important; }
-            .table-wrap { border: 1px solid #ccc !important; background: #fff !important; margin-bottom: 1rem !important; page-break-inside: avoid; }
-            .section-header { background: #f5f5f5 !important; border-bottom: 1px solid #ddd !important; }
-            .section-title { color: #333 !important; }
-            th { background: #efefef !important; color: #555 !important; border-bottom: 1px solid #ccc !important; font-size: 0.65rem !important; }
-            tbody tr { border-bottom: 1px solid #eee !important; }
-            td { color: #111 !important; padding: 0.45rem 0.75rem !important; }
-            .num-input { border: none !important; background: transparent !important; box-shadow: none !important; color: #111 !important; font-family: 'DM Mono', monospace !important; width: auto !important; }
-            .price-cell, .total-value-cell { color: #b8720f !important; }
-            .yesterday-cell { color: #1a9aab !important; }
-            .total-row td { background: #fffbf0 !important; color: #b8720f !important; border-top: 1px solid #e5c060 !important; }
-            .total-row .total-label { color: #666 !important; }
-        }
+        /* ── Expenses section ── */
+        .exp-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+                     overflow:hidden;margin-bottom:1rem;}
+        .exp-hd{display:flex;align-items:center;gap:.75rem;padding:.9rem 1.2rem;
+                border-bottom:1px solid var(--border);background:var(--surface-2);}
+        .exp-add-row{display:flex;flex-wrap:wrap;gap:.65rem;align-items:flex-end;padding:1rem 1.2rem;
+                     border-bottom:1px solid var(--border);}
+        .exp-field{display:flex;flex-direction:column;gap:.3rem;}
+        .exp-field label{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);}
+        .exp-list{padding:0;}
+        .exp-item{display:flex;align-items:center;gap:1rem;padding:.7rem 1.2rem;border-bottom:1px solid var(--border);
+                  font-size:.8rem;transition:background .12s;}
+        .exp-item:last-child{border-bottom:none;}
+        .exp-item:hover{background:var(--surface-2);}
+        .exp-cat-badge{padding:.2rem .65rem;border-radius:50px;font-size:.65rem;font-weight:700;
+                       background:rgba(167,139,250,.12);color:var(--expense);border:1px solid rgba(167,139,250,.2);}
+        .exp-desc{flex:1;font-weight:500;}
+        .exp-amount{font-family:'DM Mono',monospace;font-weight:700;color:var(--danger);white-space:nowrap;}
+        .exp-del{background:none;border:none;cursor:pointer;color:var(--text-faint);font-size:1rem;
+                 padding:.2rem .4rem;border-radius:6px;transition:.15s;}
+        .exp-del:hover{color:var(--danger);background:rgba(248,113,113,.1);}
+        .exp-total-bar{display:flex;justify-content:space-between;align-items:center;padding:.85rem 1.2rem;
+                       background:rgba(248,113,113,.05);border-top:1px solid rgba(248,113,113,.15);}
+        .exp-total-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);}
+        .exp-total-val{font-family:'DM Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--danger);}
+        .exp-empty{padding:1.5rem;text-align:center;color:var(--text-faint);font-size:.82rem;}
 
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 3px; }
+        /* ── Modal ── */
+        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);
+                       display:none;justify-content:center;align-items:center;z-index:1000;}
+        .modal-overlay.active{display:flex;}
+        .modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+               padding:2rem 2.25rem;max-width:380px;width:90%;text-align:center;
+               box-shadow:0 25px 60px rgba(0,0,0,.5);animation:popIn .2s cubic-bezier(.34,1.56,.64,1);}
+        @keyframes popIn{from{opacity:0;transform:scale(.9) translateY(12px)}to{opacity:1;transform:none}}
+        .modal-icon{font-size:2rem;margin-bottom:.75rem;}
+        .modal-msg{font-size:.9rem;color:var(--text);margin-bottom:1.5rem;line-height:1.5;font-weight:500;}
+        .modal-btns{display:flex;gap:.75rem;justify-content:center;}
 
-        @media (max-width: 640px) {
-            body { padding: 1rem; }
-            .date-hero { flex-direction: column; gap: 1rem; }
-            .date-hero-big { font-size: 2rem; }
-            .controls { flex-direction: column; align-items: stretch; }
+        /* ── Net summary bar ── */
+        .summary-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;
+                     background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+                     padding:1rem 1.5rem;margin-bottom:1rem;}
+        .sum-item{display:flex;flex-direction:column;gap:.25rem;}
+        .sum-label{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text-faint);}
+        .sum-val  {font-family:'DM Mono',monospace;font-size:1.15rem;font-weight:700;}
+        .sum-val.green{color:var(--success);}
+        .sum-val.amber{color:var(--accent);}
+        .sum-val.red  {color:var(--danger);}
+        .sum-val.teal {color:var(--teal);}
+
+        @media print{
+            .header,.controls,.date-hero-right,.modal-overlay,.exp-add-row,.exp-del{display:none!important;}
+            body{background:#fff!important;color:#111!important;padding:.5rem;}
+            .section-hd{background:#f5f5f5!important;border:none!important;}
+            .section-title{color:#333!important;}
+            th{background:#efefef!important;color:#555!important;}
+            td{color:#111!important;}
+            .num-input,.price-input{border:none!important;background:transparent!important;box-shadow:none!important;color:#111!important;width:auto!important;}
+            .total-row td{background:#fffbf0!important;color:#b8720f!important;}
         }
+        ::-webkit-scrollbar{width:6px;height:6px;}
+        ::-webkit-scrollbar-track{background:transparent;}
+        ::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:3px;}
+        @media(max-width:640px){body{padding:1rem;}.date-hero{flex-direction:column;gap:1rem;}.controls{flex-direction:column;align-items:stretch;}}
     </style>
 </head>
 <body>
 <div class="container">
 
-    <!-- Header -->
-    <div class="header">
-        <div class="logo">
-            <div class="logo-icon">📦</div>
-            <div class="logo-text">
-                <span class="logo-title">Janeth Business</span>
-                <span class="logo-sub">Daily Inventory & Sales</span>
-            </div>
-        </div>
-        <div class="header-right">
-            <div class="user-chip">
-                <div class="user-avatar"><?php echo strtoupper(substr($_SESSION['username'], 0, 1)); ?></div>
-                <span class="user-name"><?php echo htmlspecialchars($_SESSION['username']); ?></span>
-            </div>
-            <?php if ($user_role === 'admin'): ?>
-                <a href="admin/products.php" class="btn btn-ghost">⚙️ Products</a>
-            <?php endif; ?>
-            <button class="btn btn-danger" id="logoutBtn">Sign out</button>
+<!-- Header -->
+<div class="header">
+    <div class="logo">
+        <div class="logo-icon">📦</div>
+        <div class="logo-text">
+            <span class="logo-title">Janeth's Business</span>
+            <span class="logo-sub">Daily Inventory & Sales</span>
         </div>
     </div>
-
-    <!-- Modal -->
-    <div id="modalOverlay" class="modal-overlay">
-        <div class="modal">
-            <div class="modal-icon" id="modalIcon">💬</div>
-            <p class="modal-message" id="modalMessage">Are you sure?</p>
-            <div class="modal-buttons">
-                <button id="modalConfirmBtn" class="btn btn-primary">Confirm</button>
-                <button id="modalCancelBtn" class="btn btn-ghost">Cancel</button>
-            </div>
+    <div class="header-right">
+        <div class="user-chip">
+            <div class="user-avatar"><?= strtoupper(substr($username,0,1)) ?></div>
+            <span class="user-name"><?= htmlspecialchars($username) ?></span>
+            <span class="role-badge"><?= $user_role ?></span>
         </div>
-    </div>
-
-    <!-- Big Date Hero -->
-    <div class="date-hero">
-        <div class="date-hero-left">
-            <div class="date-hero-label">Selected Date</div>
-            <div class="date-hero-big" id="heroDay">—</div>
-            <div class="date-hero-sub" id="heroFull">Pick a date and click Load</div>
-        </div>
-        <div class="date-hero-right">
-            <div id="prevChip" class="prev-chip" style="display:none">↩ Yesterday from <span id="prevDateLabel"></span></div>
-            <div id="autosaveChip" class="autosave-chip">
-                <span class="autosave-dot"></span>
-                <span id="autosaveLabel">Auto-save off</span>
-            </div>
-            <span id="statusChip" class="status-chip status-none">● No data loaded</span>
-            <input type="date" id="recordDate">
-            <button class="btn btn-teal" id="loadDateBtn">↻ Load</button>
-        </div>
-    </div>
-
-    <!-- Controls with Auto-save toggle -->
-    <div class="controls">
-        <input type="text" id="searchInput" placeholder="🔍 Search product…" style="width:200px">
-        <select id="categoryFilter">
-            <option value="all">All Categories</option>
-            <option value="Chicken">🐔 Chicken</option>
-            <option value="Frozen">❄️ Frozen</option>
-        </select>
-        <div class="controls-sep"></div>
-        <div class="toggle-switch">
-            <span>⚡ Auto-save</span>
-            <input type="checkbox" id="autoSaveToggle">
-            <label for="autoSaveToggle"></label>
-        </div>
+        <?php if ($user_role === 'admin'): ?>
+        <a href="admin/products.php" class="btn btn-ghost">⚙️ Products</a>
         <a href="janeth-dashboard.php" class="btn btn-ghost">📊 Dashboard</a>
-        <button id="resetBtn" class="btn btn-ghost">⟳ Reset</button>
-        <button id="exportPdfBtn" class="btn btn-pdf">📄 Export PDF</button>
+        <?php else: ?>
+        <a href="janeth-dashboard.php" class="btn btn-ghost">📊 Dashboard</a>
+        <?php endif; ?>
+        <button class="btn btn-danger" id="logoutBtn">Sign out</button>
     </div>
+</div>
 
-    <!-- CHICKEN section -->
-    <div class="table-wrap">
-        <div class="section-header">
-            <span class="section-icon">🐔</span>
-            <span class="section-title" style="color:var(--chicken)">Chicken Products</span>
-            <span class="section-count" id="chickenCount">0 items</span>
-        </div>
-        <div class="table-scroll">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>Price (₱)</th>
-                        <th>Yesterday</th>
-                        <th>Stock In</th>
-                        <th>Remaining</th>
-                        <th>Stock In Total (₱)</th>
-                    </tr>
-                </thead>
-                <tbody id="chickenBody"></tbody>
-            </table>
+<!-- Modal -->
+<div id="modalOverlay" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-icon" id="modalIcon">💬</div>
+        <p class="modal-msg" id="modalMsg">Are you sure?</p>
+        <div class="modal-btns">
+            <button id="modalOk"  class="btn btn-primary">OK</button>
+            <button id="modalCancel" class="btn btn-ghost">Cancel</button>
         </div>
     </div>
+</div>
 
-    <!-- FROZEN section -->
-<div class="table-wrap">
-    <div class="section-header">
+<!-- Date Hero -->
+<div class="date-hero">
+    <div class="date-hero-left">
+        <div class="hero-label">Selected Date</div>
+        <div class="hero-big" id="heroDay">—</div>
+        <div class="hero-sub" id="heroFull">Pick a date and click Load</div>
+    </div>
+    <div class="date-hero-right">
+        <div id="asChip" class="as-chip"><span class="as-dot"></span><span id="asLabel">Auto-save off</span></div>
+        <span id="statusChip" class="status-chip s-none">● No data loaded</span>
+        <input type="date" id="recordDate">
+        <button class="btn btn-teal" id="loadBtn">↻ Load</button>
+    </div>
+</div>
+
+<!-- Controls -->
+<div class="controls">
+    <input type="text" id="searchInput" placeholder="🔍 Search product…" style="width:190px">
+    <select id="catFilter">
+        <option value="all">All Categories</option>
+        <option value="Chicken">🐔 Chicken</option>
+        <option value="Frozen">❄️ Frozen</option>
+    </select>
+    <div class="controls-sep"></div>
+    <div class="toggle-sw">
+        <span>⚡ Auto-save</span>
+        <input type="checkbox" id="asToggle">
+        <label for="asToggle"></label>
+    </div>
+    <button id="manualSaveBtn" class="btn btn-save">💾 Save</button>
+    <button id="resetBtn" class="btn btn-ghost">⟳ Reset</button>
+    <button id="printBtn" class="btn btn-ghost">📄 Print</button>
+</div>
+
+<!-- Net summary bar -->
+<div class="summary-bar" id="summaryBar">
+    <div class="sum-item"><div class="sum-label">Stock In Value</div><div class="sum-val teal" id="sumStockIn">₱0.00</div></div>
+    <div class="sum-item"><div class="sum-label">Sold Value (est.)</div><div class="sum-val green" id="sumSold">₱0.00</div></div>
+    <div class="sum-item"><div class="sum-label">Remaining Value</div><div class="sum-val amber" id="sumRemaining">₱0.00</div></div>
+    <div class="sum-item"><div class="sum-label">Daily Expenses</div><div class="sum-val red" id="sumExpenses">₱0.00</div></div>
+    <div class="sum-item"><div class="sum-label">Est. Net Income</div><div class="sum-val" id="sumNet">₱0.00</div></div>
+</div>
+
+<!-- Chicken section -->
+<div class="section-wrap">
+    <div class="section-hd">
+        <span class="section-icon">🐔</span>
+        <span class="section-title" style="color:var(--chicken)">Chicken Products</span>
+        <span class="section-count" id="chickenCount">0 items</span>
+    </div>
+    <div class="tbl-scroll">
+        <table>
+            <thead><tr>
+                <th>Product</th>
+                <th>Price (₱)</th>
+                <th>Yesterday</th>
+                <th>Stock In</th>
+                <th>Remaining</th>
+                <th>Sold (calc.)</th>
+                <th>Stock In Value (₱)</th>
+            </tr></thead>
+            <tbody id="chickenBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Frozen section -->
+<div class="section-wrap">
+    <div class="section-hd">
         <span class="section-icon">❄️</span>
         <span class="section-title" style="color:var(--frozen)">Frozen Products</span>
         <span class="section-count" id="frozenCount">0 items</span>
     </div>
-    <div class="table-scroll">
+    <div class="tbl-scroll">
         <table>
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Price (₱)</th>
-                    <th>Yesterday</th>
-                    <th>Stock In</th>
-                    <th>Remaining</th>
-                    <th>Stock In Total (₱)</th>
-                </tr>
-            </thead>
+            <thead><tr>
+                <th>Product</th>
+                <th>Price (₱)</th>
+                <th>Yesterday</th>
+                <th>Stock In</th>
+                <th>Remaining</th>
+                <th>Sold (calc.)</th>
+                <th>Stock In Value (₱)</th>
+            </tr></thead>
             <tbody id="frozenBody"></tbody>
-        </table>  <!-- ✅ Fixed: closed table properly -->
+        </table>
     </div>
 </div>
 
-    <div style="margin-top:0.25rem;margin-bottom:2rem">
-        <span style="font-size:0.7rem;color:var(--text-faint);font-family:'DM Mono',monospace">
-            ✦ Stock In Total = Stock In × Price &nbsp;·&nbsp; Yesterday = previous day's Remaining &nbsp;·&nbsp; ↑ ↓ arrow keys navigate rows
-        </span>
+<!-- Expenses section -->
+<div class="exp-section">
+    <div class="exp-hd">
+        <span class="section-icon">💸</span>
+        <span class="section-title" style="color:var(--expense)">Daily Expenses</span>
+        <span class="section-count" id="expCount">0 items</span>
     </div>
+    <div class="exp-add-row">
+        <div class="exp-field">
+            <label>Category</label>
+            <select id="expCat" style="width:140px">
+                <option>Utilities</option>
+                <option>Transport</option>
+                <option>Food & Snacks</option>
+                <option>Supplies</option>
+                <option>Labour</option>
+                <option>Other</option>
+            </select>
+        </div>
+        <div class="exp-field" style="flex:1;min-width:180px">
+            <label>Description</label>
+            <input type="text" id="expDesc" placeholder="e.g. Ice for the stall" style="width:100%">
+        </div>
+        <div class="exp-field">
+            <label>Amount (₱)</label>
+            <input type="number" id="expAmount" placeholder="0.00" step="0.01" min="0" style="width:110px">
+        </div>
+        <button class="btn btn-primary" id="addExpBtn" style="align-self:flex-end">+ Add</button>
+    </div>
+    <div class="exp-list" id="expList"><div class="exp-empty">No expenses recorded yet.</div></div>
+    <div class="exp-total-bar">
+        <span class="exp-total-label">Total Expenses</span>
+        <span class="exp-total-val" id="expTotalVal">₱0.00</span>
+    </div>
+</div>
 
+<div style="padding-bottom:2rem;text-align:center;font-size:.68rem;color:var(--text-faint);font-family:'DM Mono',monospace">
+    ✦ Sold = Yesterday + Stock In − Remaining &nbsp;·&nbsp; Yesterday auto-fills from previous day's Remaining
+</div>
 </div>
 
 <script>
-    const API_BASE = window.location.origin + '/Janeth_Business/Janeth-Chicken-Business/backend/janeth.php';
-    let masterProducts = [];
-    let masterRecords  = [];
-    let navGrid        = [];
+const API  = window.location.origin + '/Janeth_Business/Janeth-Chicken-Business/backend/janeth.php';
+const ROLE = '<?= $user_role ?>';
 
-    let autoSaveTimer   = null;
-    let autoSaveEnabled = false;
+let masterProducts = [];
+let masterRecords  = [];
+let expenses       = [];
+let navGrid        = [];
+let asTimer        = null;
+let asEnabled      = false;
 
-    // Load toggle state from localStorage
-    const storedToggle = localStorage.getItem('autoSaveToggle');
-    const toggle = document.getElementById('autoSaveToggle');
-    if (storedToggle === 'true') {
-        toggle.checked = true;
-        autoSaveEnabled = true;
-        document.getElementById('autosaveLabel').textContent = 'Auto-save on';
-        document.getElementById('autosaveChip').className = 'autosave-chip saved';
-        setTimeout(() => {
-            if (document.getElementById('autosaveChip').className.includes('saved'))
-                document.getElementById('autosaveChip').className = 'autosave-chip';
-        }, 1500);
-    } else {
-        toggle.checked = false;
-        autoSaveEnabled = false;
-        document.getElementById('autosaveLabel').textContent = 'Auto-save off';
-        document.getElementById('autosaveChip').className = 'autosave-chip';
-    }
+// ─── Modal ───
+function modal(msg, onOk, onCancel = null, icon = '💬', okLabel = 'OK', cancelLabel = 'Cancel') {
+    document.getElementById('modalMsg').textContent  = msg;
+    document.getElementById('modalIcon').textContent = icon;
+    document.getElementById('modalOk').textContent   = okLabel;
+    document.getElementById('modalCancel').textContent = cancelLabel;
+    document.getElementById('modalOverlay').classList.add('active');
+    const close = () => document.getElementById('modalOverlay').classList.remove('active');
+    const ok  = document.getElementById('modalOk').cloneNode(true);
+    const can = document.getElementById('modalCancel').cloneNode(true);
+    document.getElementById('modalOk').replaceWith(ok);
+    document.getElementById('modalCancel').replaceWith(can);
+    ok.addEventListener('click',  () => { close(); onOk    && onOk(); });
+    can.addEventListener('click', () => { close(); onCancel && onCancel(); });
+}
+function alert2(msg, isErr = false, autoClose = 2500) {
+    modal(msg, null, null, isErr ? '⚠️' : '✅', 'OK', '');
+    document.getElementById('modalCancel').style.display = 'none';
+    setTimeout(() => document.getElementById('modalOverlay').classList.remove('active'), autoClose);
+}
 
-    toggle.addEventListener('change', () => {
-        autoSaveEnabled = toggle.checked;
-        localStorage.setItem('autoSaveToggle', autoSaveEnabled);
-        if (!autoSaveEnabled) {
-            document.getElementById('autosaveLabel').textContent = 'Auto-save off';
-            document.getElementById('autosaveChip').className = 'autosave-chip';
-        } else {
-            document.getElementById('autosaveLabel').textContent = 'Auto-save on';
-            document.getElementById('autosaveChip').className = 'autosave-chip saved';
-            setTimeout(() => {
-                if (document.getElementById('autosaveChip').className.includes('saved'))
-                    document.getElementById('autosaveChip').className = 'autosave-chip';
-            }, 1500);
-        }
-    });
+// ─── Date helpers ───
+function prevDate(d) {
+    const dt = new Date(d + 'T00:00:00');
+    dt.setDate(dt.getDate() - 1);
+    return dt.toISOString().split('T')[0];
+}
+function peso(n) { return '₱' + (parseFloat(n)||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 
-    function setAutoSaveStatus(state) {
-        const chip  = document.getElementById('autosaveChip');
-        const label = document.getElementById('autosaveLabel');
-        chip.className = 'autosave-chip' + (state ? ' ' + state : '');
-        label.textContent = state === 'saving' ? 'Saving…' : state === 'saved' ? 'Saved ✓' : state === 'error' ? 'Save failed' : (autoSaveEnabled ? 'Auto-save on' : 'Auto-save off');
-    }
+function setStatus(t) {
+    const c = document.getElementById('statusChip');
+    c.className = 'status-chip';
+    if (t==='loaded') { c.classList.add('s-loaded'); c.textContent='● Data loaded'; }
+    else if (t==='empty') { c.classList.add('s-empty');  c.textContent='● New entry'; }
+    else { c.classList.add('s-none'); c.textContent='● No data loaded'; }
+}
+function updateHero(d) {
+    if (!d) { document.getElementById('heroDay').innerHTML='—'; document.getElementById('heroFull').textContent='Pick a date and click Load'; return; }
+    const [y,m,day] = d.split('-');
+    const dt = new Date(+y,+m-1,+day);
+    document.getElementById('heroDay').innerHTML = `<span class="day-num">${day}</span> ${dt.toLocaleDateString('en-US',{month:'long',year:'numeric'})}`;
+    document.getElementById('heroFull').textContent = dt.toLocaleDateString('en-US',{weekday:'long'});
+}
 
-    function scheduleAutoSave() {
-        if (!autoSaveEnabled) return;
-        clearTimeout(autoSaveTimer);
-        setAutoSaveStatus('saving');
-        autoSaveTimer = setTimeout(doSave, 1400);
-    }
+// ─── Auto-save ───
+const asChip = document.getElementById('asChip');
+const asLabel = document.getElementById('asLabel');
+function setAsStatus(s) {
+    asChip.className = 'as-chip' + (s?' '+s:'');
+    asLabel.textContent = s==='saving'?'Saving…':s==='saved'?'Saved ✓':s==='error'?'Save failed':(asEnabled?'Auto-save on':'Auto-save off');
+}
+function scheduleAs() {
+    if (!asEnabled) return;
+    clearTimeout(asTimer);
+    setAsStatus('saving');
+    asTimer = setTimeout(doSave, 1400);
+}
 
-    async function doSave() {
-        const date = document.getElementById('recordDate').value;
-        if (!date) { setAutoSaveStatus('error'); return; }
-        const payload = {
-            date,
-            records: masterRecords.map(r => ({
-                product_id:    r.productId,
-                yesterday_qty: r.yesterday,
-                stock_in:      r.stockIn,
-                remaining_qty: r.remaining
-            }))
-        };
-        try {
-            const res  = await fetch(API_BASE, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-            const data = await res.json();
-            if (data.success) { setStatus('loaded'); setAutoSaveStatus('saved'); }
-            else setAutoSaveStatus('error');
-            setTimeout(() => setAutoSaveStatus(''), 2800);
-        } catch { setAutoSaveStatus('error'); setTimeout(() => setAutoSaveStatus(''), 2800); }
-    }
+const asToggle = document.getElementById('asToggle');
+asEnabled = localStorage.getItem('asEnabled') === 'true';
+asToggle.checked = asEnabled;
+setAsStatus(asEnabled ? '' : '');
+asLabel.textContent = asEnabled ? 'Auto-save on' : 'Auto-save off';
 
-    /* ── Modal ── */
-    function showModal(message, onConfirm, onCancel = null, icon = '💬') {
-        document.getElementById('modalMessage').innerText = message;
-        document.getElementById('modalIcon').innerText = icon;
-        const overlay = document.getElementById('modalOverlay');
-        overlay.classList.add('active');
-        const close = () => {
-            overlay.classList.remove('active');
-            document.getElementById('modalConfirmBtn').replaceWith(document.getElementById('modalConfirmBtn').cloneNode(true));
-            document.getElementById('modalCancelBtn').replaceWith(document.getElementById('modalCancelBtn').cloneNode(true));
-        };
-        document.getElementById('modalConfirmBtn').addEventListener('click', () => { close(); onConfirm && onConfirm(); });
-        document.getElementById('modalCancelBtn').addEventListener('click', () => { close(); onCancel && onCancel(); });
-    }
-    function showAlert(msg, isError = false) {
-        showModal(msg, null, null, isError ? '⚠️' : '✅');
-        setTimeout(() => document.getElementById('modalOverlay').classList.remove('active'), 2200);
-    }
-
-    /* ── Date helpers ── */
-    function prevDate(dateStr) {
-        if (!dateStr) return '';
-        const [y, m, d] = dateStr.split('-').map(Number);
-        const daysInMonth = (year, month) => new Date(year, month, 0).getDate();
-        let prevYear = y, prevMonth = m, prevDay = d - 1;
-        if (prevDay < 1) {
-            prevMonth -= 1;
-            if (prevMonth < 1) {
-                prevYear -= 1;
-                prevMonth = 12;
-            }
-            prevDay = daysInMonth(prevYear, prevMonth);
-        }
-        return `${prevYear}-${String(prevMonth).padStart(2,'0')}-${String(prevDay).padStart(2,'0')}`;
-    }
-
-    function setStatus(type) {
-        const chip = document.getElementById('statusChip');
-        chip.className = 'status-chip';
-        if (type === 'loaded') { chip.classList.add('status-loaded'); chip.textContent = '● Data loaded'; }
-        else if (type === 'empty') { chip.classList.add('status-empty'); chip.textContent = '● New entry'; }
-        else { chip.classList.add('status-none'); chip.textContent = '● No data loaded'; }
-    }
-
-    function updateHeroDate(dateStr) {
-        if (!dateStr) {
-            document.getElementById('heroDay').innerHTML = '—';
-            document.getElementById('heroFull').textContent = 'Pick a date and click Load';
-            return;
-        }
-        const [y, m, d] = dateStr.split('-');
-        const date = new Date(+y, +m - 1, +d);
-        const monthYear = date.toLocaleDateString('en-US', { month:'long', year:'numeric' });
-        const dayName   = date.toLocaleDateString('en-US', { weekday:'long' });
-        document.getElementById('heroDay').innerHTML  = `<span class="day-num">${d}</span> ${monthYear}`;
-        document.getElementById('heroFull').textContent = dayName;
-    }
-
-    /* ── Core data loading (always fetches previous day's remaining) ── */
-    async function loadDataForDate(date, silent = false) {
-        if (!date) return;
-        updateHeroDate(date);
-        const { map: prevMap } = await fetchPrevRemaining(date);
-        try {
-            const res  = await fetch(`${API_BASE}?date=${date}`);
-            if (!res.ok) throw new Error();
-            const data = await res.json();
-            if (data.records && data.records.length) {
-                const savedMap = new Map(data.records.map(r => [Number(r.product_id), {
-                    yesterday: parseFloat(r.yesterday_qty) || 0,
-                    stockIn:   parseFloat(r.stock_in)      || 0,
-                    remaining: parseFloat(r.remaining_qty) || 0
-                }]));
-                masterRecords = masterProducts.map(p => ({
-                    ...p,
-                    yesterday: savedMap.get(Number(p.productId))?.yesterday ?? 0,
-                    stockIn:   savedMap.get(Number(p.productId))?.stockIn   ?? 0,
-                    remaining: savedMap.get(Number(p.productId))?.remaining ?? 0,
-                    yesterdayFromPrev: false
-                }));
-                if (prevMap) applyPrevRemaining(prevMap);
-                renderSections();
-                setStatus('loaded');
-                if (!silent) showAlert(`Loaded data for ${date}`);
-            } else {
-                if (prevMap) {
-                    initEmptyWithPrev(prevMap);
-                } else {
-                    initEmpty();
-                }
-                setStatus('empty');
-                if (!silent) showModal(`No data for ${date}. Start with empty form?`, null, null, '📭');
-            }
-        } catch (err) {
-            if (!silent) showAlert('Failed to load data.', true);
-        }
-    }
-
-    async function fetchPrevRemaining(date) {
-        const prev = prevDate(date);
-        try {
-            const res  = await fetch(`${API_BASE}?date=${prev}`);
-            if (!res.ok) return { map: null };
-            const data = await res.json();
-            if (data.records && data.records.length) {
-                const map = new Map(data.records.map(r => [Number(r.product_id), parseFloat(r.remaining_qty) || 0]));
-                document.getElementById('prevDateLabel').textContent = prev;
-                document.getElementById('prevChip').style.display = 'inline-flex';
-                return { map };
-            }
-        } catch {}
-        document.getElementById('prevChip').style.display = 'none';
-        return { map: null };
-    }
-
-    function applyPrevRemaining(prevMap) {
-        masterRecords.forEach(r => {
-            const val = prevMap.get(r.productId) ?? prevMap.get(String(r.productId)) ?? prevMap.get(Number(r.productId));
-            if (val !== undefined) {
-                r.yesterday = val;
-                r.yesterdayFromPrev = true;
-            } else {
-                r.yesterdayFromPrev = false;
-            }
-        });
-    }
-
-    function initEmptyWithPrev(prevMap) {
-        masterRecords = masterProducts.map(p => ({ ...p, yesterday: 0, stockIn: 0, remaining: 0, yesterdayFromPrev: false }));
-        if (prevMap) applyPrevRemaining(prevMap);
-        renderSections();
-    }
-
-    function initEmpty() {
-        masterRecords = masterProducts.map(p => ({ ...p, yesterday: 0, stockIn: 0, remaining: 0, yesterdayFromPrev: false }));
-        renderSections();
-    }
-
-    /* ── Row building ── */
-    function buildRow(rec, globalIndex, rowIndex) {
-        const tr = document.createElement('tr');
-        // Product name
-        const tdName = document.createElement('td');
-        tdName.innerHTML = `<span class="prod-name">${escapeHtml(rec.productName)}</span>`;
-        tr.appendChild(tdName);
-        // Price
-        const tdPrice = document.createElement('td');
-        tdPrice.className = 'price-cell';
-        tdPrice.textContent = `₱ ${Number(rec.price).toFixed(2)}`;
-        tr.appendChild(tdPrice);
-        // Yesterday (only number)
-        const tdYesterday = document.createElement('td');
-        const yVal = masterRecords[globalIndex].yesterday;
-        const fromPrev = masterRecords[globalIndex].yesterdayFromPrev;
-        tdYesterday.innerHTML = `<span class="yesterday-cell${fromPrev ? '' : ' manual'}">${yVal}</span>`;
-        tr.appendChild(tdYesterday);
-        // Editable inputs
-        const makeInput = (field, colId) => {
-            const td  = document.createElement('td');
-            const inp = document.createElement('input');
-            inp.type = 'number'; inp.step = 'any'; inp.min = '0';
-            inp.value = rec[field] !== 0 ? rec[field] : '';
-            inp.placeholder = '0';
-            inp.className = 'num-input';
-            inp.dataset.row = rowIndex;
-            inp.dataset.col = colId;
-            inp.addEventListener('input', e => {
-    let v = e.target.value === '' ? 0 : parseFloat(e.target.value);
-    if (isNaN(v)) v = 0;
-    masterRecords[globalIndex][field] = v;
-    const totalCell = tr.querySelector('.total-value-cell');
-    const r = masterRecords[globalIndex];
-    totalCell.textContent = `₱ ${(r.stockIn * r.price).toFixed(2)}`;
-    updateChickenTotal();
-    updateFrozenTotal();  // ✅ Added this line
-    scheduleAutoSave();
+asToggle.addEventListener('change', () => {
+    asEnabled = asToggle.checked;
+    localStorage.setItem('asEnabled', asEnabled);
+    asLabel.textContent = asEnabled ? 'Auto-save on' : 'Auto-save off';
+    setAsStatus('');
 });
-            td.appendChild(inp);
-            return td;
-        };
-        tr.appendChild(makeInput('stockIn',   0));
-        tr.appendChild(makeInput('remaining', 1));
-        // Stock In Total
-        const tdTotal = document.createElement('td');
-        tdTotal.className = 'total-value-cell';
-        tdTotal.textContent = `₱ ${(rec.stockIn * rec.price).toFixed(2)}`;
-        tr.appendChild(tdTotal);
-        return tr;
-    }
 
-    function getChickenTotal() {
-    return masterRecords.filter(r => r.category === 'Chicken').reduce((s, r) => s + r.stockIn * r.price, 0);
+// ─── Save inventory ───
+async function doSave() {
+    const date = document.getElementById('recordDate').value;
+    if (!date) { setAsStatus('error'); return; }
+    const payload = { date, records: masterRecords.map(r => ({ product_id:r.productId, yesterday_qty:r.yesterday, stock_in:r.stockIn, remaining_qty:r.remaining })) };
+    try {
+        const res  = await fetch(API, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+        const data = await res.json();
+        if (data.success) { setStatus('loaded'); setAsStatus('saved'); }
+        else setAsStatus('error');
+        setTimeout(() => setAsStatus(''), 2800);
+    } catch { setAsStatus('error'); setTimeout(()=>setAsStatus(''),2800); }
 }
 
-function getFrozenTotal() {
-    return masterRecords.filter(r => r.category === 'Frozen').reduce((s, r) => s + r.stockIn * r.price, 0);
-}
+// ─── Load records ───
+async function loadDate(date, silent = false) {
+    if (!date) return;
+    updateHero(date);
+    const prevMap = await fetchPrev(date);
 
-function updateChickenTotal() {
-    const el = document.getElementById('chickenTotalCell');
-    if (el) el.textContent = `₱ ${getChickenTotal().toFixed(2)}`;
-}
+    const res  = await fetch(`${API}?date=${date}`);
+    const data = await res.json();
 
-function updateFrozenTotal() {
-    const el = document.getElementById('frozenTotalCell');
-    if (el) el.textContent = `₱ ${getFrozenTotal().toFixed(2)}`;
-}
-
-function buildChickenTotalRow() {
-    const tr = document.createElement('tr');
-    tr.className = 'total-row';
-    tr.innerHTML = `<td colspan="5" class="total-label">Total Chicken Stock In</td><td id="chickenTotalCell">₱ ${getChickenTotal().toFixed(2)}</td>`;
-    return tr;
-}
-
-function buildFrozenTotalRow() {
-    const tr = document.createElement('tr');
-    tr.className = 'total-row';
-    tr.innerHTML = `<td colspan="5" class="total-label">Total Frozen Stock In</td><td id="frozenTotalCell">₱ ${getFrozenTotal().toFixed(2)}</td>`;
-    return tr;
-}   
-
-    function renderSections() {
-        const term = document.getElementById('searchInput').value.toLowerCase();
-        const cat  = document.getElementById('categoryFilter').value;
-        const tagged   = masterRecords.map((r, i) => ({ ...r, _gi: i }));
-        const filtered = tagged.filter(r => r.productName.toLowerCase().includes(term) && (cat === 'all' || r.category === cat));
-        const chickens = filtered.filter(r => r.category === 'Chicken');
-        const frozens  = filtered.filter(r => r.category === 'Frozen');
-        const renderInto = (tbodyId, items, showTotal, countId) => {
-            const tbody   = document.getElementById(tbodyId);
-            const countEl = document.getElementById(countId);
-            tbody.innerHTML = '';
-            if (!items.length) { tbody.innerHTML = `<tr><td colspan="6" class="empty-section">No products found.缓解</td>`; countEl.textContent = '0 items'; return; }
-            items.forEach((rec, rowIdx) => tbody.appendChild(buildRow(rec, rec._gi, rowIdx)));
-            if (showTotal) tbody.appendChild(buildChickenTotalRow());
-            countEl.textContent = `${items.length} item${items.length !== 1 ? 's' : ''}`;
-        };
-        renderInto('chickenBody', chickens, true,  'chickenCount');
-        renderInto('frozenBody',  frozens,  true, 'frozenCount');  // ✅ Changed false to true
-        rebuildNavGrid();
-    }
-
-    function rebuildNavGrid() {
-        navGrid = Array.from(document.querySelectorAll('.num-input')).map(inp => ({
-            el: inp,
-            row: +inp.dataset.row,
-            col: +inp.dataset.col,
-            tbody: inp.closest('tbody')  // store the parent tbody
+    if (data.records && data.records.length) {
+        const saved = new Map(data.records.map(r => [+r.product_id, { yesterday:+r.yesterday_qty, stockIn:+r.stock_in, remaining:+r.remaining_qty, price:+r.price }]));
+        masterRecords = masterProducts.map(p => ({
+            ...p,
+            yesterday: saved.get(p.productId)?.yesterday ?? 0,
+            stockIn:   saved.get(p.productId)?.stockIn   ?? 0,
+            remaining: saved.get(p.productId)?.remaining ?? 0,
+            yesterdayFromPrev: false
         }));
+        if (prevMap) applyPrev(prevMap);
+        setStatus('loaded');
+        if (!silent) alert2(`Loaded data for ${date}`);
+    } else {
+        masterRecords = masterProducts.map(p => ({ ...p, yesterday:0, stockIn:0, remaining:0, yesterdayFromPrev:false }));
+        if (prevMap) applyPrev(prevMap);
+        setStatus('empty');
+        if (!silent) alert2(`No data for ${date}. Starting a new entry.`, false, 2000);
     }
 
-    // ✅ FIXED arrow navigation: stay within same tbody
-    document.addEventListener('keydown', e => {
-        if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
-        const active = document.activeElement;
-        if (!active || !active.classList.contains('num-input')) return;
-        e.preventDefault();
-        const curRow = +active.dataset.row;
-        const curCol = +active.dataset.col;
-        const curTbody = active.closest('tbody');
-        const dir = e.key === 'ArrowDown' ? 1 : -1;
-        const next = navGrid.find(n =>
-            n.col === curCol &&
-            n.row === curRow + dir &&
-            n.tbody === curTbody
-        );
-        if (next) {
-            next.el.focus();
-            next.el.select();
-        }
+    await loadExpenses(date);
+    renderSections();
+}
+
+async function fetchPrev(date) {
+    const prev = prevDate(date);
+    try {
+        const res  = await fetch(`${API}?date=${prev}`);
+        const data = await res.json();
+        if (data.records && data.records.length)
+            return new Map(data.records.map(r => [+r.product_id, +r.remaining_qty]));
+    } catch {}
+    return null;
+}
+function applyPrev(map) {
+    masterRecords.forEach(r => {
+        const v = map.get(r.productId);
+        if (v !== undefined) { r.yesterday = v; r.yesterdayFromPrev = true; }
     });
+}
 
-    function escapeHtml(s) {
-        return String(s).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+// ─── Products ───
+async function fetchProducts() {
+    try {
+        const res  = await fetch(`${API}?products=1`);
+        const data = await res.json();
+        if (!data.products) throw new Error();
+        masterProducts = data.products.map(p => ({ productId:+p.id, productName:p.name, category:p.category, price:+p.price }));
+        const d = localStorage.getItem('janeth_date') || new Date().toISOString().split('T')[0];
+        document.getElementById('recordDate').value = d;
+        updateHero(d);
+        await loadDate(d, true);
+    } catch { alert2('Failed to load products.', true); }
+}
+
+// ─── Render ───
+function calcSold(r) { return Math.max(0, r.yesterday + r.stockIn - r.remaining); }
+
+function renderSections() {
+    const term = document.getElementById('searchInput').value.toLowerCase();
+    const cat  = document.getElementById('catFilter').value;
+    const tagged = masterRecords.map((r,i) => ({...r, _gi:i}));
+    const filtered = tagged.filter(r => r.productName.toLowerCase().includes(term) && (cat==='all'||r.category===cat));
+
+    renderGroup('chickenBody','chickenCount', filtered.filter(r=>r.category==='Chicken'), 'chicken');
+    renderGroup('frozenBody', 'frozenCount',  filtered.filter(r=>r.category==='Frozen'),  'frozen');
+    rebuildNav();
+    updateSummary();
+}
+
+function renderGroup(tbodyId, countId, items, section) {
+    const tbody = document.getElementById(tbodyId);
+    const countEl = document.getElementById(countId);
+    tbody.innerHTML = '';
+    if (!items.length) {
+        tbody.innerHTML = `<tr><td colspan="7" class="empty-section">No products found.</td></tr>`;
+        countEl.textContent = '0 items';
+        return;
     }
+    items.forEach((rec, rowIdx) => tbody.appendChild(buildRow(rec, rec._gi, rowIdx)));
+    tbody.appendChild(buildTotalRow(items, section));
+    countEl.textContent = `${items.length} item${items.length!==1?'s':''}`;
+}
 
-    async function fetchProducts() {
-        try {
-            const res  = await fetch(`${API_BASE}?products=1`);
-            const data = await res.json();
-            if (data.products) {
-                masterProducts = data.products
-                    .map(p => ({ productId: Number(p.id), productName: p.name, category: p.category, price: parseFloat(p.price) || 0 }))
-                    .sort((a, b) => a.productId - b.productId);
-                const savedDate = localStorage.getItem('janeth_last_date') || new Date().toISOString().split('T')[0];
-                document.getElementById('recordDate').value = savedDate;
-                updateHeroDate(savedDate);
-                await loadDataForDate(savedDate, true);
-            } else throw new Error();
-        } catch (e) {
-            showAlert('Failed to load products.', true);
-            masterProducts = [{ productId: 1, productName: 'Whole Chicken', category: 'Chicken', price: 0 }];
-            initEmpty();
-        }
-    }
+function buildRow(rec, gi, rowIdx) {
+    const tr = document.createElement('tr');
 
-    document.getElementById('recordDate').addEventListener('change', async () => {
-        const newDate = document.getElementById('recordDate').value;
-        localStorage.setItem('janeth_last_date', newDate);
-        if (masterProducts.length) {
-            await loadDataForDate(newDate, true);
-        }
+    // Product name
+    const tdName = document.createElement('td');
+    tdName.innerHTML = `<span class="prod-name">${esc(rec.productName)}</span>`;
+    tr.appendChild(tdName);
+
+    // Price – editable for staff and admin
+    const tdPrice = document.createElement('td');
+    const priceInp = document.createElement('input');
+    priceInp.type = 'number'; priceInp.step = '0.01'; priceInp.min = '0';
+    priceInp.value = rec.price.toFixed(2);
+    priceInp.className = 'price-input';
+    priceInp.title = 'Click to update price';
+    priceInp.addEventListener('change', async e => {
+        const newPrice = parseFloat(e.target.value);
+        if (isNaN(newPrice) || newPrice < 0) { e.target.value = rec.price.toFixed(2); return; }
+        masterRecords[gi].price = newPrice;
+        masterProducts.find(p=>p.productId===rec.productId) && (masterProducts.find(p=>p.productId===rec.productId).price = newPrice);
+        // Save to DB
+        await fetch(API, { method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ update_price:1, product_id:rec.productId, price:newPrice }) });
+        renderSections();
     });
+    tdPrice.appendChild(priceInp);
+    tr.appendChild(tdPrice);
 
-    document.getElementById('loadDateBtn').onclick = async () => {
-        const date = document.getElementById('recordDate').value;
-        if (!date) return showAlert('Please select a date first.', true);
-        await loadDataForDate(date, false);
-    };
-    document.getElementById('resetBtn').onclick = async () => {
-        showModal('Clear all entries? Unsaved changes will be lost.', async () => {
-            const date = document.getElementById('recordDate').value;
-            const { map: prevMap } = await fetchPrevRemaining(date);
-            if (prevMap) initEmptyWithPrev(prevMap);
-            else initEmpty();
-            setStatus('empty');
-            showAlert('Form reset.');
-        }, null, '⚠️');
-    };
-    document.getElementById('exportPdfBtn').onclick = () => { if (!document.getElementById('recordDate').value) return showAlert('Please select a date first.', true); window.print(); };
-    document.getElementById('logoutBtn').onclick = () => showModal('Sign out?', () => { window.location.href = '../backend/logout.php'; }, null, '👋');
-    document.getElementById('searchInput').oninput = () => renderSections();
-    document.getElementById('categoryFilter').onchange = () => renderSections();
+    // Yesterday (read only)
+    const tdYest = document.createElement('td');
+    const yv = masterRecords[gi].yesterday;
+    const fp = masterRecords[gi].yesterdayFromPrev;
+    tdYest.innerHTML = `<span class="yest-cell${fp?'':' manual'}">${yv}</span>`;
+    tr.appendChild(tdYest);
 
-    fetchProducts();
+    // Stock In
+    tr.appendChild(makeNumInput('stockIn', gi, rowIdx, 0, tr));
+    // Remaining
+    tr.appendChild(makeNumInput('remaining', gi, rowIdx, 1, tr));
+
+    // Sold (calculated)
+    const tdSold = document.createElement('td');
+    const sold = calcSold(masterRecords[gi]);
+    tdSold.innerHTML = `<span class="sold-cell ${sold>0?'sold-ok':''}" id="sold-${gi}">${sold}</span>`;
+    tr.appendChild(tdSold);
+
+    // Stock In Value
+    const tdVal = document.createElement('td');
+    const r = masterRecords[gi];
+    tdVal.innerHTML = `<span class="total-cell-val" id="val-${gi}">${peso(r.stockIn * r.price)}</span>`;
+    tr.appendChild(tdVal);
+
+    return tr;
+}
+
+function makeNumInput(field, gi, rowIdx, colId, tr) {
+    const td  = document.createElement('td');
+    const inp = document.createElement('input');
+    inp.type = 'number'; inp.step = '1'; inp.min = '0';
+    inp.value = masterRecords[gi][field] !== 0 ? masterRecords[gi][field] : '';
+    inp.placeholder = '0'; inp.className = 'num-input';
+    inp.dataset.row = rowIdx; inp.dataset.col = colId;
+    inp.addEventListener('input', e => {
+        let v = e.target.value === '' ? 0 : parseInt(e.target.value,10);
+        if (isNaN(v)||v<0) v=0;
+        masterRecords[gi][field] = v;
+        const r = masterRecords[gi];
+        // Update sold
+        const soldEl = document.getElementById(`sold-${gi}`);
+        if (soldEl) soldEl.textContent = calcSold(r);
+        // Update stock in value
+        const valEl = document.getElementById(`val-${gi}`);
+        if (valEl) valEl.textContent = peso(r.stockIn * r.price);
+        updateSummary();
+        scheduleAs();
+    });
+    td.appendChild(inp); return td;
+}
+
+function buildTotalRow(items, section) {
+    const totalStockIn = items.reduce((s,r)=>s + masterRecords[r._gi].stockIn * masterRecords[r._gi].price, 0);
+    const tr = document.createElement('tr');
+    tr.className = 'total-row';
+    tr.innerHTML = `<td colspan="6" class="total-label">Total ${section==='chicken'?'🐔 Chicken':'❄️ Frozen'} Stock In Value</td>
+                    <td>${peso(totalStockIn)}</td>`;
+    return tr;
+}
+
+function rebuildNav() {
+    navGrid = Array.from(document.querySelectorAll('.num-input')).map(i => ({
+        el:i, row:+i.dataset.row, col:+i.dataset.col, tbody:i.closest('tbody')
+    }));
+}
+
+document.addEventListener('keydown', e => {
+    if (e.key!=='ArrowDown'&&e.key!=='ArrowUp') return;
+    const a = document.activeElement;
+    if (!a||!a.classList.contains('num-input')) return;
+    e.preventDefault();
+    const next = navGrid.find(n=>n.col===+a.dataset.col&&n.row===+a.dataset.row+(e.key==='ArrowDown'?1:-1)&&n.tbody===a.closest('tbody'));
+    if (next) { next.el.focus(); next.el.select(); }
+});
+
+function updateSummary() {
+    let stockIn=0, sold=0, remaining=0;
+    masterRecords.forEach(r => {
+        stockIn   += r.stockIn   * r.price;
+        sold      += calcSold(r) * r.price;
+        remaining += r.remaining * r.price;
+    });
+    const expTotal = expenses.reduce((s,e)=>s+parseFloat(e.amount||0),0);
+    const net      = sold - expTotal;
+    document.getElementById('sumStockIn').textContent  = peso(stockIn);
+    document.getElementById('sumSold').textContent     = peso(sold);
+    document.getElementById('sumRemaining').textContent= peso(remaining);
+    document.getElementById('sumExpenses').textContent = peso(expTotal);
+    const netEl = document.getElementById('sumNet');
+    netEl.textContent = peso(net);
+    netEl.className   = 'sum-val ' + (net>=0?'green':'red');
+}
+
+// ─── Expenses ───
+async function loadExpenses(date) {
+    try {
+        const res  = await fetch(`${API}?expenses=${date}`);
+        const data = await res.json();
+        expenses = data.expenses || [];
+    } catch { expenses = []; }
+    renderExpenses();
+}
+
+function renderExpenses() {
+    const list = document.getElementById('expList');
+    const count = document.getElementById('expCount');
+    const total = expenses.reduce((s,e)=>s+parseFloat(e.amount||0),0);
+    document.getElementById('expTotalVal').textContent = peso(total);
+    count.textContent = `${expenses.length} item${expenses.length!==1?'s':''}`;
+    updateSummary();
+    if (!expenses.length) { list.innerHTML='<div class="exp-empty">No expenses recorded yet.</div>'; return; }
+    list.innerHTML = expenses.map(e => `
+        <div class="exp-item">
+            <span class="exp-cat-badge">${esc(e.category)}</span>
+            <span class="exp-desc">${esc(e.description)}</span>
+            <span class="exp-amount">${peso(e.amount)}</span>
+            <button class="exp-del" onclick="delExpense(${e.id})" title="Delete">✕</button>
+        </div>`).join('');
+}
+
+document.getElementById('addExpBtn').addEventListener('click', async () => {
+    const date   = document.getElementById('recordDate').value;
+    const cat    = document.getElementById('expCat').value;
+    const desc   = document.getElementById('expDesc').value.trim();
+    const amount = parseFloat(document.getElementById('expAmount').value);
+    if (!date)        return alert2('Please load a date first.', true);
+    if (!desc)        return alert2('Please enter a description.', true);
+    if (!amount||amount<=0) return alert2('Please enter a valid amount.', true);
+
+    const res  = await fetch(API, { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ save_expense:1, expense_date:date, category:cat, description:desc, amount }) });
+    const data = await res.json();
+    if (data.success) {
+        document.getElementById('expDesc').value   = '';
+        document.getElementById('expAmount').value = '';
+        expenses.unshift({ id:data.id, category:cat, description:desc, amount });
+        renderExpenses();
+    } else alert2('Failed to save expense.', true);
+});
+
+async function delExpense(id) {
+    modal('Delete this expense?', async () => {
+        const res  = await fetch(API, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ delete_expense:id }) });
+        const data = await res.json();
+        if (data.success) { expenses = expenses.filter(e=>e.id!==id); renderExpenses(); }
+        else alert2('Failed to delete expense.', true);
+    }, null, '🗑️', 'Delete', 'Cancel');
+}
+
+// ─── Button events ───
+document.getElementById('recordDate').addEventListener('change', async () => {
+    const d = document.getElementById('recordDate').value;
+    localStorage.setItem('janeth_date', d);
+    await loadDate(d, true);
+});
+document.getElementById('loadBtn').addEventListener('click', async () => {
+    const d = document.getElementById('recordDate').value;
+    if (!d) return alert2('Please select a date.', true);
+    await loadDate(d, false);
+});
+document.getElementById('manualSaveBtn').addEventListener('click', async () => {
+    const date = document.getElementById('recordDate').value;
+    if (!date) return alert2('Please select a date first.', true);
+    await doSave();
+    alert2('Data saved successfully!');
+});
+document.getElementById('resetBtn').addEventListener('click', () => {
+    modal('Clear all entries? Unsaved changes will be lost.', async () => {
+        const d = document.getElementById('recordDate').value;
+        const prev = await fetchPrev(d);
+        masterRecords = masterProducts.map(p=>({...p,yesterday:0,stockIn:0,remaining:0,yesterdayFromPrev:false}));
+        if (prev) applyPrev(prev);
+        setStatus('empty'); renderSections(); alert2('Form reset.');
+    }, null, '⚠️', 'Reset', 'Cancel');
+});
+document.getElementById('printBtn').addEventListener('click', () => {
+    if (!document.getElementById('recordDate').value) return alert2('Please select a date first.', true);
+    window.print();
+});
+document.getElementById('logoutBtn').addEventListener('click', () => {
+    modal('Sign out?', () => { window.location.href='../backend/logout.php'; }, null, '👋', 'Yes, sign out', 'Stay');
+});
+document.getElementById('searchInput').addEventListener('input', renderSections);
+document.getElementById('catFilter').addEventListener('change', renderSections);
+
+function esc(s) { return String(s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+
+fetchProducts();
 </script>
 </body>
 </html>

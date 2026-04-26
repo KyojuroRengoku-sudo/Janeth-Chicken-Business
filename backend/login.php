@@ -4,8 +4,8 @@ header('Content-Type: application/json');
 require_once 'db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $input = json_decode(file_get_contents('php://input'), true);
-    $username = $input['username'] ?? '';
+    $input    = json_decode(file_get_contents('php://input'), true);
+    $username = trim($input['username'] ?? '');
     $password = $input['password'] ?? '';
 
     if (empty($username) || empty($password)) {
@@ -18,15 +18,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = $stmt->fetch();
 
     if ($user && md5($password) === $user['password']) {
-        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['user_id']  = $user['id'];
         $_SESSION['username'] = $user['username'];
-        $_SESSION['role'] = $user['role'];
+        $_SESSION['role']     = $user['role'];
         echo json_encode(['success' => true, 'role' => $user['role']]);
     } else {
-        echo json_encode(['success' => false, 'message' => 'Invalid credentials']);
+        echo json_encode(['success' => false, 'message' => 'Invalid username or password']);
     }
 } else {
     http_response_code(405);
     echo json_encode(['error' => 'Method not allowed']);
 }
-?>
