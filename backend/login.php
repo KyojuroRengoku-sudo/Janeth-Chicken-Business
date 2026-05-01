@@ -1,31 +1,230 @@
-<?php
-session_start();
-header('Content-Type: application/json');
-require_once 'db.php';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Login · Janeth's Business</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0e17;
+            --surface: #111827;
+            --surface-2: #1a2234;
+            --border: rgba(255,255,255,0.07);
+            --accent: #f5a623;
+            --accent-glow: rgba(245,166,35,0.25);
+            --teal: #29b6c8;
+            --teal-dim: rgba(41,182,200,0.12);
+            --teal-glow: rgba(41,182,200,0.3);
+            --text: #e8edf5;
+            --text-muted: #6b7a93;
+            --text-faint: #3d4d63;
+            --danger: #f87171;
+            --danger-dim: rgba(248,113,113,0.1);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $input    = json_decode(file_get_contents('php://input'), true);
-    $username = trim($input['username'] ?? '');
-    $password = $input['password'] ?? '';
+        body {
+            font-family: 'Sora', sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            padding: 1.5rem;
+            overflow: hidden;
+        }
 
-    if (empty($username) || empty($password)) {
-        echo json_encode(['success' => false, 'message' => 'Username and password required']);
-        exit;
+        /* Animated background orbs */
+        .bg-orb {
+            position: fixed; border-radius: 50%; filter: blur(80px);
+            pointer-events: none; z-index: 0; animation: drift 12s ease-in-out infinite alternate;
+        }
+        .bg-orb-1 { width:500px;height:500px; background:rgba(41,182,200,0.07); top:-150px; left:-100px; }
+        .bg-orb-2 { width:400px;height:400px; background:rgba(245,166,35,0.05); bottom:-100px; right:-80px; animation-delay:-6s; }
+        @keyframes drift { from{transform:translate(0,0)} to{transform:translate(30px,20px)} }
+
+        /* Grid */
+        body::before {
+            content:''; position:fixed; inset:0; z-index:0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+            background-size: 52px 52px;
+            pointer-events:none;
+        }
+
+        .card {
+            position:relative; z-index:1;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            width:100%; max-width:430px;
+            padding: 2.75rem 2.5rem 2.25rem;
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.03), 0 40px 80px -20px rgba(0,0,0,0.7),
+                        0 0 100px -30px var(--teal-glow);
+            animation: slideUp .45s cubic-bezier(.34,1.2,.64,1) both;
+        }
+        @keyframes slideUp { from{opacity:0;transform:translateY(28px) scale(.97)} to{opacity:1;transform:none} }
+
+        /* Top glow line */
+        .card::before {
+            content:''; position:absolute; top:0; left:50%; transform:translateX(-50%);
+            width:55%; height:1px;
+            background: linear-gradient(90deg, transparent, var(--teal), transparent);
+        }
+
+        /* Brand */
+        .brand { text-align:center; margin-bottom:2.25rem; }
+        .brand-logo {
+            width:60px; height:60px; margin:0 auto .75rem;
+            background: linear-gradient(135deg, var(--teal), #1a9aab);
+            border-radius:16px;
+            display:flex; align-items:center; justify-content:center;
+            font-size:1.6rem;
+            box-shadow: 0 8px 32px var(--teal-glow);
+        }
+        .brand-name { font-size:1.5rem; font-weight:700; letter-spacing:-.03em; color:var(--text); }
+        .brand-sub  { font-size:.7rem; color:var(--text-muted); font-weight:400; letter-spacing:.1em; text-transform:uppercase; margin-top:.25rem; }
+
+        /* Form */
+        .field { margin-bottom:1.1rem; }
+        .field label {
+            display:block; font-size:.68rem; font-weight:700;
+            text-transform:uppercase; letter-spacing:.09em;
+            color:var(--text-muted); margin-bottom:.45rem;
+        }
+        .field input {
+            width:100%; background:var(--surface-2);
+            border:1px solid var(--border); border-radius:10px;
+            color:var(--text); font-family:'Sora',sans-serif;
+            font-size:.88rem; padding:.8rem 1rem; outline:none; transition:.18s;
+        }
+        .field input::placeholder { color:var(--text-faint); }
+        .field input:focus {
+            border-color:var(--teal); background:rgba(41,182,200,0.05);
+            box-shadow:0 0 0 3px var(--teal-dim);
+        }
+
+        .btn-login {
+            width:100%; margin-top:.5rem;
+            background: linear-gradient(135deg, var(--teal), #1a9aab);
+            color:#0a0e17; border:none; padding:.9rem;
+            border-radius:50px; font-family:'Sora',sans-serif;
+            font-size:.9rem; font-weight:700; cursor:pointer;
+            transition:.18s; letter-spacing:.02em;
+            box-shadow:0 4px 20px var(--teal-glow);
+        }
+        .btn-login:hover { box-shadow:0 8px 32px rgba(41,182,200,.45); transform:translateY(-1px); }
+        .btn-login:active { transform:none; }
+        .btn-login:disabled { opacity:.55; cursor:not-allowed; transform:none; }
+
+        .error-box {
+            display:none; align-items:center; gap:.5rem;
+            background:var(--danger-dim); border:1px solid rgba(248,113,113,.2);
+            border-radius:10px; padding:.7rem .9rem; margin-top:.85rem;
+            font-size:.78rem; color:var(--danger); font-weight:500;
+        }
+        .error-box.show { display:flex; }
+
+        /* Demo creds */
+        .demo {
+            margin-top:1.75rem;
+            background:var(--surface-2); border:1px solid var(--border);
+            border-radius:12px; padding:1rem; text-align:center;
+        }
+        .demo-label {
+            font-size:.63rem; font-weight:700; text-transform:uppercase;
+            letter-spacing:.1em; color:var(--text-faint); margin-bottom:.65rem;
+        }
+        .demo-row { display:flex; justify-content:center; gap:1.5rem; flex-wrap:wrap; }
+        .cred-block { display:flex; flex-direction:column; gap:.25rem; }
+        .cred-role  { font-size:.63rem; color:var(--text-faint); text-transform:uppercase; letter-spacing:.06em; }
+        .cred-val   { font-family:'DM Mono',monospace; font-size:.75rem; color:var(--teal); font-weight:500; cursor:pointer; }
+        .cred-val:hover { color:var(--accent); }
+        .demo-sep   { width:1px; background:var(--border); align-self:stretch; }
+    </style>
+</head>
+<body>
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
+
+<div class="card">
+    <div class="brand">
+        <div class="brand-logo">📦</div>
+        <div class="brand-name">Janeth's Business</div>
+        <div class="brand-sub">Inventory & Sales System</div>
+    </div>
+
+    <div class="field">
+        <label>Username</label>
+        <input type="text" id="username" placeholder="Enter your username" autofocus autocomplete="username">
+    </div>
+    <div class="field">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn-login" id="loginBtn">Sign in →</button>
+    <div id="errorBox" class="error-box"><span>⚠️</span><span id="errorText"></span></div>
+
+    <div class="demo">
+        <div class="demo-label">Demo Access — click to fill</div>
+        <div class="demo-row">
+            <div class="cred-block">
+                <span class="cred-role">👑 Admin</span>
+                <span class="cred-val" onclick="fillCreds('admin','admin123')">admin / admin123</span>
+            </div>
+            <div class="demo-sep"></div>
+            <div class="cred-block">
+                <span class="cred-role">👤 Staff</span>
+                <span class="cred-val" onclick="fillCreds('staff1','staff123')">staff1 / staff123</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Use relative path so it works regardless of installation directory
+    const API = 'login.php';
+
+    function fillCreds(u, p) {
+        document.getElementById('username').value = u;
+        document.getElementById('password').value = p;
+        document.getElementById('errorBox').classList.remove('show');
     }
 
-    $stmt = $pdo->prepare("SELECT id, username, password, role FROM users WHERE username = ?");
-    $stmt->execute([$username]);
-    $user = $stmt->fetch();
-
-    if ($user && md5($password) === $user['password']) {
-        $_SESSION['user_id']  = $user['id'];
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['role']     = $user['role'];
-        echo json_encode(['success' => true, 'role' => $user['role']]);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Invalid username or password']);
+    function showError(msg) {
+        document.getElementById('errorText').textContent = msg;
+        document.getElementById('errorBox').classList.add('show');
     }
-} else {
-    http_response_code(405);
-    echo json_encode(['error' => 'Method not allowed']);
-}
+
+    async function doLogin() {
+        const btn = document.getElementById('loginBtn');
+        const u   = document.getElementById('username').value.trim();
+        const p   = document.getElementById('password').value;
+        document.getElementById('errorBox').classList.remove('show');
+
+        if (!u || !p) return showError('Please enter your username and password.');
+
+        btn.disabled = true; btn.textContent = 'Signing in…';
+        try {
+            const res  = await fetch(API, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({username:u, password:p}) });
+            const data = await res.json();
+            if (data.success) {
+                btn.textContent = '✓ Welcome!';
+                // Staff and admin both land on the daily entry page
+                window.location.href = 'janeth-input.php';
+            } else {
+                showError(data.message || 'Invalid credentials.');
+                btn.disabled = false; btn.textContent = 'Sign in →';
+            }
+        } catch {
+            showError('Cannot reach server. Is XAMPP running?');
+            btn.disabled = false; btn.textContent = 'Sign in →';
+        }
+    }
+
+    document.getElementById('loginBtn').addEventListener('click', doLogin);
+    document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+    ['username','password'].forEach(id => document.getElementById(id).addEventListener('input', () => document.getElementById('errorBox').classList.remove('show')));
+</script>
+</body>
+</html>

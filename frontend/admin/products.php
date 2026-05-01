@@ -1,9 +1,9 @@
 <?php
 session_start();
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header('Location: ../login.html'); exit;
+    header('Location: login.html'); exit;
 }
-require_once '../../backend/db.php';
+require_once '../backend/db.php';
 
 $message = ''; $msgType = '';
 
@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['add'])) {
         $chk = $pdo->prepare("SELECT id FROM products WHERE name = ?"); $chk->execute([$name]);
         if ($chk->fetch()) { $message='A product with this name already exists.'; $msgType='error'; }
         else {
-            $pdo->prepare("INSERT INTO products (name,category,price,low_stock_threshold) VALUES (?,?,?,?)")->execute([$name,$category,$price,$threshold]);
+            $pdo->prepare("INSERT INTO products (name,category,selling_price,low_stock_threshold) VALUES (?,?,?,?)")->execute([$name,$category,$price,$threshold]);
             $message='Product added successfully.'; $msgType='success';
         }
     }
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['batch_update'])) {
         foreach ($names as $id => $name) {
             $cat   = $categories[$id]; $price=floatval($prices[$id]); $thr=intval($thresholds[$id]);
             if (empty(trim($name))||$price<0||$thr<0) continue;
-            $pdo->prepare("UPDATE products SET name=?,category=?,price=?,low_stock_threshold=? WHERE id=?")->execute([trim($name),$cat,$price,$thr,$id]);
+            $pdo->prepare("UPDATE products SET name=?,category=?,selling_price=?,low_stock_threshold=? WHERE id=?")->execute([trim($name),$cat,$price,$thr,$id]);
         }
         $pdo->commit(); $message='All products updated.'; $msgType='success';
     } catch (Exception $e) { $pdo->rollBack(); $message='Error: '.$e->getMessage(); $msgType='error'; }
@@ -206,8 +206,8 @@ $cntStmt->execute(); $total=$cntStmt->fetchColumn(); $totPages=ceil($total/$limi
         <span class="admin-badge">Admin</span>
     </div>
     <div style="display:flex;gap:.65rem;flex-wrap:wrap;align-items:center">
-        <a href="../janeth-dashboard.php" class="btn btn-ghost">📊 Dashboard</a>
-        <a href="../janeth-input.php" class="btn btn-ghost">← Entry</a>
+        <a href="janeth-dashboard.php" class="btn btn-ghost">📊 Dashboard</a>
+        <a href="janeth-input.php" class="btn btn-ghost">← Entry</a>
     </div>
 </div>
 
@@ -296,7 +296,7 @@ $cntStmt->execute(); $total=$cntStmt->fetchColumn(); $totPages=ceil($total/$limi
                             <option value="Frozen"  <?= $p['category']==='Frozen' ?'selected':'' ?>>❄️ Frozen</option>
                         </select>
                     </td>
-                    <td><input class="tbl-in" type="number" step="0.01" min="0" name="price[<?= $p['id'] ?>]" value="<?= $p['price'] ?>" required style="width:100px;font-family:'DM Mono',monospace"></td>
+                    <td><input class="tbl-in" type="number" step="0.01" min="0" name="price[<?= $p['id'] ?>]" value="<?= $p['selling_price'] ?>" required style="width:100px;font-family:'DM Mono',monospace"></td>
                     <td><input class="tbl-in" type="number" min="0" name="threshold[<?= $p['id'] ?>]" value="<?= $p['low_stock_threshold']??10 ?>" required style="width:80px"></td>
                     <td><button type="button" class="btn btn-del" onclick="delProduct(<?= $p['id'] ?>)">Delete</button></td>
                 </tr>
@@ -319,7 +319,7 @@ $cntStmt->execute(); $total=$cntStmt->fetchColumn(); $totPages=ceil($total/$limi
 <div class="bot-bar">
     <span class="hint">✦ Edit inline and click "Save All Changes" · Prices also editable from the Entry page</span>
     <div style="display:flex;gap:.65rem;flex-wrap:wrap">
-        <a href="../janeth-input.php" class="btn btn-ghost">← Entry</a>
+        <a href="janeth-input.php" class="btn btn-ghost">← Entry</a>
         <button type="submit" form="batchForm" class="btn btn-save">💾 Save All Changes</button>
     </div>
 </div>
