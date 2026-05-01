@@ -3,29 +3,28 @@ session_start();
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header('Location: login.html'); exit;
 }
-require_once '../backend/db.php';
+require_once 'db.php';
 
 $message = ''; $msgType = '';
 
-// Add product
+// Add product (AJAX JSON response)
 if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['add'])) {
+    header('Content-Type: application/json');
     $name      = trim($_POST['name']      ?? '');
     $category  = $_POST['category']       ?? 'Chicken';
     $price     = floatval($_POST['price'] ?? 0);
     $threshold = intval($_POST['threshold'] ?? 10);
 
-    if (empty($name))         { $message='Product name is required.'; $msgType='error'; }
-    elseif ($price < 0)       { $message='Price cannot be negative.'; $msgType='error'; }
-    elseif ($threshold < 0)   { $message='Threshold cannot be negative.'; $msgType='error'; }
-    else {
-        $chk = $pdo->prepare("SELECT id FROM products WHERE name = ?"); $chk->execute([$name]);
-        if ($chk->fetch()) { $message='A product with this name already exists.'; $msgType='error'; }
-        else {
-            $pdo->prepare("INSERT INTO products (name,category,selling_price,low_stock_threshold) VALUES (?,?,?,?)")->execute([$name,$category,$price,$threshold]);
-            $message='Product added successfully.'; $msgType='success';
-        }
-    }
-    header("Location: products.php?msg=".urlencode($message)."&type=$msgType"); exit;
+    if (empty($name))         { echo json_encode(['success'=>false,'message'=>'Product name is required.']); exit; }
+    if ($price < 0)           { echo json_encode(['success'=>false,'message'=>'Price cannot be negative.']); exit; }
+    if ($threshold < 0)       { echo json_encode(['success'=>false,'message'=>'Threshold cannot be negative.']); exit; }
+
+    $chk = $pdo->prepare("SELECT id FROM products WHERE name = ? AND is_deleted = 0"); $chk->execute([$name]);
+    if ($chk->fetch()) { echo json_encode(['success'=>false,'message'=>'A product with this name already exists.']); exit; }
+
+    $pdo->prepare("INSERT INTO products (name,category,selling_price,low_stock_threshold) VALUES (?,?,?,?)")->execute([$name,$category,$price,$threshold]);
+    echo json_encode(['success'=>true,'message'=>'Product added successfully.']);
+    exit;
 }
 
 // Delete (AJAX)
@@ -355,9 +354,12 @@ document.getElementById('addBtn').addEventListener('click', async () => {
     const fd = new FormData();
     fd.append('add','1'); fd.append('name',name); fd.append('category',cat);
     fd.append('price',price); fd.append('threshold',thr);
-    const res = await fetch(window.location.href,{method:'POST',body:fd});
-    if (res.ok) window.location.reload();
-    else alert2('Error adding product.', true);
+    try {
+        const res = await fetch(window.location.href,{method:'POST',body:fd});
+        const result = await res.json();
+        if (result.success) { alert2(result.message || 'Product added!'); setTimeout(()=>window.location.reload(), 1200); }
+        else alert2(result.message || 'Error adding product.', true);
+    } catch { alert2('Error adding product.', true); }
 });
 
 async function delProduct(id) {

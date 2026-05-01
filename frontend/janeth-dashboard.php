@@ -175,6 +175,7 @@ $username  = $_SESSION['username'];
         ::-webkit-scrollbar-track{background:transparent;}
         ::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:3px;}
         @keyframes popIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+        #modalOverlay.active{display:flex!important;}
         @media(max-width:640px){body{padding:1rem;}.controls{flex-direction:column;}.totals-bar{grid-template-columns:1fr;}.total-cell:not(:last-child){border-right:none;border-bottom:1px solid var(--border);}.charts-grid{grid-template-columns:1fr;}}
     </style>
 </head>
@@ -665,7 +666,7 @@ document.getElementById('searchInput').addEventListener('input',()=>{curPage=1;r
 // ── Logout warning ──
 document.getElementById('logoutBtn').addEventListener('click',()=>{
     const ov=document.getElementById('modalOverlay');
-    ov.style.display='flex';
+    ov.classList.add('active');
     document.getElementById('modalIcon').textContent='👋';
     document.getElementById('modalMsg').textContent='Are you sure you want to sign out?';
     document.getElementById('modalOk').textContent='Yes, sign out';
@@ -674,8 +675,8 @@ document.getElementById('logoutBtn').addEventListener('click',()=>{
     const can=document.getElementById('modalCancel').cloneNode(true);
     document.getElementById('modalOk').replaceWith(ok);
     document.getElementById('modalCancel').replaceWith(can);
-    ok.addEventListener('click',()=>{ov.style.display='none';window.location.href='backend/logout.php';});
-    can.addEventListener('click',()=>ov.style.display='none');
+    ok.addEventListener('click',()=>{ov.classList.remove('active');window.location.href='logout.php';});
+    can.addEventListener('click',()=>ov.classList.remove('active'));
 });
 
 // Init date range defaults

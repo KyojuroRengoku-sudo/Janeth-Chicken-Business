@@ -7,163 +7,360 @@
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0a0e17;
-            --surface: #111827;
-            --surface-2: #1a2234;
-            --border: rgba(255,255,255,0.07);
-            --accent: #f5a623;
-            --accent-glow: rgba(245,166,35,0.25);
-            --teal: #29b6c8;
-            --teal-dim: rgba(41,182,200,0.12);
-            --teal-glow: rgba(41,182,200,0.3);
-            --text: #e8edf5;
-            --text-muted: #6b7a93;
-            --text-faint: #3d4d63;
-            --danger: #f87171;
-            --danger-dim: rgba(248,113,113,0.1);
+            --bg:           #080c14;
+            --surface:      #0f1724;
+            --surface-2:    #161f30;
+            --surface-3:    #1c2840;
+            --border:       rgba(255,255,255,0.06);
+            --border-focus: rgba(41,182,200,0.5);
+            --accent:       #f5a623;
+            --accent-dim:   rgba(245,166,35,0.15);
+            --teal:         #29b6c8;
+            --teal-dim:     rgba(41,182,200,0.1);
+            --teal-glow:    rgba(41,182,200,0.28);
+            --teal-dark:    #1a9aab;
+            --text:         #e2e8f4;
+            --text-muted:   #5d6e87;
+            --text-faint:   #2e3d52;
+            --danger:       #f87171;
+            --danger-dim:   rgba(248,113,113,0.08);
+            --success:      #34d399;
+            --success-dim:  rgba(52,211,153,0.1);
         }
-        * { margin:0; padding:0; box-sizing:border-box; }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Sora', sans-serif;
             background: var(--bg);
             min-height: 100vh;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 1.5rem;
             overflow: hidden;
+            position: relative;
         }
 
-        /* Animated background orbs */
-        .bg-orb {
-            position: fixed; border-radius: 50%; filter: blur(80px);
-            pointer-events: none; z-index: 0; animation: drift 12s ease-in-out infinite alternate;
+        /* Animated background */
+        .bg-mesh {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background:
+                radial-gradient(ellipse 600px 500px at 10% 20%, rgba(41,182,200,0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 500px 400px at 90% 80%, rgba(245,166,35,0.04) 0%, transparent 70%),
+                radial-gradient(ellipse 400px 300px at 60% 10%, rgba(41,182,200,0.03) 0%, transparent 60%);
+            animation: meshDrift 18s ease-in-out infinite alternate;
         }
-        .bg-orb-1 { width:500px;height:500px; background:rgba(41,182,200,0.07); top:-150px; left:-100px; }
-        .bg-orb-2 { width:400px;height:400px; background:rgba(245,166,35,0.05); bottom:-100px; right:-80px; animation-delay:-6s; }
-        @keyframes drift { from{transform:translate(0,0)} to{transform:translate(30px,20px)} }
+        @keyframes meshDrift {
+            from { transform: scale(1) translateX(0); }
+            to   { transform: scale(1.05) translateX(-15px); }
+        }
 
-        /* Grid */
+        /* Grid overlay */
         body::before {
-            content:''; position:fixed; inset:0; z-index:0;
+            content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
             background-image:
-                linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
-            background-size: 52px 52px;
-            pointer-events:none;
+                linear-gradient(rgba(255,255,255,0.014) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.014) 1px, transparent 1px);
+            background-size: 48px 48px;
         }
 
+        /* Floating particles */
+        .particle {
+            position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
+            background: var(--teal); opacity: 0;
+            animation: float linear infinite;
+        }
+        @keyframes float {
+            0%   { opacity: 0; transform: translateY(0) scale(0); }
+            10%  { opacity: 0.4; }
+            90%  { opacity: 0.1; }
+            100% { opacity: 0; transform: translateY(-120vh) scale(1); }
+        }
+
+        /* Card */
         .card {
-            position:relative; z-index:1;
+            position: relative; z-index: 1;
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 24px;
-            width:100%; max-width:430px;
-            padding: 2.75rem 2.5rem 2.25rem;
-            box-shadow: 0 0 0 1px rgba(255,255,255,0.03), 0 40px 80px -20px rgba(0,0,0,0.7),
-                        0 0 100px -30px var(--teal-glow);
-            animation: slideUp .45s cubic-bezier(.34,1.2,.64,1) both;
+            border-radius: 28px;
+            width: 100%; max-width: 440px;
+            padding: 3rem 2.75rem 2.5rem;
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.025),
+                0 32px 80px -16px rgba(0,0,0,0.75),
+                0 0 120px -40px var(--teal-glow);
+            animation: cardIn .5s cubic-bezier(.34,1.2,.64,1) both;
         }
-        @keyframes slideUp { from{opacity:0;transform:translateY(28px) scale(.97)} to{opacity:1;transform:none} }
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(32px) scale(.96); }
+            to   { opacity: 1; transform: none; }
+        }
 
-        /* Top glow line */
+        /* Top shimmer line */
         .card::before {
-            content:''; position:absolute; top:0; left:50%; transform:translateX(-50%);
-            width:55%; height:1px;
-            background: linear-gradient(90deg, transparent, var(--teal), transparent);
+            content: ''; position: absolute;
+            top: 0; left: 50%; transform: translateX(-50%);
+            width: 60%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--teal), var(--accent), var(--teal), transparent);
+            border-radius: 1px;
+            animation: shimmer 4s ease-in-out infinite alternate;
+        }
+        @keyframes shimmer {
+            from { opacity: 0.6; width: 40%; }
+            to   { opacity: 1;   width: 70%; }
+        }
+
+        /* Corner accents */
+        .card::after {
+            content: ''; position: absolute; inset: -1px;
+            border-radius: 28px; pointer-events: none;
+            background:
+                linear-gradient(135deg, rgba(41,182,200,0.12) 0%, transparent 30%),
+                linear-gradient(315deg, rgba(245,166,35,0.06) 0%, transparent 30%);
         }
 
         /* Brand */
-        .brand { text-align:center; margin-bottom:2.25rem; }
+        .brand {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            animation: brandIn .5s .1s both ease-out;
+        }
+        @keyframes brandIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
         .brand-logo {
-            width:60px; height:60px; margin:0 auto .75rem;
-            background: linear-gradient(135deg, var(--teal), #1a9aab);
-            border-radius:16px;
-            display:flex; align-items:center; justify-content:center;
-            font-size:1.6rem;
-            box-shadow: 0 8px 32px var(--teal-glow);
+            width: 68px; height: 68px; margin: 0 auto 1rem;
+            background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+            border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 8px 40px var(--teal-glow), 0 0 0 1px rgba(41,182,200,0.2);
+            position: relative;
+            transition: transform .2s, box-shadow .2s;
         }
-        .brand-name { font-size:1.5rem; font-weight:700; letter-spacing:-.03em; color:var(--text); }
-        .brand-sub  { font-size:.7rem; color:var(--text-muted); font-weight:400; letter-spacing:.1em; text-transform:uppercase; margin-top:.25rem; }
+        .brand-logo:hover { transform: translateY(-2px) rotate(-3deg); box-shadow: 0 14px 50px var(--teal-glow); }
+        .brand-logo::after {
+            content: ''; position: absolute; inset: 0; border-radius: 20px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+        }
+        .brand-name {
+            font-size: 1.6rem; font-weight: 700;
+            letter-spacing: -.04em; color: var(--text);
+            line-height: 1.1;
+        }
+        .brand-sub {
+            font-size: .68rem; color: var(--text-muted);
+            font-weight: 400; letter-spacing: .12em;
+            text-transform: uppercase; margin-top: .35rem;
+        }
 
-        /* Form */
-        .field { margin-bottom:1.1rem; }
+        /* Fields */
+        .fields { animation: fieldsIn .45s .18s both ease-out; }
+        @keyframes fieldsIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+        .field { margin-bottom: 1.15rem; }
         .field label {
-            display:block; font-size:.68rem; font-weight:700;
-            text-transform:uppercase; letter-spacing:.09em;
-            color:var(--text-muted); margin-bottom:.45rem;
+            display: flex; align-items: center; gap: .4rem;
+            font-size: .65rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .1em;
+            color: var(--text-muted); margin-bottom: .5rem;
         }
+        .field label .icon { opacity: .6; font-size: .8rem; }
+
+        .input-wrap { position: relative; }
         .field input {
-            width:100%; background:var(--surface-2);
-            border:1px solid var(--border); border-radius:10px;
-            color:var(--text); font-family:'Sora',sans-serif;
-            font-size:.88rem; padding:.8rem 1rem; outline:none; transition:.18s;
+            width: 100%;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-family: 'Sora', sans-serif;
+            font-size: .875rem;
+            padding: .85rem 1rem .85rem 1rem;
+            outline: none;
+            transition: border-color .18s, background .18s, box-shadow .18s;
         }
-        .field input::placeholder { color:var(--text-faint); }
+        .field input::placeholder { color: var(--text-faint); }
         .field input:focus {
-            border-color:var(--teal); background:rgba(41,182,200,0.05);
-            box-shadow:0 0 0 3px var(--teal-dim);
+            border-color: var(--border-focus);
+            background: rgba(41,182,200,0.04);
+            box-shadow: 0 0 0 3px var(--teal-dim), 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .field input:not(:placeholder-shown):valid {
+            border-color: rgba(52,211,153,0.25);
         }
 
+        /* Password toggle */
+        .pw-toggle {
+            position: absolute; right: .85rem; top: 50%; transform: translateY(-50%);
+            background: none; border: none; color: var(--text-muted);
+            cursor: pointer; padding: .2rem; font-size: .85rem; line-height: 1;
+            transition: color .15s;
+        }
+        .pw-toggle:hover { color: var(--teal); }
+
+        /* Login button */
         .btn-login {
-            width:100%; margin-top:.5rem;
-            background: linear-gradient(135deg, var(--teal), #1a9aab);
-            color:#0a0e17; border:none; padding:.9rem;
-            border-radius:50px; font-family:'Sora',sans-serif;
-            font-size:.9rem; font-weight:700; cursor:pointer;
-            transition:.18s; letter-spacing:.02em;
-            box-shadow:0 4px 20px var(--teal-glow);
+            width: 100%; margin-top: .65rem;
+            background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+            color: #05111e; border: none;
+            padding: .95rem;
+            border-radius: 50px;
+            font-family: 'Sora', sans-serif;
+            font-size: .9rem; font-weight: 700;
+            cursor: pointer; letter-spacing: .03em;
+            transition: transform .18s, box-shadow .18s, opacity .18s;
+            box-shadow: 0 4px 24px var(--teal-glow);
+            position: relative; overflow: hidden;
         }
-        .btn-login:hover { box-shadow:0 8px 32px rgba(41,182,200,.45); transform:translateY(-1px); }
-        .btn-login:active { transform:none; }
-        .btn-login:disabled { opacity:.55; cursor:not-allowed; transform:none; }
-
-        .error-box {
-            display:none; align-items:center; gap:.5rem;
-            background:var(--danger-dim); border:1px solid rgba(248,113,113,.2);
-            border-radius:10px; padding:.7rem .9rem; margin-top:.85rem;
-            font-size:.78rem; color:var(--danger); font-weight:500;
+        .btn-login::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+            border-radius: inherit;
         }
-        .error-box.show { display:flex; }
+        .btn-login:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 36px rgba(41,182,200,.5);
+        }
+        .btn-login:active:not(:disabled) { transform: translateY(0); }
+        .btn-login:disabled { opacity: .5; cursor: not-allowed; }
 
-        /* Demo creds */
+        /* Spinner */
+        .spinner {
+            display: inline-block; width: 14px; height: 14px;
+            border: 2px solid rgba(5,17,30,0.3);
+            border-top-color: #05111e;
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+            vertical-align: middle; margin-right: .4rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Alerts */
+        .alert {
+            display: none; align-items: flex-start; gap: .55rem;
+            border-radius: 12px; padding: .75rem 1rem;
+            margin-top: 1rem; font-size: .78rem; font-weight: 500;
+        }
+        .alert.show { display: flex; }
+        .alert-icon { font-size: .9rem; flex-shrink: 0; margin-top: .05rem; }
+
+        .alert-error {
+            background: var(--danger-dim);
+            border: 1px solid rgba(248,113,113,.18);
+            color: var(--danger);
+        }
+        .alert-success {
+            background: var(--success-dim);
+            border: 1px solid rgba(52,211,153,.2);
+            color: var(--success);
+        }
+        .alert-server {
+            background: var(--accent-dim);
+            border: 1px solid rgba(245,166,35,.2);
+            color: var(--accent);
+        }
+
+        /* Demo box */
         .demo {
-            margin-top:1.75rem;
-            background:var(--surface-2); border:1px solid var(--border);
-            border-radius:12px; padding:1rem; text-align:center;
+            margin-top: 2rem;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 14px; padding: 1.1rem 1rem;
+            text-align: center;
+            animation: demoIn .45s .28s both ease-out;
         }
+        @keyframes demoIn { from { opacity: 0; } to { opacity: 1; } }
+
         .demo-label {
-            font-size:.63rem; font-weight:700; text-transform:uppercase;
-            letter-spacing:.1em; color:var(--text-faint); margin-bottom:.65rem;
+            font-size: .62rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .1em; color: var(--text-faint); margin-bottom: .8rem;
         }
-        .demo-row { display:flex; justify-content:center; gap:1.5rem; flex-wrap:wrap; }
-        .cred-block { display:flex; flex-direction:column; gap:.25rem; }
-        .cred-role  { font-size:.63rem; color:var(--text-faint); text-transform:uppercase; letter-spacing:.06em; }
-        .cred-val   { font-family:'DM Mono',monospace; font-size:.75rem; color:var(--teal); font-weight:500; cursor:pointer; }
-        .cred-val:hover { color:var(--accent); }
-        .demo-sep   { width:1px; background:var(--border); align-self:stretch; }
+        .demo-row { display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
+        .cred-block { display: flex; flex-direction: column; gap: .3rem; }
+        .cred-role  { font-size: .62rem; color: var(--text-faint); text-transform: uppercase; letter-spacing: .07em; }
+        .cred-val {
+            font-family: 'DM Mono', monospace; font-size: .78rem;
+            color: var(--teal); font-weight: 500; cursor: pointer;
+            padding: .2rem .5rem; border-radius: 6px;
+            transition: background .15s, color .15s;
+            border: 1px solid transparent;
+        }
+        .cred-val:hover {
+            background: var(--teal-dim); color: #fff;
+            border-color: rgba(41,182,200,0.2);
+        }
+        .demo-sep { width: 1px; background: var(--border); align-self: stretch; }
+
+        /* Server help tip */
+        .server-tip {
+            display: none; margin-top: .6rem;
+            font-size: .72rem; color: var(--text-muted); line-height: 1.5;
+        }
+        .server-tip.show { display: block; }
+        .server-tip code {
+            font-family: 'DM Mono', monospace; color: var(--teal);
+            background: var(--teal-dim); padding: .1rem .4rem; border-radius: 4px;
+        }
     </style>
 </head>
 <body>
-<div class="bg-orb bg-orb-1"></div>
-<div class="bg-orb bg-orb-2"></div>
+<div class="bg-mesh"></div>
+
+<!-- Floating particles -->
+<script>
+(function(){
+    const colors = ['rgba(41,182,200,0.5)','rgba(245,166,35,0.4)','rgba(41,182,200,0.3)'];
+    for (let i = 0; i < 12; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = Math.random() * 3 + 1;
+        p.style.cssText = `
+            width:${size}px; height:${size}px;
+            left:${Math.random()*100}vw;
+            bottom:-10px;
+            background:${colors[Math.floor(Math.random()*colors.length)]};
+            animation-duration:${Math.random()*15+10}s;
+            animation-delay:${Math.random()*10}s;
+        `;
+        document.body.appendChild(p);
+    }
+})();
+</script>
 
 <div class="card">
     <div class="brand">
         <div class="brand-logo">📦</div>
         <div class="brand-name">Janeth's Business</div>
-        <div class="brand-sub">Inventory & Sales System</div>
+        <div class="brand-sub">Inventory &amp; Sales System</div>
     </div>
 
-    <div class="field">
-        <label>Username</label>
-        <input type="text" id="username" placeholder="Enter your username" autofocus autocomplete="username">
+    <div class="fields">
+        <div class="field">
+            <label><span class="icon">👤</span> Username</label>
+            <input type="text" id="username" placeholder="Enter your username"
+                   autofocus autocomplete="username" required>
+        </div>
+        <div class="field">
+            <label><span class="icon">🔒</span> Password</label>
+            <div class="input-wrap">
+                <input type="password" id="password" placeholder="••••••••"
+                       autocomplete="current-password" required>
+                <button class="pw-toggle" id="pwToggle" type="button" title="Show/hide password">👁</button>
+            </div>
+        </div>
+
+        <button class="btn-login" id="loginBtn" type="button">Sign in →</button>
+
+        <div id="errorBox"   class="alert alert-error">  <span class="alert-icon">⚠️</span><span id="errorText"></span></div>
+        <div id="successBox" class="alert alert-success"> <span class="alert-icon">✓</span> <span>Welcome back! Redirecting…</span></div>
+        <div id="serverBox"  class="alert alert-server">  <span class="alert-icon">🔌</span><span id="serverText"></span></div>
+
+        <div class="server-tip" id="serverTip">
+            Make sure XAMPP is running and you're opening this page via
+            <code>http://localhost/…/login.html</code> — not as a <code>file:///</code> URL.
+        </div>
     </div>
-    <div class="field">
-        <label>Password</label>
-        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
-    </div>
-    <button class="btn-login" id="loginBtn">Sign in →</button>
-    <div id="errorBox" class="error-box"><span>⚠️</span><span id="errorText"></span></div>
 
     <div class="demo">
         <div class="demo-label">Demo Access — click to fill</div>
@@ -182,49 +379,90 @@
 </div>
 
 <script>
-    // Adjust this path to match your folder structure
-    const API = window.location.origin + '/Janeth_Business/Janeth-Chicken-Business/backend/login.php';
+const API = 'login.php';
 
-    function fillCreds(u, p) {
-        document.getElementById('username').value = u;
-        document.getElementById('password').value = p;
-        document.getElementById('errorBox').classList.remove('show');
-    }
+// Password toggle
+document.getElementById('pwToggle').addEventListener('click', function() {
+    const inp = document.getElementById('password');
+    const show = inp.type === 'password';
+    inp.type = show ? 'text' : 'password';
+    this.textContent = show ? '🙈' : '👁';
+});
 
-    function showError(msg) {
-        document.getElementById('errorText').textContent = msg;
-        document.getElementById('errorBox').classList.add('show');
-    }
+function fillCreds(u, p) {
+    document.getElementById('username').value = u;
+    document.getElementById('password').value = p;
+    hideAlerts();
+}
 
-    async function doLogin() {
-        const btn = document.getElementById('loginBtn');
-        const u   = document.getElementById('username').value.trim();
-        const p   = document.getElementById('password').value;
-        document.getElementById('errorBox').classList.remove('show');
+function hideAlerts() {
+    ['errorBox','successBox','serverBox'].forEach(id =>
+        document.getElementById(id).classList.remove('show')
+    );
+    document.getElementById('serverTip').classList.remove('show');
+}
 
-        if (!u || !p) return showError('Please enter your username and password.');
+function showError(msg) {
+    hideAlerts();
+    document.getElementById('errorText').textContent = msg;
+    document.getElementById('errorBox').classList.add('show');
+}
 
-        btn.disabled = true; btn.textContent = 'Signing in…';
-        try {
-            const res  = await fetch(API, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({username:u, password:p}) });
-            const data = await res.json();
-            if (data.success) {
-                btn.textContent = '✓ Welcome!';
-                // Staff and admin both land on the daily entry page
-                window.location.href = 'janeth-input.php';
-            } else {
-                showError(data.message || 'Invalid credentials.');
-                btn.disabled = false; btn.textContent = 'Sign in →';
-            }
-        } catch {
-            showError('Cannot reach server. Is XAMPP running?');
-            btn.disabled = false; btn.textContent = 'Sign in →';
+function showServerError(msg) {
+    hideAlerts();
+    document.getElementById('serverText').textContent = msg;
+    document.getElementById('serverBox').classList.add('show');
+    document.getElementById('serverTip').classList.add('show');
+}
+
+async function doLogin() {
+    const btn = document.getElementById('loginBtn');
+    const u   = document.getElementById('username').value.trim();
+    const p   = document.getElementById('password').value;
+    hideAlerts();
+
+    if (!u || !p) return showError('Please enter your username and password.');
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Signing in…';
+
+    try {
+        const res  = await fetch(API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: u, password: p })
+        });
+
+        // If the response isn't JSON (e.g. PHP error page), handle gracefully
+        const text = await res.text();
+        let data;
+        try { data = JSON.parse(text); }
+        catch {
+            showServerError('Server returned an unexpected response. Check PHP/XAMPP logs.');
+            btn.disabled = false; btn.innerHTML = 'Sign in →';
+            return;
         }
-    }
 
-    document.getElementById('loginBtn').addEventListener('click', doLogin);
-    document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-    ['username','password'].forEach(id => document.getElementById(id).addEventListener('input', () => document.getElementById('errorBox').classList.remove('show')));
+        if (data.success) {
+            document.getElementById('successBox').classList.add('show');
+            btn.innerHTML = '✓ Welcome!';
+            setTimeout(() => { window.location.href = 'janeth-input.php'; }, 800);
+        } else {
+            showError(data.message || 'Invalid credentials.');
+            btn.disabled = false; btn.innerHTML = 'Sign in →';
+        }
+    } catch (err) {
+        // Network error — most likely opened as file:// or XAMPP not running
+        showServerError('Cannot reach server. Is XAMPP running?');
+        btn.disabled = false; btn.innerHTML = 'Sign in →';
+    }
+}
+
+document.getElementById('loginBtn').addEventListener('click', doLogin);
+document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+['username','password'].forEach(id =>
+    document.getElementById(id).addEventListener('input', hideAlerts)
+);
 </script>
 </body>
 </html>

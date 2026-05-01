@@ -89,9 +89,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
         // Also get stock entries for this date
         $seStmt = $pdo->prepare("
-            SELECT se.*, s.name AS supplier_name
+            SELECT se.*, s.name AS supplier_name, p.name AS product_name,
+                   (se.qty * se.cost_price) AS total_cost
             FROM stock_entries se
             JOIN suppliers s ON s.id = se.supplier_id
+            JOIN products p ON p.id = se.product_id
             WHERE se.record_date = ?
             ORDER BY se.product_id, se.id
         ");
@@ -105,7 +107,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $date = $_GET['stock_entries'];
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) send(['error' => 'Invalid date format'], 400);
         $stmt = $pdo->prepare("
-            SELECT se.*, p.name AS product_name, s.name AS supplier_name
+            SELECT se.*, p.name AS product_name, s.name AS supplier_name,
+                   (se.qty * se.cost_price) AS total_cost
             FROM stock_entries se
             JOIN products p ON p.id = se.product_id
             JOIN suppliers s ON s.id = se.supplier_id
@@ -164,7 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $totalExpenses = (float)($expStmt->fetch()['total'] ?? 0);
 
         // Total stock cost in range
-        $costStmt = $pdo->prepare("SELECT SUM(total_cost) AS total FROM stock_entries WHERE record_date BETWEEN ? AND ?");
+        $costStmt = $pdo->prepare("SELECT SUM(qty * cost_price) AS total FROM stock_entries WHERE record_date BETWEEN ? AND ?");
         $costStmt->execute([$from, $to]);
         $totalCost = (float)($costStmt->fetch()['total'] ?? 0);
 

@@ -12,6 +12,7 @@ $username  = $_SESSION['username'];
     <title>Daily Entry · Janeth's Business</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
+        /* [Your existing CSS – unchanged] */
         :root {
             --bg:#0a0e17;--surface:#111827;--surface-2:#1a2234;--surface-3:#222d42;
             --border:rgba(255,255,255,0.07);--border-hi:rgba(255,255,255,0.12);
@@ -27,8 +28,6 @@ $username  = $_SESSION['username'];
              background-image:radial-gradient(ellipse 70% 50% at 10% -10%,rgba(41,182,200,.06) 0%,transparent 60%),
                               radial-gradient(ellipse 60% 40% at 90% 110%,rgba(245,166,35,.04) 0%,transparent 60%);}
         .container{max-width:1520px;margin:0 auto;}
-
-        /* ── Header ── */
         .header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;
                 margin-bottom:1.75rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border);}
         .logo{display:flex;align-items:center;gap:.75rem;}
@@ -61,8 +60,6 @@ $username  = $_SESSION['username'];
         .btn-save:hover{box-shadow:0 6px 20px rgba(41,182,200,.4);transform:translateY(-1px);}
         .btn-purple{background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.2);color:var(--purple);}
         .btn-purple:hover{background:rgba(167,139,250,.2);}
-
-        /* ── Date hero ── */
         .date-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
                    padding:1.5rem 2rem;margin-bottom:1.1rem;display:flex;align-items:center;gap:2rem;flex-wrap:wrap;}
         .date-hero-left{flex:1;min-width:200px;}
@@ -85,8 +82,6 @@ $username  = $_SESSION['username'];
         .as-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
         .as-chip.saving .as-dot{animation:blink .8s infinite;}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-
-        /* ── Controls ── */
         .controls{display:flex;flex-wrap:wrap;gap:.65rem;align-items:center;
                   background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
                   padding:.8rem 1.2rem;margin-bottom:1.1rem;}
@@ -106,8 +101,6 @@ $username  = $_SESSION['username'];
         .toggle-sw input::before{content:'';width:11px;height:11px;background:#fff;border-radius:50%;
                                  position:absolute;top:2px;left:2px;transition:.2s;}
         .toggle-sw input:checked::before{left:17px;}
-
-        /* ── Tables ── */
         .section-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
                       overflow:hidden;margin-bottom:1rem;}
         .section-hd{display:flex;align-items:center;gap:.75rem;padding:.9rem 1.2rem;
@@ -145,8 +138,6 @@ $username  = $_SESSION['username'];
                                 font-family:'Sora',sans-serif!important;font-size:.7rem!important;
                                 font-weight:600!important;text-transform:uppercase;letter-spacing:.07em;padding-right:1.5rem!important;}
         .empty-section{padding:2.5rem;text-align:center;color:var(--text-faint);font-size:.83rem;}
-
-        /* ── Product Chooser Panel ── */
         .chooser-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
                        overflow:hidden;margin-bottom:1rem;display:none;}
         .chooser-panel.open{display:block;}
@@ -162,8 +153,6 @@ $username  = $_SESSION['username'];
         .chooser-cat{font-size:.63rem;padding:.1rem .45rem;border-radius:50px;font-weight:700;}
         .cc-chicken{background:rgba(251,191,36,.15);color:var(--chicken);}
         .cc-frozen {background:rgba(96,165,250,.12); color:var(--frozen);}
-
-        /* ── Stock Entries section ── */
         .se-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
                     overflow:hidden;margin-bottom:1rem;}
         .se-hd{display:flex;align-items:center;gap:.75rem;padding:.9rem 1.2rem;
@@ -188,8 +177,6 @@ $username  = $_SESSION['username'];
         .se-total-bar{display:flex;justify-content:space-between;align-items:center;padding:.85rem 1.2rem;
                       background:rgba(248,113,113,.05);border-top:1px solid rgba(248,113,113,.15);}
         .se-empty{padding:1.5rem;text-align:center;color:var(--text-faint);font-size:.82rem;}
-
-        /* ── Expenses section ── */
         .exp-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
                      overflow:hidden;margin-bottom:1rem;}
         .exp-hd{display:flex;align-items:center;gap:.75rem;padding:.9rem 1.2rem;
@@ -215,8 +202,6 @@ $username  = $_SESSION['username'];
         .exp-total-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);}
         .exp-total-val{font-family:'DM Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--danger);}
         .exp-empty{padding:1.5rem;text-align:center;color:var(--text-faint);font-size:.82rem;}
-
-        /* ── Summary bar ── */
         .summary-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;
                      background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
                      padding:1rem 1.5rem;margin-bottom:1rem;}
@@ -227,8 +212,6 @@ $username  = $_SESSION['username'];
         .sum-val.amber{color:var(--accent);}
         .sum-val.red  {color:var(--danger);}
         .sum-val.teal {color:var(--teal);}
-
-        /* ── Modal ── */
         .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);
                        display:none;justify-content:center;align-items:center;z-index:1000;padding:1rem;}
         .modal-overlay.active{display:flex;}
@@ -239,7 +222,6 @@ $username  = $_SESSION['username'];
         .modal-icon{font-size:2rem;margin-bottom:.75rem;}
         .modal-msg{font-size:.9rem;color:var(--text);margin-bottom:1.5rem;line-height:1.5;font-weight:500;}
         .modal-btns{display:flex;gap:.75rem;justify-content:center;}
-
         @media print{
             .header,.controls,.date-hero-right,.modal-overlay,.exp-add-row,.exp-del,.se-add-row,.se-del,.chooser-panel{display:none!important;}
             body{background:#fff!important;color:#111!important;padding:.5rem;}
@@ -257,7 +239,6 @@ $username  = $_SESSION['username'];
 <body>
 <div class="container">
 
-<!-- Header -->
 <div class="header">
     <div class="logo">
         <div class="logo-icon">📦</div>
@@ -281,7 +262,6 @@ $username  = $_SESSION['username'];
     </div>
 </div>
 
-<!-- Modal -->
 <div id="modalOverlay" class="modal-overlay">
     <div class="modal">
         <div class="modal-icon" id="modalIcon">💬</div>
@@ -293,7 +273,6 @@ $username  = $_SESSION['username'];
     </div>
 </div>
 
-<!-- Date Hero -->
 <div class="date-hero">
     <div class="date-hero-left">
         <div class="hero-label">Selected Date</div>
@@ -308,7 +287,6 @@ $username  = $_SESSION['username'];
     </div>
 </div>
 
-<!-- Controls -->
 <div class="controls">
     <input type="text" id="searchInput" placeholder="🔍 Search product…" style="width:175px">
     <select id="catFilter">
@@ -327,7 +305,6 @@ $username  = $_SESSION['username'];
     <button id="printBtn" class="btn btn-ghost">📄 Print</button>
 </div>
 
-<!-- Product Chooser -->
 <div class="chooser-panel" id="chooserPanel">
     <div class="chooser-hd">
         <span class="section-icon">☰</span>
@@ -337,7 +314,6 @@ $username  = $_SESSION['username'];
     <div class="chooser-grid" id="chooserGrid"></div>
 </div>
 
-<!-- Net summary bar -->
 <div class="summary-bar" id="summaryBar">
     <div class="sum-item"><div class="sum-label">Stock In Value</div><div class="sum-val teal" id="sumStockIn">₱0.00</div></div>
     <div class="sum-item"><div class="sum-label">Supplier Cost</div><div class="sum-val red" id="sumSupplierCost">₱0.00</div></div>
@@ -347,7 +323,6 @@ $username  = $_SESSION['username'];
     <div class="sum-item"><div class="sum-label">Est. Net Income</div><div class="sum-val" id="sumNet">₱0.00</div></div>
 </div>
 
-<!-- Chicken section -->
 <div class="section-wrap" id="chickenSection">
     <div class="section-hd">
         <span class="section-icon">🐔</span>
@@ -356,21 +331,22 @@ $username  = $_SESSION['username'];
     </div>
     <div class="tbl-scroll">
         <table>
-            <thead><tr>
-                <th>Product</th>
-                <th>Selling Price (₱)</th>
-                <th>Yesterday</th>
-                <th>Stock In</th>
-                <th>Remaining</th>
-                <th>Sold (calc.)</th>
-                <th>Sales Value (₱)</th>
-            </tr></thead>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Selling Price (₱)</th>
+                    <th>Yesterday</th>
+                    <th>Stock In</th>
+                    <th>Remaining</th>
+                    <th>Sold (calc.)</th>
+                    <th>Sales Value (₱)</th>
+                </tr>
+            </thead>
             <tbody id="chickenBody"></tbody>
         </table>
     </div>
 </div>
 
-<!-- Frozen section -->
 <div class="section-wrap" id="frozenSection">
     <div class="section-hd">
         <span class="section-icon">❄️</span>
@@ -379,21 +355,22 @@ $username  = $_SESSION['username'];
     </div>
     <div class="tbl-scroll">
         <table>
-            <thead><tr>
-                <th>Product</th>
-                <th>Selling Price (₱)</th>
-                <th>Yesterday</th>
-                <th>Stock In</th>
-                <th>Remaining</th>
-                <th>Sold (calc.)</th>
-                <th>Sales Value (₱)</th>
-            </tr></thead>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Selling Price (₱)</th>
+                    <th>Yesterday</th>
+                    <th>Stock In</th>
+                    <th>Remaining</th>
+                    <th>Sold (calc.)</th>
+                    <th>Sales Value (₱)</th>
+                </tr>
+            </thead>
             <tbody id="frozenBody"></tbody>
         </table>
     </div>
 </div>
 
-<!-- Stock Entries (Supplier Purchases) -->
 <div class="se-section">
     <div class="se-hd">
         <span class="section-icon">🚚</span>
@@ -430,7 +407,6 @@ $username  = $_SESSION['username'];
     </div>
 </div>
 
-<!-- Expenses section -->
 <div class="exp-section">
     <div class="exp-hd">
         <span class="section-icon">💸</span>
@@ -472,8 +448,8 @@ $username  = $_SESSION['username'];
 const API  = 'janeth.php';
 const ROLE = '<?= $user_role ?>';
 
-let masterProducts = [];   // all non-deleted, visible_input=1 products
-let allProducts    = [];   // all non-deleted products (for chooser)
+let masterProducts = [];
+let allProducts    = [];
 let masterRecords  = [];
 let expenses       = [];
 let stockEntries   = [];
@@ -482,7 +458,6 @@ let navGrid        = [];
 let asTimer        = null;
 let asEnabled      = false;
 
-// ─── Modal ───
 function modal(msg, onOk, onCancel=null, icon='💬', okLabel='OK', cancelLabel='Cancel') {
     document.getElementById('modalMsg').textContent  = msg;
     document.getElementById('modalIcon').textContent = icon;
@@ -504,7 +479,6 @@ function alert2(msg, isErr=false, autoClose=2500) {
     setTimeout(() => document.getElementById('modalOverlay').classList.remove('active'), autoClose);
 }
 
-// ─── Date helpers ───
 function prevDate(d) {
     const dt = new Date(d+'T00:00:00'); dt.setDate(dt.getDate()-1);
     return dt.toISOString().split('T')[0];
@@ -528,11 +502,10 @@ function setHero(d) {
 
 function calcSold(r) { return Math.max(0,(r.yesterday+r.stockIn)-r.remaining); }
 
-// ─── Auto-save ───
 document.getElementById('asToggle').addEventListener('change',e=>{
     asEnabled=e.target.checked;
     const chip=document.getElementById('asChip'), lbl=document.getElementById('asLabel');
-    chip.className='as-chip'; chip.classList.add(asEnabled?'saving':'');
+    chip.className='as-chip';
     lbl.textContent=asEnabled?'Auto-save on':'Auto-save off';
 });
 function triggerAutoSave() {
@@ -558,7 +531,6 @@ async function doSave() {
     } catch{chip.className='as-chip error';lbl.textContent='Save failed';}
 }
 
-// ─── Fetch all products (for chooser & dropdown) ───
 async function fetchAllProducts() {
     const [visProd, allProd, sups] = await Promise.all([
         fetch(`${API}?products=1&page=input`).then(r=>r.json()),
@@ -576,7 +548,6 @@ async function fetchAllProducts() {
     if (saved) { document.getElementById('recordDate').value=saved; await loadDate(saved,true); }
 }
 
-// ─── Chooser ───
 function buildChooser() {
     const grid = document.getElementById('chooserGrid');
     grid.innerHTML = allProducts.map(p=>{
@@ -611,7 +582,6 @@ document.getElementById('saveChooserBtn').addEventListener('click', async()=>{
     await fetchAllProducts();
 });
 
-// ─── Stock entries dropdowns ───
 function buildSeDropdowns() {
     const pSel = document.getElementById('seProduct');
     const sSel = document.getElementById('seSupplier');
@@ -621,7 +591,6 @@ function buildSeDropdowns() {
         suppliers.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
 }
 
-// ─── Load date ───
 async function loadDate(d, silent=false) {
     if (!d) return;
     setHero(d);
@@ -651,7 +620,6 @@ async function loadDate(d, silent=false) {
                 }));
                 setStatus('loaded');
             } else {
-                // Try prev day remaining → today's yesterday
                 const prev = await fetchPrev(d);
                 masterRecords = masterProducts.map(p=>({
                     ...p, price:parseFloat(p.price)||0,
@@ -686,7 +654,6 @@ function applyPrev(prev) {
     });
 }
 
-// ─── Render ───
 function renderSections() {
     const search = document.getElementById('searchInput').value.toLowerCase();
     const cat    = document.getElementById('catFilter').value;
@@ -763,7 +730,6 @@ function updateSummary() {
     netEl.className   = 'sum-val '+(net>=0?'green':'red');
 }
 
-// ─── Stock Entries ───
 async function loadStockEntries(date) {
     try { const r=await fetch(`${API}?stock_entries=${date}`); const d=await r.json(); stockEntries=d.stock_entries||[]; }
     catch{ stockEntries=[]; }
@@ -817,7 +783,6 @@ async function delStockEntry(id){
     },null,'🗑️','Delete','Cancel');
 }
 
-// ─── Expenses ───
 async function loadExpenses(date) {
     try{const r=await fetch(`${API}?expenses=${date}`);const d=await r.json();expenses=d.expenses||[];}
     catch{expenses=[];}
@@ -865,7 +830,6 @@ async function delExpense(id){
     },null,'🗑️','Delete','Cancel');
 }
 
-// ─── Button events ───
 document.getElementById('recordDate').addEventListener('change',async()=>{
     const d=document.getElementById('recordDate').value;
     localStorage.setItem('janeth_date',d);
@@ -895,10 +859,9 @@ document.getElementById('printBtn').addEventListener('click',()=>{
     if(!document.getElementById('recordDate').value) return alert2('Please select a date first.',true);
     window.print();
 });
-// ── Logout with warning ──
 document.getElementById('logoutBtn').addEventListener('click',()=>{
     modal('Are you sure you want to sign out?\nAny unsaved changes will be lost.',
-        ()=>{ window.location.href='backend/logout.php'; },
+        ()=>{ window.location.href='logout.php'; },
         null,'👋','Yes, sign out','Stay');
 });
 document.getElementById('searchInput').addEventListener('input',renderSections);
