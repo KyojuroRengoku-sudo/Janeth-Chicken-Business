@@ -3,7 +3,7 @@ session_start();
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header('Location: login.html'); exit;
 }
-require_once 'db.php';
+require_once '../backend/db.php';
 
 $message = ''; $msgType = '';
 
@@ -97,14 +97,14 @@ $cntStmt->execute(); $total=$cntStmt->fetchColumn(); $totPages=ceil($total/$limi
         [data-theme="light"] tbody tr:hover { background:var(--surface-2); }
         [data-theme="light"] .panel { background:var(--surface); }
         [data-theme="light"] thead tr { background:var(--surface-2); }
-        body { font-size:15px; }
-        th   { font-size:.78rem!important; }
-        td   { font-size:.9rem!important; }
-        .logo-title { font-size:1.15rem!important; }
-        .btn        { font-size:.84rem!important;padding:.5rem 1.1rem!important; }
+        body { font-size:17px; }
+        th   { font-size:.88rem!important; }
+        td   { font-size:.95rem!important; }
+        .logo-title { font-size:1.3rem!important; }
+        .btn        { font-size:.95rem!important;padding:.6rem 1.25rem!important; }
         .panel-title { font-size:.75rem!important; }
         .fg label    { font-size:.74rem!important; }
-        input[type="text"],input[type="number"],select { font-size:.9rem!important; }
+        input[type="text"],input[type="number"],select { font-size:.95rem!important; }
         .rec-count { font-size:.78rem!important; }
         #themeToggle { background:var(--surface-2);border:1px solid var(--border);color:var(--text-muted);border-radius:50px;padding:.42rem .9rem;font-size:.8rem;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;transition:.18s; }
         #themeToggle:hover { border-color:var(--teal);color:var(--teal); }

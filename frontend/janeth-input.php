@@ -13,7 +13,7 @@ $username  = $_SESSION['username'];
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="theme.js"></script>
     <style>
-        /* [Your existing CSS – unchanged] */
+        /* ── Design tokens ── */
         :root {
             --bg:#0a0e17;--surface:#111827;--surface-2:#1a2234;--surface-3:#222d42;
             --border:rgba(255,255,255,0.07);--border-hi:rgba(255,255,255,0.12);
@@ -22,9 +22,13 @@ $username  = $_SESSION['username'];
             --text:#e8edf5;--text-muted:#6b7a93;--text-faint:#3d4d63;
             --danger:#f87171;--success:#34d399;--purple:#a78bfa;
             --chicken:#fbbf24;--frozen:#60a5fa;--expense:#a78bfa;
-            --radius:14px;--radius-sm:9px;
+            --radius:16px;--radius-sm:10px;
         }
-        [data-theme="light"] { --bg:#f0f4f9;--surface:#ffffff;--surface-2:#e8eef5;--surface-3:#d8e3ef;--border:rgba(0,0,0,0.08);--border-hi:rgba(0,0,0,0.14);--text:#0d1b2a;--text-muted:#4a6080;--text-faint:#7090b0; }
+        [data-theme="light"] {
+            --bg:#f0f4f9;--surface:#ffffff;--surface-2:#e8eef5;--surface-3:#d8e3ef;
+            --border:rgba(0,0,0,0.08);--border-hi:rgba(0,0,0,0.14);
+            --text:#0d1b2a;--text-muted:#4a6080;--text-faint:#7090b0;
+        }
         [data-theme="light"] body { background-image:radial-gradient(ellipse 70% 50% at 10% -10%,rgba(41,182,200,.04) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 90% 110%,rgba(245,166,35,.03) 0%,transparent 60%); }
         [data-theme="light"] input[type="text"],[data-theme="light"] input[type="date"],[data-theme="light"] input[type="number"],[data-theme="light"] select { background:var(--surface-2);color:var(--text);border-color:var(--border); }
         [data-theme="light"] select option { background:#e8eef5;color:#0d1b2a; }
@@ -34,57 +38,39 @@ $username  = $_SESSION['username'];
         [data-theme="light"] .section-hd,[data-theme="light"] thead tr,[data-theme="light"] .controls,[data-theme="light"] .date-hero { background:var(--surface); }
         [data-theme="light"] .summary-bar { background:var(--surface); }
         [data-theme="light"] .as-chip { background:var(--surface-2);border-color:var(--border); }
-        /* Bigger fonts */
-        body { font-size:15px; }
-        th   { font-size:.78rem!important;padding:.72rem 1rem!important; }
-        td   { font-size:.9rem!important; }
-        .logo-title { font-size:1.15rem!important; }
-        .logo-sub   { font-size:.78rem!important; }
-        .user-name  { font-size:.88rem!important; }
-        .role-badge { font-size:.7rem!important; }
-        .btn        { font-size:.84rem!important;padding:.5rem 1.1rem!important; }
-        .section-title { font-size:.96rem!important; }
-        .hero-label { font-size:.78rem!important; }
-        .hero-sub   { font-size:.84rem!important; }
-        .sum-label  { font-size:.72rem!important; }
-        .sum-val    { font-size:1.2rem!important; }
-        .prod-name  { font-size:.88rem!important; }
-        .num-input  { font-size:.9rem!important;width:96px!important; }
-        label,.se-field label,.exp-field label { font-size:.74rem!important; }
-        input[type="text"],input[type="date"],input[type="number"],select { font-size:.9rem!important; }
-        .exp-desc,.se-product { font-size:.9rem!important; }
-        .exp-cat-badge,.se-supplier-badge { font-size:.74rem!important; }
-        .exp-amount,.se-cost { font-size:.88rem!important; }
-        .exp-total-val { font-size:1.2rem!important; }
-        .status-chip { font-size:.76rem!important; }
-        .as-chip { font-size:.74rem!important; }
-        .chooser-name { font-size:.85rem!important; }
-        /* Theme toggle */
-        #themeToggle { background:var(--surface-2);border:1px solid var(--border);color:var(--text-muted);border-radius:50px;padding:.42rem .9rem;font-size:.8rem;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;transition:.18s; }
-        #themeToggle:hover { border-color:var(--teal);color:var(--teal); }
+
         *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:1.5rem;
-             background-image:radial-gradient(ellipse 70% 50% at 10% -10%,rgba(41,182,200,.06) 0%,transparent 60%),
-                              radial-gradient(ellipse 60% 40% at 90% 110%,rgba(245,166,35,.04) 0%,transparent 60%);}
+        html { font-size: 17px; } /* Base font — bigger for elders */
+
+        body{
+            font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);
+            min-height:100vh;padding:1.5rem;font-size:1rem;
+            background-image:radial-gradient(ellipse 70% 50% at 10% -10%,rgba(41,182,200,.06) 0%,transparent 60%),
+                             radial-gradient(ellipse 60% 40% at 90% 110%,rgba(245,166,35,.04) 0%,transparent 60%);
+        }
         .container{max-width:1520px;margin:0 auto;}
+
+        /* ── Header ── */
         .header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;
                 margin-bottom:1.75rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border);}
-        .logo{display:flex;align-items:center;gap:.75rem;}
-        .logo-icon{width:40px;height:40px;background:linear-gradient(135deg,var(--teal),#1a9aab);border-radius:10px;
-                   display:flex;align-items:center;justify-content:center;font-size:1.1rem;box-shadow:0 4px 16px rgba(41,182,200,.3);}
+        .logo{display:flex;align-items:center;gap:.9rem;}
+        .logo-icon{width:48px;height:48px;background:linear-gradient(135deg,var(--teal),#1a9aab);border-radius:12px;
+                   display:flex;align-items:center;justify-content:center;font-size:1.4rem;box-shadow:0 4px 16px rgba(41,182,200,.3);}
         .logo-text{display:flex;flex-direction:column;}
-        .logo-title{font-size:1.1rem;font-weight:700;letter-spacing:-.02em;}
-        .logo-sub{font-size:.67rem;color:var(--text-muted);font-weight:400;letter-spacing:.07em;text-transform:uppercase;}
-        .header-right{display:flex;align-items:center;gap:.65rem;flex-wrap:wrap;}
-        .user-chip{display:flex;align-items:center;gap:.55rem;background:var(--surface);border:1px solid var(--border);
-                   border-radius:50px;padding:.3rem .85rem .3rem .45rem;}
-        .user-avatar{width:24px;height:24px;background:linear-gradient(135deg,var(--accent),#e8920f);border-radius:50%;
-                     display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;color:#0a0e17;}
-        .user-name{font-size:.78rem;font-weight:500;}
-        .role-badge{font-size:.6rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:.15rem .55rem;
+        .logo-title{font-size:1.2rem;font-weight:700;letter-spacing:-.02em;}
+        .logo-sub{font-size:.8rem;color:var(--text-muted);font-weight:400;letter-spacing:.07em;text-transform:uppercase;}
+        .header-right{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;}
+        .user-chip{display:flex;align-items:center;gap:.65rem;background:var(--surface);border:1px solid var(--border);
+                   border-radius:50px;padding:.4rem 1rem .4rem .5rem;}
+        .user-avatar{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),#e8920f);border-radius:50%;
+                     display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:#0a0e17;}
+        .user-name{font-size:1rem;font-weight:600;}
+        .role-badge{font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.2rem .65rem;
                     border-radius:50px;background:var(--accent-dim);color:var(--accent);border:1px solid rgba(245,166,35,.2);}
-        .btn{display:inline-flex;align-items:center;gap:.4rem;padding:.42rem 1rem;border-radius:50px;
-             font-size:.76rem;font-weight:600;font-family:'Sora',sans-serif;cursor:pointer;border:none;
+
+        /* ── Buttons ── */
+        .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1.25rem;border-radius:50px;
+             font-size:.95rem;font-weight:600;font-family:'Sora',sans-serif;cursor:pointer;border:none;
              transition:.18s;text-decoration:none;white-space:nowrap;letter-spacing:.01em;}
         .btn-primary{background:linear-gradient(135deg,var(--accent),#e8920f);color:#0a0e17;box-shadow:0 3px 12px var(--accent-glow);}
         .btn-primary:hover{box-shadow:0 6px 20px rgba(245,166,35,.4);transform:translateY(-1px);}
@@ -99,168 +85,185 @@ $username  = $_SESSION['username'];
         .btn-save:hover{box-shadow:0 6px 20px rgba(41,182,200,.4);transform:translateY(-1px);}
         .btn-purple{background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.2);color:var(--purple);}
         .btn-purple:hover{background:rgba(167,139,250,.2);}
+        #themeToggle{background:var(--surface-2);border:1px solid var(--border);color:var(--text-muted);
+                     border-radius:50px;padding:.5rem 1rem;font-size:.9rem;font-weight:600;cursor:pointer;
+                     font-family:'Sora',sans-serif;transition:.18s;}
+        #themeToggle:hover{border-color:var(--teal);color:var(--teal);}
+
+        /* ── Date hero ── */
         .date-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-                   padding:1.5rem 2rem;margin-bottom:1.1rem;display:flex;align-items:center;gap:2rem;flex-wrap:wrap;}
+                   padding:1.75rem 2rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:2rem;flex-wrap:wrap;}
         .date-hero-left{flex:1;min-width:200px;}
-        .hero-label{font-size:.67rem;text-transform:uppercase;letter-spacing:.12em;color:var(--text-muted);font-weight:600;margin-bottom:.4rem;}
-        .hero-big{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;letter-spacing:-.03em;line-height:1;}
+        .hero-label{font-size:.85rem;text-transform:uppercase;letter-spacing:.12em;color:var(--text-muted);font-weight:600;margin-bottom:.5rem;}
+        .hero-big{font-size:clamp(2rem,5vw,3.5rem);font-weight:700;letter-spacing:-.03em;line-height:1;}
         .hero-big .day-num{color:var(--accent);}
-        .hero-sub{font-size:.75rem;color:var(--text-muted);margin-top:.3rem;font-family:'DM Mono',monospace;}
-        .date-hero-right{display:flex;align-items:center;gap:.65rem;flex-wrap:wrap;}
-        .status-chip{display:inline-flex;align-items:center;gap:.4rem;padding:.28rem .8rem;border-radius:50px;
-                     font-size:.68rem;font-weight:700;letter-spacing:.05em;}
+        .hero-sub{font-size:.9rem;color:var(--text-muted);margin-top:.4rem;font-family:'DM Mono',monospace;}
+        .date-hero-right{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;}
+
+        /* ── Status / autosave chips ── */
+        .status-chip{display:inline-flex;align-items:center;gap:.4rem;padding:.4rem 1rem;border-radius:50px;
+                     font-size:.85rem;font-weight:700;letter-spacing:.04em;}
         .s-loaded{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);color:var(--success);}
         .s-empty {background:var(--accent-dim);border:1px solid rgba(245,166,35,.25);color:var(--accent);}
         .s-none  {background:var(--surface-2);border:1px solid var(--border);color:var(--text-muted);}
-        .as-chip{display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .7rem;border-radius:50px;
-                 font-size:.67rem;font-weight:600;letter-spacing:.04em;transition:.3s;
+        .as-chip{display:inline-flex;align-items:center;gap:.4rem;padding:.35rem .85rem;border-radius:50px;
+                 font-size:.82rem;font-weight:600;letter-spacing:.04em;transition:.3s;
                  background:var(--surface-2);border:1px solid var(--border);color:var(--text-faint);}
         .as-chip.saving{border-color:rgba(41,182,200,.3);color:var(--teal);background:var(--teal-dim);}
         .as-chip.saved {border-color:rgba(52,211,153,.25);color:var(--success);background:rgba(52,211,153,.08);}
         .as-chip.error {border-color:rgba(248,113,113,.25);color:var(--danger);background:rgba(248,113,113,.08);}
-        .as-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+        .as-dot{width:7px;height:7px;border-radius:50%;background:currentColor;}
         .as-chip.saving .as-dot{animation:blink .8s infinite;}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-        .controls{display:flex;flex-wrap:wrap;gap:.65rem;align-items:center;
+
+        /* ── Controls bar ── */
+        .controls{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;
                   background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-                  padding:.8rem 1.2rem;margin-bottom:1.1rem;}
+                  padding:1rem 1.4rem;margin-bottom:1.25rem;}
         .controls-sep{flex:1;}
         input[type="text"],input[type="date"],input[type="number"],select{
             background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);
-            color:var(--text);font-family:'Sora',sans-serif;font-size:.78rem;
-            padding:.42rem .85rem;outline:none;transition:.18s;}
+            color:var(--text);font-family:'Sora',sans-serif;font-size:.95rem;
+            padding:.55rem 1rem;outline:none;transition:.18s;}
         input:focus,select:focus{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-dim);}
         select option{background:#1a2234;}
-        .toggle-sw{display:inline-flex;align-items:center;gap:.45rem;background:var(--surface-2);
-                   border-radius:50px;padding:.22rem .7rem .22rem .8rem;border:1px solid var(--border);}
-        .toggle-sw label{font-size:.68rem;font-weight:600;color:var(--text-muted);cursor:pointer;}
-        .toggle-sw input{width:30px;height:15px;appearance:none;background:var(--surface-3);border-radius:30px;
+        .toggle-sw{display:inline-flex;align-items:center;gap:.55rem;background:var(--surface-2);
+                   border-radius:50px;padding:.3rem .9rem .3rem 1rem;border:1px solid var(--border);}
+        .toggle-sw label{font-size:.85rem;font-weight:600;color:var(--text-muted);cursor:pointer;}
+        .toggle-sw input{width:36px;height:20px;appearance:none;background:var(--surface-3);border-radius:30px;
                          position:relative;cursor:pointer;transition:.2s;}
         .toggle-sw input:checked{background:var(--teal);}
-        .toggle-sw input::before{content:'';width:11px;height:11px;background:#fff;border-radius:50%;
-                                 position:absolute;top:2px;left:2px;transition:.2s;}
-        .toggle-sw input:checked::before{left:17px;}
+        .toggle-sw input::before{content:'';width:14px;height:14px;background:#fff;border-radius:50%;
+                                 position:absolute;top:3px;left:3px;transition:.2s;}
+        .toggle-sw input:checked::before{left:19px;}
+
+        /* ── Section panels ── */
         .section-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-                      overflow:hidden;margin-bottom:1rem;}
-        .section-hd{display:flex;align-items:center;gap:.75rem;padding:.9rem 1.2rem;
+                      overflow:hidden;margin-bottom:1.25rem;}
+        .section-hd{display:flex;align-items:center;gap:.85rem;padding:1rem 1.4rem;
                     border-bottom:1px solid var(--border);background:var(--surface-2);}
-        .section-icon{font-size:1.2rem;}
-        .section-title{font-size:.88rem;font-weight:700;}
-        .section-count{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--text-faint);margin-left:auto;}
+        .section-icon{font-size:1.4rem;}
+        .section-title{font-size:1.05rem;font-weight:700;}
+        .section-count{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--text-faint);margin-left:auto;}
+
+        /* ── Table ── */
         .tbl-scroll{overflow-x:auto;}
         table{width:100%;border-collapse:collapse;min-width:820px;}
         thead tr{border-bottom:1px solid var(--border);}
-        th{padding:.62rem 1rem;text-align:center;font-size:.65rem;font-weight:700;text-transform:uppercase;
-           letter-spacing:.09em;color:var(--text-faint);background:var(--surface-2);white-space:nowrap;}
+        th{padding:.8rem 1.1rem;text-align:center;font-size:.8rem;font-weight:700;text-transform:uppercase;
+           letter-spacing:.08em;color:var(--text-faint);background:var(--surface-2);white-space:nowrap;}
         th:first-child{text-align:left;}
         tbody tr{border-bottom:1px solid var(--border);transition:background .12s;}
         tbody tr:last-child:not(.total-row){border-bottom:none;}
         tbody tr:hover:not(.total-row){background:var(--surface-2);}
-        td{padding:.58rem 1rem;font-size:.81rem;color:var(--text);text-align:center;vertical-align:middle;}
+        td{padding:.75rem 1.1rem;font-size:.95rem;color:var(--text);text-align:center;vertical-align:middle;}
         td:first-child{text-align:left;}
-        .prod-name{font-weight:600;font-size:.82rem;}
-        .prod-id{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--text-faint);
-                 background:var(--surface-3);padding:.1rem .4rem;border-radius:4px;margin-left:.4rem;}
-        .num-input{width:88px;background:var(--surface-3);border:1px solid var(--border);border-radius:var(--radius-sm);
-                   color:var(--text);font-family:'DM Mono',monospace;font-size:.82rem;
-                   padding:.36rem .6rem;text-align:center;outline:none;transition:.15s;}
+        .prod-name{font-weight:600;font-size:.95rem;}
+        .prod-id{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--text-faint);
+                 background:var(--surface-3);padding:.1rem .45rem;border-radius:5px;margin-left:.5rem;}
+        .num-input{width:100px;background:var(--surface-3);border:1px solid var(--border);border-radius:var(--radius-sm);
+                   color:var(--text);font-family:'DM Mono',monospace;font-size:.95rem;
+                   padding:.5rem .7rem;text-align:center;outline:none;transition:.15s;}
         .num-input:focus{border-color:var(--teal);background:rgba(41,182,200,.05);box-shadow:0 0 0 3px var(--teal-dim);}
-        .price-ro{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--accent);}
-        .yest-cell{font-family:'DM Mono',monospace;font-size:.82rem;font-weight:700;color:var(--teal);}
-        .sold-cell{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--success);}
-        .total-cell-val{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--accent);}
+        .price-ro{font-family:'DM Mono',monospace;font-size:.9rem;color:var(--accent);}
+        .yest-cell{font-family:'DM Mono',monospace;font-size:.95rem;font-weight:700;color:var(--teal);}
+        .sold-cell{font-family:'DM Mono',monospace;font-size:.95rem;color:var(--success);}
+        .total-cell-val{font-family:'DM Mono',monospace;font-size:.9rem;color:var(--accent);}
         .sold-warn{color:var(--danger);}
         .sold-ok  {color:var(--success);}
         .total-row td{background:rgba(245,166,35,.06)!important;border-top:1px solid rgba(245,166,35,.18)!important;
-                      color:var(--accent)!important;font-family:'DM Mono',monospace;font-size:.83rem;font-weight:700;}
+                      color:var(--accent)!important;font-family:'DM Mono',monospace;font-size:.9rem;font-weight:700;}
         .total-row .total-label{text-align:right!important;color:var(--text-muted)!important;
-                                font-family:'Sora',sans-serif!important;font-size:.7rem!important;
-                                font-weight:600!important;text-transform:uppercase;letter-spacing:.07em;padding-right:1.5rem!important;}
-        .empty-section{padding:2.5rem;text-align:center;color:var(--text-faint);font-size:.83rem;}
+                                font-family:'Sora',sans-serif!important;font-size:.8rem!important;
+                                font-weight:600!important;text-transform:uppercase;letter-spacing:.06em;padding-right:1.5rem!important;}
+        .empty-section{padding:3rem;text-align:center;color:var(--text-faint);font-size:.95rem;}
+
+        /* ── Chooser panel ── */
         .chooser-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-                       overflow:hidden;margin-bottom:1rem;display:none;}
+                       overflow:hidden;margin-bottom:1.25rem;display:none;}
         .chooser-panel.open{display:block;}
-        .chooser-hd{display:flex;align-items:center;gap:.75rem;padding:.9rem 1.2rem;
+        .chooser-hd{display:flex;align-items:center;gap:.85rem;padding:1rem 1.4rem;
                     border-bottom:1px solid var(--border);background:var(--surface-2);}
-        .chooser-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:.75rem;padding:1.2rem;}
-        .chooser-item{display:flex;align-items:center;gap:.75rem;background:var(--surface-2);border:1px solid var(--border);
-                      border-radius:var(--radius-sm);padding:.65rem .9rem;cursor:pointer;transition:.15s;}
+        .chooser-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:.85rem;padding:1.4rem;}
+        .chooser-item{display:flex;align-items:center;gap:.85rem;background:var(--surface-2);border:1px solid var(--border);
+                      border-radius:var(--radius-sm);padding:.85rem 1rem;cursor:pointer;transition:.15s;}
         .chooser-item:hover{border-color:var(--teal);background:var(--teal-dim);}
         .chooser-item.active{border-color:var(--success);background:rgba(52,211,153,.07);}
-        .chooser-cb{width:16px;height:16px;accent-color:var(--teal);cursor:pointer;flex-shrink:0;}
-        .chooser-name{font-size:.78rem;font-weight:600;flex:1;}
-        .chooser-cat{font-size:.63rem;padding:.1rem .45rem;border-radius:50px;font-weight:700;}
+        .chooser-cb{width:20px;height:20px;accent-color:var(--teal);cursor:pointer;flex-shrink:0;}
+        .chooser-name{font-size:.95rem;font-weight:600;flex:1;}
+        .chooser-cat{font-size:.72rem;padding:.15rem .55rem;border-radius:50px;font-weight:700;}
         .cc-chicken{background:rgba(251,191,36,.15);color:var(--chicken);}
         .cc-frozen {background:rgba(96,165,250,.12); color:var(--frozen);}
-        .se-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-                    overflow:hidden;margin-bottom:1rem;}
-        .se-hd{display:flex;align-items:center;gap:.75rem;padding:.9rem 1.2rem;
-               border-bottom:1px solid var(--border);background:var(--surface-2);}
-        .se-add-row{display:flex;flex-wrap:wrap;gap:.65rem;align-items:flex-end;padding:1rem 1.2rem;
-                    border-bottom:1px solid var(--border);}
-        .se-field{display:flex;flex-direction:column;gap:.3rem;}
-        .se-field label{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);}
+
+        /* ── Stock entries ── */
+        .se-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1.25rem;}
+        .se-hd{display:flex;align-items:center;gap:.85rem;padding:1rem 1.4rem;border-bottom:1px solid var(--border);background:var(--surface-2);}
+        .se-add-row{display:flex;flex-wrap:wrap;gap:.75rem;align-items:flex-end;padding:1.2rem 1.4rem;border-bottom:1px solid var(--border);}
+        .se-field{display:flex;flex-direction:column;gap:.35rem;}
+        .se-field label{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);}
         .se-list{padding:0;}
-        .se-item{display:flex;align-items:center;gap:.75rem;padding:.7rem 1.2rem;border-bottom:1px solid var(--border);
-                 font-size:.8rem;flex-wrap:wrap;transition:background .12s;}
+        .se-item{display:flex;align-items:center;gap:.85rem;padding:.9rem 1.4rem;border-bottom:1px solid var(--border);
+                 font-size:.95rem;flex-wrap:wrap;transition:background .12s;}
         .se-item:last-child{border-bottom:none;}
         .se-item:hover{background:var(--surface-2);}
-        .se-supplier-badge{padding:.2rem .65rem;border-radius:50px;font-size:.65rem;font-weight:700;
+        .se-supplier-badge{padding:.25rem .75rem;border-radius:50px;font-size:.78rem;font-weight:700;
                            background:rgba(41,182,200,.12);color:var(--teal);border:1px solid rgba(41,182,200,.2);white-space:nowrap;}
-        .se-product{font-weight:600;flex:1;min-width:120px;}
-        .se-detail{font-family:'DM Mono',monospace;font-size:.76rem;color:var(--text-muted);}
-        .se-cost{font-family:'DM Mono',monospace;font-weight:700;color:var(--danger);white-space:nowrap;}
-        .se-del{background:none;border:none;cursor:pointer;color:var(--text-faint);font-size:1rem;
-                padding:.2rem .4rem;border-radius:6px;transition:.15s;}
+        .se-product{font-weight:600;flex:1;min-width:130px;font-size:.95rem;}
+        .se-detail{font-family:'DM Mono',monospace;font-size:.85rem;color:var(--text-muted);}
+        .se-cost{font-family:'DM Mono',monospace;font-weight:700;color:var(--danger);white-space:nowrap;font-size:.95rem;}
+        .se-del{background:none;border:none;cursor:pointer;color:var(--text-faint);font-size:1.1rem;
+                padding:.3rem .5rem;border-radius:7px;transition:.15s;}
         .se-del:hover{color:var(--danger);background:rgba(248,113,113,.1);}
-        .se-total-bar{display:flex;justify-content:space-between;align-items:center;padding:.85rem 1.2rem;
+        .se-total-bar{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.4rem;
                       background:rgba(248,113,113,.05);border-top:1px solid rgba(248,113,113,.15);}
-        .se-empty{padding:1.5rem;text-align:center;color:var(--text-faint);font-size:.82rem;}
-        .exp-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-                     overflow:hidden;margin-bottom:1rem;}
-        .exp-hd{display:flex;align-items:center;gap:.75rem;padding:.9rem 1.2rem;
-                border-bottom:1px solid var(--border);background:var(--surface-2);}
-        .exp-add-row{display:flex;flex-wrap:wrap;gap:.65rem;align-items:flex-end;padding:1rem 1.2rem;
-                     border-bottom:1px solid var(--border);}
-        .exp-field{display:flex;flex-direction:column;gap:.3rem;}
-        .exp-field label{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);}
+        .se-empty{padding:2rem;text-align:center;color:var(--text-faint);font-size:.95rem;}
+
+        /* ── Expenses ── */
+        .exp-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1.25rem;}
+        .exp-hd{display:flex;align-items:center;gap:.85rem;padding:1rem 1.4rem;border-bottom:1px solid var(--border);background:var(--surface-2);}
+        .exp-add-row{display:flex;flex-wrap:wrap;gap:.75rem;align-items:flex-end;padding:1.2rem 1.4rem;border-bottom:1px solid var(--border);}
+        .exp-field{display:flex;flex-direction:column;gap:.35rem;}
+        .exp-field label{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);}
         .exp-list{padding:0;}
-        .exp-item{display:flex;align-items:center;gap:1rem;padding:.7rem 1.2rem;border-bottom:1px solid var(--border);
-                  font-size:.8rem;transition:background .12s;}
+        .exp-item{display:flex;align-items:center;gap:1.1rem;padding:.9rem 1.4rem;border-bottom:1px solid var(--border);
+                  font-size:.95rem;transition:background .12s;}
         .exp-item:last-child{border-bottom:none;}
         .exp-item:hover{background:var(--surface-2);}
-        .exp-cat-badge{padding:.2rem .65rem;border-radius:50px;font-size:.65rem;font-weight:700;
+        .exp-cat-badge{padding:.25rem .75rem;border-radius:50px;font-size:.78rem;font-weight:700;
                        background:rgba(167,139,250,.12);color:var(--expense);border:1px solid rgba(167,139,250,.2);}
-        .exp-desc{flex:1;font-weight:500;}
-        .exp-amount{font-family:'DM Mono',monospace;font-weight:700;color:var(--danger);white-space:nowrap;}
-        .exp-del{background:none;border:none;cursor:pointer;color:var(--text-faint);font-size:1rem;
-                 padding:.2rem .4rem;border-radius:6px;transition:.15s;}
+        .exp-desc{flex:1;font-weight:500;font-size:.95rem;}
+        .exp-amount{font-family:'DM Mono',monospace;font-weight:700;color:var(--danger);white-space:nowrap;font-size:.95rem;}
+        .exp-del{background:none;border:none;cursor:pointer;color:var(--text-faint);font-size:1.1rem;
+                 padding:.3rem .5rem;border-radius:7px;transition:.15s;}
         .exp-del:hover{color:var(--danger);background:rgba(248,113,113,.1);}
-        .exp-total-bar{display:flex;justify-content:space-between;align-items:center;padding:.85rem 1.2rem;
+        .exp-total-bar{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.4rem;
                        background:rgba(248,113,113,.05);border-top:1px solid rgba(248,113,113,.15);}
-        .exp-total-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);}
-        .exp-total-val{font-family:'DM Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--danger);}
-        .exp-empty{padding:1.5rem;text-align:center;color:var(--text-faint);font-size:.82rem;}
-        .summary-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;
+        .exp-total-label{font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-faint);}
+        .exp-total-val{font-family:'DM Mono',monospace;font-size:1.3rem;font-weight:700;color:var(--danger);}
+        .exp-empty{padding:2rem;text-align:center;color:var(--text-faint);font-size:.95rem;}
+
+        /* ── Summary bar ── */
+        .summary-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.1rem;
                      background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-                     padding:1rem 1.5rem;margin-bottom:1rem;}
-        .sum-item{display:flex;flex-direction:column;gap:.25rem;}
-        .sum-label{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text-faint);}
-        .sum-val  {font-family:'DM Mono',monospace;font-size:1.15rem;font-weight:700;}
-        .sum-val.green{color:var(--success);}
-        .sum-val.amber{color:var(--accent);}
-        .sum-val.red  {color:var(--danger);}
-        .sum-val.teal {color:var(--teal);}
+                     padding:1.2rem 1.75rem;margin-bottom:1.25rem;}
+        .sum-item{display:flex;flex-direction:column;gap:.3rem;}
+        .sum-label{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);}
+        .sum-val  {font-family:'DM Mono',monospace;font-size:1.4rem;font-weight:700;}
+        .sum-val.green{color:var(--success);}.sum-val.amber{color:var(--accent);}.sum-val.red{color:var(--danger);}.sum-val.teal{color:var(--teal);}
+
+        /* ── Modal ── */
         .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);
                        display:none;justify-content:center;align-items:center;z-index:1000;padding:1rem;}
         .modal-overlay.active{display:flex;}
         .modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-               padding:2rem 2.25rem;max-width:420px;width:100%;text-align:center;
+               padding:2.25rem 2.5rem;max-width:460px;width:100%;text-align:center;
                box-shadow:0 25px 60px rgba(0,0,0,.5);animation:popIn .2s cubic-bezier(.34,1.56,.64,1);}
         @keyframes popIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
-        .modal-icon{font-size:2rem;margin-bottom:.75rem;}
-        .modal-msg{font-size:.9rem;color:var(--text);margin-bottom:1.5rem;line-height:1.5;font-weight:500;}
-        .modal-btns{display:flex;gap:.75rem;justify-content:center;}
+        .modal-icon{font-size:2.5rem;margin-bottom:.85rem;}
+        .modal-msg{font-size:1.05rem;color:var(--text);margin-bottom:1.75rem;line-height:1.55;font-weight:500;}
+        .modal-btns{display:flex;gap:.85rem;justify-content:center;}
+
+        /* Print */
         @media print{
             .header,.controls,.date-hero-right,.modal-overlay,.exp-add-row,.exp-del,.se-add-row,.se-del,.chooser-panel{display:none!important;}
             body{background:#fff!important;color:#111!important;padding:.5rem;}
@@ -269,9 +272,9 @@ $username  = $_SESSION['username'];
             td{color:#111!important;}
             .num-input{border:none!important;background:transparent!important;width:auto!important;}
         }
-        ::-webkit-scrollbar{width:6px;height:6px;}
+        ::-webkit-scrollbar{width:7px;height:7px;}
         ::-webkit-scrollbar-track{background:transparent;}
-        ::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:3px;}
+        ::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:4px;}
         @media(max-width:640px){body{padding:1rem;}.date-hero{flex-direction:column;gap:1rem;}.controls{flex-direction:column;align-items:stretch;}}
     </style>
 </head>
@@ -293,16 +296,17 @@ $username  = $_SESSION['username'];
             <span class="role-badge"><?= $user_role ?></span>
         </div>
         <?php if ($user_role === 'admin'): ?>
-        <a href="products.php" class="btn btn-ghost">⚙️ Products</a>
+        <a href="../frontend/admin/products.php" class="btn btn-ghost">⚙️ Products</a>
         <a href="users.php" class="btn btn-ghost">👥 Users</a>
         <?php endif; ?>
         <a href="janeth-dashboard.php" class="btn btn-ghost">📊 Dashboard</a>
         <button class="btn btn-purple" id="chooserBtn">☰ Choose Products</button>
         <button id="themeToggle" onclick="toggleTheme()">☀️ Light</button>
-        <button class="btn btn-danger" id="logoutBtn">Sign out</button>
+        <button class="btn btn-danger" id="logoutBtn">🚪 Sign out</button>
     </div>
 </div>
 
+<!-- Modal -->
 <div id="modalOverlay" class="modal-overlay">
     <div class="modal">
         <div class="modal-icon" id="modalIcon">💬</div>
@@ -329,7 +333,7 @@ $username  = $_SESSION['username'];
 </div>
 
 <div class="controls">
-    <input type="text" id="searchInput" placeholder="🔍 Search product…" style="width:175px">
+    <input type="text" id="searchInput" placeholder="🔍 Search product…" style="width:200px">
     <select id="catFilter">
         <option value="">All Categories</option>
         <option value="Chicken">🐔 Chicken</option>
@@ -346,6 +350,7 @@ $username  = $_SESSION['username'];
     <button id="printBtn" class="btn btn-ghost">📄 Print</button>
 </div>
 
+<!-- Chooser panel -->
 <div class="chooser-panel" id="chooserPanel">
     <div class="chooser-hd">
         <span class="section-icon">☰</span>
@@ -355,6 +360,7 @@ $username  = $_SESSION['username'];
     <div class="chooser-grid" id="chooserGrid"></div>
 </div>
 
+<!-- Summary -->
 <div class="summary-bar" id="summaryBar">
     <div class="sum-item"><div class="sum-label">Stock In Value</div><div class="sum-val teal" id="sumStockIn">₱0.00</div></div>
     <div class="sum-item"><div class="sum-label">Supplier Cost</div><div class="sum-val red" id="sumSupplierCost">₱0.00</div></div>
@@ -364,6 +370,7 @@ $username  = $_SESSION['username'];
     <div class="sum-item"><div class="sum-label">Est. Net Income</div><div class="sum-val" id="sumNet">₱0.00</div></div>
 </div>
 
+<!-- Chicken table -->
 <div class="section-wrap" id="chickenSection">
     <div class="section-hd">
         <span class="section-icon">🐔</span>
@@ -372,22 +379,21 @@ $username  = $_SESSION['username'];
     </div>
     <div class="tbl-scroll">
         <table>
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Selling Price (₱)</th>
-                    <th>Yesterday</th>
-                    <th>Stock In</th>
-                    <th>Remaining</th>
-                    <th>Sold (calc.)</th>
-                    <th>Sales Value (₱)</th>
-                </tr>
-            </thead>
+            <thead><tr>
+                <th>Product</th>
+                <th>Selling Price (₱)</th>
+                <th>Yesterday</th>
+                <th>Stock In</th>
+                <th>Remaining</th>
+                <th>Sold (calc.)</th>
+                <th>Sales Value (₱)</th>
+            </tr></thead>
             <tbody id="chickenBody"></tbody>
         </table>
     </div>
 </div>
 
+<!-- Frozen table -->
 <div class="section-wrap" id="frozenSection">
     <div class="section-hd">
         <span class="section-icon">❄️</span>
@@ -396,22 +402,21 @@ $username  = $_SESSION['username'];
     </div>
     <div class="tbl-scroll">
         <table>
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Selling Price (₱)</th>
-                    <th>Yesterday</th>
-                    <th>Stock In</th>
-                    <th>Remaining</th>
-                    <th>Sold (calc.)</th>
-                    <th>Sales Value (₱)</th>
-                </tr>
-            </thead>
+            <thead><tr>
+                <th>Product</th>
+                <th>Selling Price (₱)</th>
+                <th>Yesterday</th>
+                <th>Stock In</th>
+                <th>Remaining</th>
+                <th>Sold (calc.)</th>
+                <th>Sales Value (₱)</th>
+            </tr></thead>
             <tbody id="frozenBody"></tbody>
         </table>
     </div>
 </div>
 
+<!-- Stock entries -->
 <div class="se-section">
     <div class="se-hd">
         <span class="section-icon">🚚</span>
@@ -421,21 +426,21 @@ $username  = $_SESSION['username'];
     <div class="se-add-row">
         <div class="se-field">
             <label>Product</label>
-            <select id="seProduct" style="width:180px"><option value="">Select…</option></select>
+            <select id="seProduct" style="width:190px"><option value="">Select…</option></select>
         </div>
         <div class="se-field">
             <label>Supplier</label>
-            <select id="seSupplier" style="width:160px"><option value="">Select…</option></select>
+            <select id="seSupplier" style="width:170px"><option value="">Select…</option></select>
         </div>
         <div class="se-field">
             <label>Qty</label>
-            <input type="number" id="seQty" placeholder="0" min="1" style="width:80px">
+            <input type="number" id="seQty" placeholder="0" min="1" style="width:90px">
         </div>
         <div class="se-field">
             <label>Cost Price (₱)</label>
-            <input type="number" id="seCost" placeholder="0.00" step="0.01" min="0" style="width:110px">
+            <input type="number" id="seCost" placeholder="0.00" step="0.01" min="0" style="width:120px">
         </div>
-        <div class="se-field" style="flex:1;min-width:130px">
+        <div class="se-field" style="flex:1;min-width:140px">
             <label>Notes</label>
             <input type="text" id="seNotes" placeholder="Optional" style="width:100%">
         </div>
@@ -448,6 +453,7 @@ $username  = $_SESSION['username'];
     </div>
 </div>
 
+<!-- Expenses -->
 <div class="exp-section">
     <div class="exp-hd">
         <span class="section-icon">💸</span>
@@ -457,19 +463,19 @@ $username  = $_SESSION['username'];
     <div class="exp-add-row">
         <div class="exp-field">
             <label>Category</label>
-            <select id="expCat" style="width:140px">
+            <select id="expCat" style="width:155px">
                 <option>Utilities</option><option>Transport</option>
                 <option>Food & Snacks</option><option>Supplies</option>
                 <option>Labour</option><option>Other</option>
             </select>
         </div>
-        <div class="exp-field" style="flex:1;min-width:180px">
+        <div class="exp-field" style="flex:1;min-width:200px">
             <label>Description</label>
             <input type="text" id="expDesc" placeholder="e.g. Ice for the stall" style="width:100%">
         </div>
         <div class="exp-field">
             <label>Amount (₱)</label>
-            <input type="number" id="expAmount" placeholder="0.00" step="0.01" min="0" style="width:110px">
+            <input type="number" id="expAmount" placeholder="0.00" step="0.01" min="0" style="width:120px">
         </div>
         <button class="btn btn-primary" id="addExpBtn" style="align-self:flex-end">+ Add</button>
     </div>
@@ -480,13 +486,14 @@ $username  = $_SESSION['username'];
     </div>
 </div>
 
-<div style="padding-bottom:2rem;text-align:center;font-size:.68rem;color:var(--text-faint);font-family:'DM Mono',monospace">
+<div style="padding-bottom:2rem;text-align:center;font-size:.85rem;color:var(--text-faint);font-family:'DM Mono',monospace">
     ✦ Sold = Yesterday + Stock In − Remaining &nbsp;·&nbsp; Yesterday auto-fills from previous day's Remaining
 </div>
 </div>
 
 <script>
-const API = '../backend/janeth.php';
+/* ── BUG FIX: API path — all files must be in the same folder ── */
+const API  = 'janeth.php';
 const ROLE = '<?= $user_role ?>';
 
 let masterProducts = [];
@@ -515,7 +522,7 @@ function modal(msg, onOk, onCancel=null, icon='💬', okLabel='OK', cancelLabel=
     ok.addEventListener('click',  () => { close(); onOk    && onOk(); });
     can.addEventListener('click', () => { close(); onCancel && onCancel(); });
 }
-function alert2(msg, isErr=false, autoClose=2500) {
+function alert2(msg, isErr=false, autoClose=2800) {
     modal(msg, null, null, isErr?'⚠️':'✅', 'OK', '');
     setTimeout(() => document.getElementById('modalOverlay').classList.remove('active'), autoClose);
 }
@@ -540,7 +547,6 @@ function setHero(d) {
     document.getElementById('heroDay').innerHTML=`${days[dt.getDay()]}, <span class="day-num">${dt.getDate()}</span>`;
     document.getElementById('heroFull').textContent=`${months[dt.getMonth()]} ${dt.getFullYear()}`;
 }
-
 function calcSold(r) { return Math.max(0,(r.yesterday+r.stockIn)-r.remaining); }
 
 document.getElementById('asToggle').addEventListener('change',e=>{
@@ -573,20 +579,22 @@ async function doSave() {
 }
 
 async function fetchAllProducts() {
-    const [visProd, allProd, sups] = await Promise.all([
-        fetch(`${API}?products=1&page=input`).then(r=>r.json()),
-        fetch(`${API}?products=1`).then(r=>r.json()),
-        fetch(`${API}?suppliers=1`).then(r=>r.json())
-    ]);
-    masterProducts = visProd.products || [];
-    allProducts    = allProd.products  || [];
-    suppliers      = sups.suppliers    || [];
-    buildChooser();
-    buildSeDropdowns();
-    masterRecords = masterProducts.map(p=>({...p,price:parseFloat(p.price)||0,yesterday:0,stockIn:0,remaining:0,yesterdayFromPrev:false}));
-    renderSections();
-    const saved = localStorage.getItem('janeth_date');
-    if (saved) { document.getElementById('recordDate').value=saved; await loadDate(saved,true); }
+    try {
+        const [visProd, allProd, sups] = await Promise.all([
+            fetch(`${API}?products=1&page=input`).then(r=>r.json()),
+            fetch(`${API}?products=1`).then(r=>r.json()),
+            fetch(`${API}?suppliers=1`).then(r=>r.json())
+        ]);
+        masterProducts = visProd.products || [];
+        allProducts    = allProd.products  || [];
+        suppliers      = sups.suppliers    || [];
+        buildChooser();
+        buildSeDropdowns();
+        masterRecords = masterProducts.map(p=>({...p,price:parseFloat(p.price)||0,yesterday:0,stockIn:0,remaining:0,yesterdayFromPrev:false}));
+        renderSections();
+        const saved = localStorage.getItem('janeth_date');
+        if (saved) { document.getElementById('recordDate').value=saved; await loadDate(saved,true); }
+    } catch(e) { console.error('Failed to fetch products:', e); }
 }
 
 function buildChooser() {
@@ -641,7 +649,7 @@ async function loadDate(d, silent=false) {
             fetch(`${API}?expenses=${d}`),
             fetch(`${API}?stock_entries=${d}`)
         ]);
-        const data   = await res.json();
+        const data    = await res.json();
         const expData = await expRes.json();
         const seData  = await seRes.json();
 
@@ -662,15 +670,14 @@ async function loadDate(d, silent=false) {
                 setStatus('loaded');
             } else {
                 const prev = await fetchPrev(d);
-                masterRecords = masterProducts.map(p=>({
-                    ...p, price:parseFloat(p.price)||0,
-                    yesterday:0, stockIn:0, remaining:0, yesterdayFromPrev:false
-                }));
+                masterRecords = masterProducts.map(p=>({...p,price:parseFloat(p.price)||0,yesterday:0,stockIn:0,remaining:0,yesterdayFromPrev:false}));
                 if (prev) applyPrev(prev);
                 setStatus('empty');
             }
         } else {
+            const prev = await fetchPrev(d);
             masterRecords = masterProducts.map(p=>({...p,price:parseFloat(p.price)||0,yesterday:0,stockIn:0,remaining:0,yesterdayFromPrev:false}));
+            if (prev) applyPrev(prev);
             setStatus('empty');
         }
         renderSections();
@@ -678,7 +685,7 @@ async function loadDate(d, silent=false) {
         renderStockEntries();
         updateSummary();
         if (!silent) alert2(`Loaded data for ${d}`);
-    } catch(e) { alert2('Failed to load data.', true); }
+    } catch(e) { alert2('Failed to load data. Check your server connection.', true); }
 }
 
 async function fetchPrev(d) {
@@ -708,7 +715,6 @@ function renderSections() {
     updateSummary();
 }
 
-let _rowIdx = 0;
 function renderBody(bodyId, recs, startRow) {
     const tbody = document.getElementById(bodyId);
     if (!recs.length) { tbody.innerHTML=`<tr><td colspan="7" class="empty-section">No products to show.</td></tr>`; return; }
@@ -724,7 +730,7 @@ function renderBody(bodyId, recs, startRow) {
         return `<tr>
             <td><span class="prod-name">${esc(r.name)}</span><span class="prod-id">#${r.id}</span></td>
             <td><span class="price-ro">₱${(r.price||0).toFixed(2)}</span></td>
-            <td class="yest-cell${r.yesterdayFromPrev?' manual':''}">${r.yesterday}</td>
+            <td class="yest-cell">${r.yesterday}</td>
             <td><input class="num-input" type="number" min="0" value="${r.stockIn}" data-pid="${r.id}" data-field="stockIn" data-row="${row}" data-col="1"></td>
             <td><input class="num-input" type="number" min="0" value="${r.remaining}" data-pid="${r.id}" data-field="remaining" data-row="${row}" data-col="2"></td>
             <td class="sold-cell ${soldCls}">${sold}</td>
@@ -803,7 +809,6 @@ document.getElementById('addSeBtn').addEventListener('click',async()=>{
     if(!pid)  return alert2('Select a product.',true);
     if(!sid)  return alert2('Select a supplier.',true);
     if(qty<=0) return alert2('Qty must be greater than 0.',true);
-    if(cost<0) return alert2('Cost price cannot be negative.',true);
     const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({save_stock_entry:1,entry_date:date,product_id:pid,supplier_id:sid,qty,cost_price:cost,notes})});
     const data=await res.json();
@@ -900,11 +905,14 @@ document.getElementById('printBtn').addEventListener('click',()=>{
     if(!document.getElementById('recordDate').value) return alert2('Please select a date first.',true);
     window.print();
 });
+
+/* ── BUG FIX: Logout correctly redirects via logout.php ── */
 document.getElementById('logoutBtn').addEventListener('click',()=>{
     modal('Are you sure you want to sign out?\nAny unsaved changes will be lost.',
         ()=>{ window.location.href='logout.php'; },
         null,'👋','Yes, sign out','Stay');
 });
+
 document.getElementById('searchInput').addEventListener('input',renderSections);
 document.getElementById('catFilter').addEventListener('change',renderSections);
 

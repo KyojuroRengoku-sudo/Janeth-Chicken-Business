@@ -36,7 +36,7 @@ $username  = $_SESSION['username'];
         [data-theme="light"] .chart-card { background:var(--surface); }
         [data-theme="light"] .lowstock-bar { background:rgba(251,191,36,0.06); }
         /* Bigger fonts */
-        body { font-size:15px; }
+        body { font-size:17px; }
         th   { font-size:.78rem!important; }
         td   { font-size:.9rem!important; }
         .logo-title { font-size:1.15rem!important; }
@@ -44,15 +44,15 @@ $username  = $_SESSION['username'];
         .user-name  { font-size:.88rem!important; }
         .role-badge { font-size:.7rem!important; }
         .btn        { font-size:.84rem!important;padding:.5rem 1.1rem!important; }
-        .kpi-label  { font-size:.76rem!important; }
-        .kpi-val    { font-size:clamp(1.05rem,2vw,1.75rem)!important; }
-        .kpi-sub    { font-size:.82rem!important; }
-        .ctrl-label,.a-label { font-size:.78rem!important; }
-        .chart-title { font-size:.78rem!important; }
-        .ctab { font-size:.78rem!important; }
-        .table-title { font-size:.88rem!important; }
-        .total-label { font-size:.74rem!important; }
-        .total-amount { font-size:1.12rem!important; }
+        .kpi-label  { font-size:.88rem!important; }
+        .kpi-val    { font-size:clamp(1.2rem,2vw,2rem)!important; }
+        .kpi-sub    { font-size:.9rem!important; }
+        .ctrl-label,.a-label { font-size:.9rem!important; }
+        .chart-title { font-size:.88rem!important; }
+        .ctab { font-size:.88rem!important; }
+        .table-title { font-size:1rem!important; }
+        .total-label { font-size:.88rem!important; }
+        .total-amount { font-size:1.3rem!important; }
         input[type="text"],input[type="date"],select { font-size:.9rem!important; }
         /* Theme toggle */
         #themeToggle { background:var(--surface-2);border:1px solid var(--border);color:var(--text-muted);border-radius:50px;padding:.42rem .9rem;font-size:.8rem;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;transition:.18s; }
@@ -331,15 +331,17 @@ $username  = $_SESSION['username'];
     </div>
     <div class="tbl-scroll">
         <table>
-            <thead><tr>
-                <th onclick="sortBy('rank')" style="text-align:left">Rank</th>
-                <th onclick="sortBy('product_name')" style="text-align:left">Product</th>
-                <th onclick="sortBy('price')">Price (₱)</th>
-                <th onclick="sortBy('sold')">Qty Sold</th>
-                <th onclick="sortBy('sold_peso')">Sales (₱)</th>
-                <th onclick="sortBy('remaining_qty')">Remaining</th>
-                <th onclick="sortBy('rem_peso')">Rem. Value (₱)</th>
-            </tr></thead>
+            <thead>
+                <tr>
+                    <th onclick="sortBy('rank')" style="text-align:left">Rank</th>
+                    <th onclick="sortBy('product_name')" style="text-align:left">Product</th>
+                    <th onclick="sortBy('price')">Price (₱)</th>
+                    <th onclick="sortBy('sold')">Qty Sold</th>
+                    <th onclick="sortBy('sold_peso')">Sales (₱)</th>
+                    <th onclick="sortBy('remaining_qty')">Remaining</th>
+                    <th onclick="sortBy('rem_peso')">Rem. Value (₱)</th>
+                </tr>
+            </thead>
             <tbody id="dashBody"><tr class="state-row"><td colspan="7">Select a date and click Load</td></tr></tbody>
         </table>
     </div>
@@ -368,7 +370,7 @@ $username  = $_SESSION['username'];
 
 
 <script>
-const API = '../backend/janeth.php';
+const API = 'janeth.php';
 const ROLE = '<?= $user_role ?>';
 let fullRecords = [];
 let expenses    = [];
@@ -598,10 +600,10 @@ async function loadAnalytics(){
         const res=await fetch(`${API}?analytics=1&from=${from}&to=${to}`);
         const data=await res.json();
         analyticsData=data;
-        // Weekly KPI (sum of daily sales in range)
+        // Weekly KPI – sum of daily sales from weekly data (now only last 7 days or fewer)
         const weeklyTotal = (data.weekly||[]).reduce((s,d)=>s+parseFloat(d.day_sales||0),0);
         document.getElementById('kpiWeekly').textContent = peso(weeklyTotal);
-        document.getElementById('kpiWeeklySub').textContent = `${(data.weekly||[]).length} days in range`;
+        document.getElementById('kpiWeeklySub').textContent = `${(data.weekly||[]).length} day(s) in last 7 days`;
         // Monthly KPI (sum of current month in range)
         const monthlyTotal = (data.monthly||[]).reduce((s,d)=>s+parseFloat(d.month_sales||0),0);
         document.getElementById('kpiMonthly').textContent = peso(monthlyTotal);
@@ -734,3 +736,4 @@ loadDateSelector().then(()=>loadAnalytics());
 </script>
 
 </body>
+</html>

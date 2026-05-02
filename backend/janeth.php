@@ -138,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         send(['liquidation' => $liq ?: null]);
     }
 
-    // ── Analytics: top/bottom sellers over date range ──
+    // ── Analytics: top/bottom sellers over date range (weekly now only last 7 days) ──
     if (isset($_GET['analytics'])) {
         $from = $_GET['from'] ?? date('Y-m-01');
         $to   = $_GET['to']   ?? date('Y-m-d');
@@ -171,18 +171,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $costStmt->execute([$from, $to]);
         $totalCost = (float)($costStmt->fetch()['total'] ?? 0);
 
-        // Weekly sales (last 7 days within range, by day)
+        // Weekly sales – LAST 7 DAYS within range (or less)
         $weeklyStmt = $pdo->prepare("
-            SELECT jr.record_date, SUM(jr.sold * p.selling_price) AS day_sales
+            SELECT record_date, SUM(jr.sold * p.selling_price) AS day_sales
             FROM janeth_records jr
             JOIN products p ON p.id = jr.product_id
             WHERE jr.record_date BETWEEN ? AND ?
-            GROUP BY jr.record_date
-            ORDER BY jr.record_date ASC
+            GROUP BY record_date
+            ORDER BY record_date DESC
             LIMIT 7
         ");
         $weeklyStmt->execute([$from, $to]);
-        $weekly = $weeklyStmt->fetchAll();
+        $weekly = array_reverse($weeklyStmt->fetchAll()); // ascending order for chart
 
         // Monthly sales (aggregate by month)
         $monthlyStmt = $pdo->prepare("
@@ -403,3 +403,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 send(['error' => 'Method not allowed'], 405);
+?>
