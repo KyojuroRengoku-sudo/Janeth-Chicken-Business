@@ -1,3 +1,4 @@
+<?php session_start(); if (isset($_SESSION["user_id"])) { header("Location: janeth-input.php"); exit; } ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -199,11 +200,11 @@
     <div id="errorBox"   class="alert alert-error">  <span>⚠️</span><span id="errorText"></span></div>
     <div id="successBox" class="alert alert-success"> <span>✅</span><span id="successText"></span></div>
 
-    <div class="login-link">Already have an account? <a href="login.html">Sign in</a></div>
+    <div class="login-link">Already have an account? <a href="login.php">Sign in</a></div>
 </div>
 
 <script>
-const API = '../backend/register.php';   // FIXED: consistent API path
+const API = 'register.php';
 
 // Password toggles
 function setupToggle(toggleId, inputId) {

@@ -1,107 +1,127 @@
 # Janeth's Business – Inventory & Sales System
 
-A lightweight web-based system to manage daily inventory, distribution, and sales for **Janeth's branch**. Designed to be simple, fast, and expandable to multiple branches later (Aljun, Riche, etc.).
+A lightweight PHP + MySQL web app for managing daily inventory, distribution, and sales.
 
 ## 📁 Project Structure
 
-Janeth's Business/
-├── frontend/
-│ ├── janeth-input.html # Data entry with auto-calculation
-│ └── janeth-dashboard.html # Summary view and history
-├── backend/
-│ ├── db.php # Database connection
-│ └── janeth.php # REST API (GET products, GET records, POST save)
+```
+janeth-chicken-business/
+├── app/
+│   ├── controllers/
+│   │   ├── AuthController.php       # Login, logout, register
+│   │   ├── ProductController.php    # All inventory API logic (was janeth.php)
+│   │   └── UserController.php       # Admin user management
+│   ├── models/
+│   │   ├── Database.php             # PDO singleton
+│   │   ├── User.php                 # User + registration request queries
+│   │   └── Product.php              # Products, inventory, analytics queries
+│   └── helpers/
+│       └── helpers.php              # send(), requireAuth(), validDate()
+├── config/
+│   └── database.php                 # Reads credentials from .env
 ├── database/
-│ └── schema.sql # MySQL database structure + sample data
-└── README.md # This file
+│   └── schema.sql                   # Full MySQL schema + sample data
+├── public/                          # Web root (point Apache here)
+│   ├── index.php                    # Front controller + autoloader
+│   ├── login.php                    # Login page
+│   ├── register.php                 # Registration request page
+│   ├── logout.php                   # Session destroy + redirect
+│   ├── janeth.php                   # Backward-compat alias → api.php
+│   ├── api.php                      # Inventory REST API entry point
+│   ├── janeth-input.php             # Daily entry page
+│   ├── janeth-dashboard.php         # Dashboard + analytics
+│   └── assets/
+│       └── js/theme.js              # Light/dark mode toggle
+├── admin/
+│   ├── bootstrap.php                # Auth check + $pdo setup for admin pages
+│   ├── products.php                 # Product management (admin only)
+│   └── users.php                    # User management (admin only)
+├── routes/
+│   └── web.php                      # Route definitions
+├── storage/                         # Logs, uploads (gitignored)
+├── .env                             # DB credentials (never commit this)
+├── .htaccess                        # Routing + security
+└── README.md
+```
 
-## 🚀 Features
-
-- **Daily entry** – Input yesterday's stock, stock‑in, distributed, sold.
-- **Auto‑calculations** – Remaining stock and unsold quantity updated in real time.
-- **Date‑based storage** – Each day's record is saved separately.
-- **Dashboard** – View totals (distributed, sold, unsold, remaining) for any date.
-- **Backend API** – Built with PHP + MySQL (PDO).
-- **Future‑ready** – Easy to add more branches (just duplicate tables or add a `branch` column).
-
-## 🛠️ Setup Instructions
+## 🚀 Setup
 
 ### 1. Prerequisites
-- XAMPP / WAMP / MAMP (Apache + MySQL + PHP)
-- Web browser
+- XAMPP / WAMP / MAMP (Apache + MySQL + PHP 8.1+)
 
 ### 2. Installation
 
-1. **Copy the folder** `Janeth's Business` into your web server's document root:
-   - XAMPP: `C:\xampp\htdocs\`
-   - WAMP: `C:\wamp\www\`
-   - MAMP: `/Applications/MAMP/htdocs/`
+1. Copy folder to your web server root:
+   - XAMPP: `C:\xampp\htdocs\janeth-chicken-business\`
 
-2. **Start Apache and MySQL** from your control panel.
+2. Start Apache and MySQL.
 
-3. **Create the database:**
-   - Open phpMyAdmin (http://localhost/phpmyadmin)
-   - Import the file `database/schema.sql`
+3. Import the database:
+   - Open phpMyAdmin → import `database/schema.sql`
 
-4. **Configure database credentials** (if needed):
-   - Open `backend/db.php`
-   - Update `$username`, `$password` to match your MySQL setup.
-   - Default XAMPP: `root` with empty password.
+4. Configure credentials in `.env`:
+   ```
+   DB_HOST=localhost
+   DB_NAME=inventory_system
+   DB_USER=root
+   DB_PASS=
+   ```
 
-### 3. Access the application
+5. **Fix default passwords** — run once in your browser:
+   ```
+   http://localhost/janeth-chicken-business/fix_passwords.php
+   ```
+   Then delete `fix_passwords.php`.
 
-- **Data entry:**  
-  `http://localhost/Janeth%27s%20Business/frontend/janeth-input.html`
+### 3. Access
 
-- **Dashboard:**  
-  `http://localhost/Janeth%27s%20Business/frontend/janeth-dashboard.html`
+| Page | URL |
+|------|-----|
+| Login | `http://localhost/janeth-chicken-business/public/login.php` |
+| Daily Entry | `http://localhost/janeth-chicken-business/public/janeth-input.php` |
+| Dashboard | `http://localhost/janeth-chicken-business/public/janeth-dashboard.php` |
+| Product Admin | `http://localhost/janeth-chicken-business/admin/products.php` |
+| User Admin | `http://localhost/janeth-chicken-business/admin/users.php` |
 
-> Note: The apostrophe and space are URL‑encoded as `%27` and `%20`.  
-> To avoid encoding, rename the folder to `janeth_business`.
+**Default credentials after running fix_passwords.php:**
+- `admin` / `admin123`
+- `staff1` / `staff123`
 
-## 🧪 How to Use
+## 🏗️ Architecture
 
-### Daily Entry (`janeth-input.html`)
-1. Select a date.
-2. For each product, enter:
-   - **Yesterday Qty** – remaining from previous day
-   - **Stock In** – new stock received
-   - **Distributed** – quantity given to Janeth (or to sales)
-   - **Sold** – actual units sold
-3. The table automatically shows **Unsold** (Distributed – Sold) and **Remaining** (Yesterday + Stock In – Distributed).
-4. Click **Save record** – data is sent to the backend and stored in MySQL.
-5. Click **Load existing data** to see previously saved entries for that date.
+The app uses a simple MVC-style layout without Composer or a framework:
 
-### Dashboard (`janeth-dashboard.html`)
-- Select a date from the dropdown.
-- View a summary table and total cards.
-- Switch between dates to compare performance.
+- **Front controller** (`public/index.php`) registers a PSR-4-style autoloader and loads `routes/web.php`
+- **Controllers** handle HTTP logic and delegate to models
+- **Models** wrap all database queries (PDO)
+- **Admin pages** use `admin/bootstrap.php` for auth + `$pdo` access
+- **`public/janeth.php`** is a backward-compatible alias so existing fetch() calls don't break
 
-## 🔄 Future Expansion
+## 🔄 API Endpoints
 
-To add more branches (e.g., Aljun, Riche):
+All via `public/api.php` (or the `janeth.php` alias). Requires session auth.
 
-**Option A – Add a `branch` column**  
-Add `branch VARCHAR(50)` to `janeth_records` table, then modify the API to filter by branch.
-
-**Option B – Duplicate tables**  
-Create `aljun_records`, `riche_records` and copy the same backend endpoints.
-
-The current architecture is modular – reuse the same patterns.
+| Method | Query / Body | Description |
+|--------|-------------|-------------|
+| GET | `?products=1&page=input\|dashboard\|all` | List products |
+| GET | `?date=YYYY-MM-DD&for=input\|dashboard` | Records + stock entries for date |
+| GET | `?analytics=1&from=…&to=…` | Sales analytics |
+| GET | `?expenses=YYYY-MM-DD` | Daily expenses |
+| GET | `?liquidation=YYYY-MM-DD` | Liquidation record |
+| POST | `{date, records}` | Save inventory records |
+| POST | `{save_expense, …}` | Add expense |
+| POST | `{save_liquidation, …}` | Save liquidation |
+| POST | `{add_product, …}` | Add product (admin) |
 
 ## 🐛 Troubleshooting
 
-| Problem | Likely solution |
-|---------|------------------|
-| `404 Not Found` on API calls | Check that `backend/janeth.php` exists and the path `../backend/janeth.php` is correct relative to the HTML file. |
-| `Database connection failed` | Verify MySQL is running and credentials in `db.php` are correct. |
-| `No products loaded` | Run `schema.sql` again and ensure the `products` table has data. |
-| Saved data doesn't appear | Check browser console for errors; confirm the POST response shows `"success": true`. |
+| Problem | Solution |
+|---------|----------|
+| 404 on API calls | Ensure `public/` is the web root, or adjust URL prefix in `.htaccess` |
+| Database connection failed | Check `.env` credentials and that MySQL is running |
+| Login fails | Run `fix_passwords.php` once to set correct bcrypt hashes |
+| `require_once` errors | Check PHP version is 8.1+ (`str_starts_with` used in autoloader) |
 
 ## 📝 License
 
-Free for internal business use. Open source under MIT.
-
-## 👤 Author
-
-Built for Janeth's Business – scalable, simple, and effective.
+MIT – free for internal business use.

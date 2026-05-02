@@ -1,3 +1,4 @@
+<?php session_start(); if (isset($_SESSION["user_id"])) { header("Location: janeth-input.php"); exit; } ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -381,7 +382,7 @@
     </div>
 
     <div style="text-align:center;margin-top:1.25rem;font-size:.74rem;color:var(--text-muted)">
-        Don't have an account? <a href="register.html" style="color:var(--teal);font-weight:600;text-decoration:none">Request one →</a>
+        Don't have an account? <a href="register.php" style="color:var(--teal);font-weight:600;text-decoration:none">Request one →</a>
     </div>
 
     <div class="demo">

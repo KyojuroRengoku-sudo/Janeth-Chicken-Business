@@ -1,0 +1,20 @@
+Options -Indexes
+
+# Block direct access to sensitive directories
+<FilesMatch "\.(env|sql|md)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /janeth-chicken-business/
+
+    # Block access to app/, config/, storage/, routes/
+    RewriteRule ^(app|config|storage|routes)/ - [F,L]
+
+    # Route everything through public/index.php if not a real file/dir
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ public/index.php [QSA,L]
+</IfModule>

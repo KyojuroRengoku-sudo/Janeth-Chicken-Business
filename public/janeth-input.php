@@ -296,7 +296,7 @@ $username  = $_SESSION['username'];
             <span class="role-badge"><?= $user_role ?></span>
         </div>
         <?php if ($user_role === 'admin'): ?>
-        <a href="../frontend/admin/products.php" class="btn btn-ghost">⚙️ Products</a>
+        <a href="../admin/products.php" class="btn btn-ghost">⚙️ Products</a>
         <a href="users.php" class="btn btn-ghost">👥 Users</a>
         <?php endif; ?>
         <a href="janeth-dashboard.php" class="btn btn-ghost">📊 Dashboard</a>
