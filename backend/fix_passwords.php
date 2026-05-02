@@ -104,7 +104,7 @@ file_put_contents($lockFile, date('Y-m-d H:i:s'));
         A lock file <code>.pw_fixed</code> has also been created.
     </div>
 
-    <a href="login.html">→ Go to Login</a>
+    <a href="../frontend/login.html">→ Go to Login</a>
 </div>
 </body>
 </html>

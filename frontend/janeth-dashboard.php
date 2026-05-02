@@ -368,7 +368,7 @@ $username  = $_SESSION['username'];
 
 
 <script>
-const API  = 'janeth.php';
+const API = '../backend/janeth.php';
 const ROLE = '<?= $user_role ?>';
 let fullRecords = [];
 let expenses    = [];

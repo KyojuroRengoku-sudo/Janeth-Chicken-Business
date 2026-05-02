@@ -486,7 +486,7 @@ $username  = $_SESSION['username'];
 </div>
 
 <script>
-const API  = 'janeth.php';
+const API = '../backend/janeth.php';
 const ROLE = '<?= $user_role ?>';
 
 let masterProducts = [];
