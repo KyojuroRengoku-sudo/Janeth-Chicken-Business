@@ -199,6 +199,7 @@ $username  = $_SESSION['username'];
         </div>
         <?php if ($user_role==='admin'): ?>
         <a href="products.php" class="btn btn-ghost">⚙️ Products</a>
+        <a href="users.php" class="btn btn-ghost">👥 Users</a>
         <?php endif; ?>
         <a href="janeth-input.php" class="btn btn-ghost">✏️ Entry</a>
         <a href="liquidation.php" class="btn btn-purple">💵 Liquidation</a>

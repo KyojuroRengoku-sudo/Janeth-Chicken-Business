@@ -61,7 +61,7 @@ $search = $_GET['search'] ?? '';
 $catF   = $_GET['category'] ?? 'all';
 $limit  = 20; $offset = ($page-1)*$limit;
 
-$where  = "name LIKE :s" . ($catF!=='all'?" AND category=:c":"");
+$where  = "is_deleted=0 AND name LIKE :s" . ($catF!=='all'?" AND category=:c":"");
 $stmt   = $pdo->prepare("SELECT * FROM products WHERE $where ORDER BY category,name LIMIT :l OFFSET :o");
 $stmt->bindValue(':s', "%$search%"); if ($catF!=='all') $stmt->bindValue(':c',$catF);
 $stmt->bindValue(':l',$limit,PDO::PARAM_INT); $stmt->bindValue(':o',$offset,PDO::PARAM_INT);
@@ -206,6 +206,7 @@ $cntStmt->execute(); $total=$cntStmt->fetchColumn(); $totPages=ceil($total/$limi
     </div>
     <div style="display:flex;gap:.65rem;flex-wrap:wrap;align-items:center">
         <a href="janeth-dashboard.php" class="btn btn-ghost">📊 Dashboard</a>
+        <a href="users.php" class="btn btn-ghost">👥 Users</a>
         <a href="janeth-input.php" class="btn btn-ghost">← Entry</a>
     </div>
 </div>

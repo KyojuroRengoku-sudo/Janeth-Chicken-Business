@@ -362,6 +362,10 @@
         </div>
     </div>
 
+    <div style="text-align:center;margin-top:1.25rem;font-size:.74rem;color:var(--text-muted)">
+        Don't have an account? <a href="register.html" style="color:var(--teal);font-weight:600;text-decoration:none">Request one →</a>
+    </div>
+
     <div class="demo">
         <div class="demo-label">Demo Access — click to fill</div>
         <div class="demo-row">
@@ -379,9 +383,7 @@
 </div>
 
 <script>
-const API = 'login.php';
-
-// Password toggle
+const API = 'login.php';// Password toggle
 document.getElementById('pwToggle').addEventListener('click', function() {
     const inp = document.getElementById('password');
     const show = inp.type === 'password';

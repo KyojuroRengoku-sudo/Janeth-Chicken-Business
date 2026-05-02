@@ -41,11 +41,15 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
--- Insert demo users (hashes shown for 'admin123' and 'staff123')
--- To generate real hashes, use: echo password_hash('admin123', PASSWORD_DEFAULT);
+
+
+-- ⚠️ BUG FIX: Old hashes were for the word "password", not admin123/staff123.
+-- Run fix_passwords.php once after importing to set correct passwords.
+-- Default passwords after running fix_passwords.php: admin=admin123, staff1=staff123
 INSERT INTO users (username, password_hash, role) VALUES
-('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin'),
-('staff1', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'staff');
+('admin',  '$2y$10$placeholder.admin.placeholder.placeholder.placeholder.X', 'admin'),
+('staff1', '$2y$10$placeholder.staff.placeholder.placeholder.placeholder.Y', 'staff');
+
 
 -- Suppliers table
 CREATE TABLE IF NOT EXISTS suppliers (
@@ -105,4 +109,14 @@ CREATE TABLE IF NOT EXISTS janeth_records (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
     UNIQUE KEY unique_date_product (record_date, product_id)
+) ENGINE=InnoDB;
+-- Registration requests (for admin approval)
+CREATE TABLE IF NOT EXISTS registration_requests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    requested_role ENUM('admin', 'staff') DEFAULT 'staff',
+    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    reviewed_at DATETIME DEFAULT NULL
 ) ENGINE=InnoDB;
