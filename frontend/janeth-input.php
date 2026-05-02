@@ -11,6 +11,7 @@ $username  = $_SESSION['username'];
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Daily Entry · Janeth's Business</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="theme.js"></script>
     <style>
         /* [Your existing CSS – unchanged] */
         :root {
@@ -23,6 +24,44 @@ $username  = $_SESSION['username'];
             --chicken:#fbbf24;--frozen:#60a5fa;--expense:#a78bfa;
             --radius:14px;--radius-sm:9px;
         }
+        [data-theme="light"] { --bg:#f0f4f9;--surface:#ffffff;--surface-2:#e8eef5;--surface-3:#d8e3ef;--border:rgba(0,0,0,0.08);--border-hi:rgba(0,0,0,0.14);--text:#0d1b2a;--text-muted:#4a6080;--text-faint:#7090b0; }
+        [data-theme="light"] body { background-image:radial-gradient(ellipse 70% 50% at 10% -10%,rgba(41,182,200,.04) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 90% 110%,rgba(245,166,35,.03) 0%,transparent 60%); }
+        [data-theme="light"] input[type="text"],[data-theme="light"] input[type="date"],[data-theme="light"] input[type="number"],[data-theme="light"] select { background:var(--surface-2);color:var(--text);border-color:var(--border); }
+        [data-theme="light"] select option { background:#e8eef5;color:#0d1b2a; }
+        [data-theme="light"] .num-input { background:var(--surface-3);color:var(--text); }
+        [data-theme="light"] tbody tr:hover:not(.total-row) { background:var(--surface-2); }
+        [data-theme="light"] .total-row td { background:rgba(245,166,35,.08)!important; }
+        [data-theme="light"] .section-hd,[data-theme="light"] thead tr,[data-theme="light"] .controls,[data-theme="light"] .date-hero { background:var(--surface); }
+        [data-theme="light"] .summary-bar { background:var(--surface); }
+        [data-theme="light"] .as-chip { background:var(--surface-2);border-color:var(--border); }
+        /* Bigger fonts */
+        body { font-size:15px; }
+        th   { font-size:.78rem!important;padding:.72rem 1rem!important; }
+        td   { font-size:.9rem!important; }
+        .logo-title { font-size:1.15rem!important; }
+        .logo-sub   { font-size:.78rem!important; }
+        .user-name  { font-size:.88rem!important; }
+        .role-badge { font-size:.7rem!important; }
+        .btn        { font-size:.84rem!important;padding:.5rem 1.1rem!important; }
+        .section-title { font-size:.96rem!important; }
+        .hero-label { font-size:.78rem!important; }
+        .hero-sub   { font-size:.84rem!important; }
+        .sum-label  { font-size:.72rem!important; }
+        .sum-val    { font-size:1.2rem!important; }
+        .prod-name  { font-size:.88rem!important; }
+        .num-input  { font-size:.9rem!important;width:96px!important; }
+        label,.se-field label,.exp-field label { font-size:.74rem!important; }
+        input[type="text"],input[type="date"],input[type="number"],select { font-size:.9rem!important; }
+        .exp-desc,.se-product { font-size:.9rem!important; }
+        .exp-cat-badge,.se-supplier-badge { font-size:.74rem!important; }
+        .exp-amount,.se-cost { font-size:.88rem!important; }
+        .exp-total-val { font-size:1.2rem!important; }
+        .status-chip { font-size:.76rem!important; }
+        .as-chip { font-size:.74rem!important; }
+        .chooser-name { font-size:.85rem!important; }
+        /* Theme toggle */
+        #themeToggle { background:var(--surface-2);border:1px solid var(--border);color:var(--text-muted);border-radius:50px;padding:.42rem .9rem;font-size:.8rem;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;transition:.18s; }
+        #themeToggle:hover { border-color:var(--teal);color:var(--teal); }
         *{margin:0;padding:0;box-sizing:border-box;}
         body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:1.5rem;
              background-image:radial-gradient(ellipse 70% 50% at 10% -10%,rgba(41,182,200,.06) 0%,transparent 60%),
@@ -259,6 +298,7 @@ $username  = $_SESSION['username'];
         <?php endif; ?>
         <a href="janeth-dashboard.php" class="btn btn-ghost">📊 Dashboard</a>
         <button class="btn btn-purple" id="chooserBtn">☰ Choose Products</button>
+        <button id="themeToggle" onclick="toggleTheme()">☀️ Light</button>
         <button class="btn btn-danger" id="logoutBtn">Sign out</button>
     </div>
 </div>

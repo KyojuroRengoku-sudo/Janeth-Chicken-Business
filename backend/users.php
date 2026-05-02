@@ -114,6 +114,7 @@ $username = $_SESSION['username'];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Management · Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="theme.js"></script>
     <style>
         :root{
             --bg:#0a0e17;--surface:#111827;--surface-2:#1a2234;--surface-3:#222d42;
@@ -126,6 +127,23 @@ $username = $_SESSION['username'];
             --purple:#a78bfa;
             --radius:14px;--radius-sm:9px;
         }
+        [data-theme="light"] { --bg:#f0f4f9;--surface:#ffffff;--surface-2:#e8eef5;--surface-3:#d8e3ef;--border:rgba(0,0,0,0.08);--text:#0d1b2a;--text-muted:#4a6080;--text-faint:#7090b0;--danger-dim:rgba(248,113,113,0.1);--success-dim:rgba(52,211,153,0.1); }
+        [data-theme="light"] input,[data-theme="light"] select { background:var(--surface-2);color:var(--text);border-color:var(--border); }
+        [data-theme="light"] select option { background:#e8eef5;color:#0d1b2a; }
+        [data-theme="light"] tbody tr:hover { background:var(--surface-2); }
+        [data-theme="light"] .panel { background:var(--surface); }
+        [data-theme="light"] thead tr { background:var(--surface-2); }
+        body { font-size:15px; }
+        th   { font-size:.78rem!important; }
+        td   { font-size:.9rem!important; }
+        .logo-title { font-size:1.15rem!important; }
+        .btn        { font-size:.84rem!important;padding:.5rem 1.1rem!important; }
+        .panel-title { font-size:.82rem!important; }
+        .fg label    { font-size:.74rem!important; }
+        input[type="text"],input[type="password"],select { font-size:.9rem!important; }
+        .role-badge { font-size:.72rem!important; }
+        #themeToggle { background:var(--surface-2);border:1px solid var(--border);color:var(--text-muted);border-radius:50px;padding:.42rem .9rem;font-size:.8rem;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;transition:.18s; }
+        #themeToggle:hover { border-color:var(--teal);color:var(--teal); }
         *{margin:0;padding:0;box-sizing:border-box;}
         body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:1.5rem;
              background-image:radial-gradient(ellipse 70% 50% at 10% -10%,rgba(41,182,200,.06) 0%,transparent 60%),
@@ -228,6 +246,7 @@ $username = $_SESSION['username'];
     <div style="display:flex;gap:.65rem;flex-wrap:wrap;align-items:center">
         <a href="janeth-dashboard.php" class="btn btn-ghost">📊 Dashboard</a>
         <a href="products.php" class="btn btn-ghost">⚙️ Products</a>
+        <button id="themeToggle" onclick="toggleTheme()">☀️ Light</button>
         <a href="janeth-input.php" class="btn btn-ghost">← Entry</a>
     </div>
 </div>

@@ -28,6 +28,23 @@
             --success-dim:  rgba(52,211,153,0.1);
         }
 
+        [data-theme="light"] { --bg:#f0f4f9;--surface:#ffffff;--surface-2:#e8eef5;--surface-3:#d8e3ef;--border:rgba(0,0,0,0.09);--border-focus:rgba(41,182,200,0.6);--text:#0d1b2a;--text-muted:#4a6080;--text-faint:#7090b0;--danger-dim:rgba(248,113,113,0.1);--success-dim:rgba(52,211,153,0.1); }
+        [data-theme="light"] .card { box-shadow: 0 0 0 1px rgba(0,0,0,0.04), 0 20px 60px rgba(0,0,0,0.12), 0 0 80px -20px rgba(41,182,200,0.15); }
+        [data-theme="light"] .field input { background: var(--surface-2); }
+        [data-theme="light"] .demo { background: var(--surface-2); }
+        /* Bigger fonts */
+        .brand-name { font-size: 1.75rem !important; }
+        .brand-sub  { font-size: .78rem !important; }
+        .field label { font-size: .74rem !important; }
+        .field input { font-size: .95rem !important; padding: .9rem 1rem !important; }
+        .btn-login { font-size: .95rem !important; }
+        .alert { font-size: .85rem !important; }
+        .demo-label { font-size: .7rem !important; }
+        .cred-val { font-size: .85rem !important; }
+        /* Theme toggle */
+        #themeToggle { position:fixed; top:1rem; right:1rem; z-index:10; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); color:#ccc; border-radius:50px; padding:.38rem .85rem; font-size:.78rem; font-weight:600; cursor:pointer; font-family:'Sora',sans-serif; backdrop-filter:blur(8px); transition:.18s; }
+        [data-theme="light"] #themeToggle { background:rgba(0,0,0,0.06); border-color:rgba(0,0,0,0.12); color:#4a6080; }
+        #themeToggle:hover { border-color:var(--teal); color:var(--teal); }
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
@@ -303,6 +320,7 @@
             background: var(--teal-dim); padding: .1rem .4rem; border-radius: 4px;
         }
     </style>
+<script src="theme.js"></script>
 </head>
 <body>
 <div class="bg-mesh"></div>
@@ -383,7 +401,7 @@
 </div>
 
 <script>
-const API = 'login.php';// Password toggle
+const API = '.../login.php';
 document.getElementById('pwToggle').addEventListener('click', function() {
     const inp = document.getElementById('password');
     const show = inp.type === 'password';
@@ -423,25 +441,24 @@ async function doLogin() {
     const p   = document.getElementById('password').value;
     hideAlerts();
 
-    if (!u || !p) return showError('Please enter your username and password.');
+    if (!u || !p) return showError('Please enter username and password.');
 
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span>Signing in…';
 
     try {
-        const res  = await fetch(API, {
+        const res = await fetch(API, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username: u, password: p })
         });
 
-        // If the response isn't JSON (e.g. PHP error page), handle gracefully
         const text = await res.text();
         let data;
-        try { data = JSON.parse(text); }
-        catch {
-            showServerError('Server returned an unexpected response. Check PHP/XAMPP logs.');
-            btn.disabled = false; btn.innerHTML = 'Sign in →';
+        try { data = JSON.parse(text); } catch {
+            showServerError('Server returned an invalid response. Check PHP logs.');
+            btn.disabled = false;
+            btn.innerHTML = 'Sign in →';
             return;
         }
 
@@ -451,12 +468,13 @@ async function doLogin() {
             setTimeout(() => { window.location.href = 'janeth-input.php'; }, 800);
         } else {
             showError(data.message || 'Invalid credentials.');
-            btn.disabled = false; btn.innerHTML = 'Sign in →';
+            btn.disabled = false;
+            btn.innerHTML = 'Sign in →';
         }
     } catch (err) {
-        // Network error — most likely opened as file:// or XAMPP not running
         showServerError('Cannot reach server. Is XAMPP running?');
-        btn.disabled = false; btn.innerHTML = 'Sign in →';
+        btn.disabled = false;
+        btn.innerHTML = 'Sign in →';
     }
 }
 
@@ -466,5 +484,6 @@ document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); })
     document.getElementById(id).addEventListener('input', hideAlerts)
 );
 </script>
+<button id="themeToggle" onclick="toggleTheme()">☀️ Light</button>
 </body>
 </html>

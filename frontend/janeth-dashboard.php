@@ -11,6 +11,7 @@ $username  = $_SESSION['username'];
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Dashboard · Janeth's Business</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="theme.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
@@ -25,6 +26,37 @@ $username  = $_SESSION['username'];
             --chicken:#fbbf24;--frozen:#60a5fa;--expense:#a78bfa;
             --radius:14px;--radius-sm:9px;
         }
+        [data-theme="light"] { --bg:#f0f4f9;--surface:#ffffff;--surface-2:#e8eef5;--surface-3:#d8e3ef;--border:rgba(0,0,0,0.08);--text:#0d1b2a;--text-muted:#4a6080;--text-faint:#7090b0; }
+        [data-theme="light"] body { background-image:radial-gradient(ellipse 70% 50% at 10% -10%,rgba(41,182,200,.04) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 90% 110%,rgba(245,166,35,.03) 0%,transparent 60%); }
+        [data-theme="light"] input,[data-theme="light"] select { background:var(--surface-2);color:var(--text);border-color:var(--border); }
+        [data-theme="light"] select option { background:#e8eef5;color:#0d1b2a; }
+        [data-theme="light"] tbody tr:hover { background:var(--surface-2); }
+        [data-theme="light"] thead tr,[data-theme="light"] .controls,[data-theme="light"] .analytics-bar { background:var(--surface); }
+        [data-theme="light"] .kpi:hover { box-shadow:0 8px 24px rgba(0,0,0,0.1); }
+        [data-theme="light"] .chart-card { background:var(--surface); }
+        [data-theme="light"] .lowstock-bar { background:rgba(251,191,36,0.06); }
+        /* Bigger fonts */
+        body { font-size:15px; }
+        th   { font-size:.78rem!important; }
+        td   { font-size:.9rem!important; }
+        .logo-title { font-size:1.15rem!important; }
+        .logo-sub   { font-size:.78rem!important; }
+        .user-name  { font-size:.88rem!important; }
+        .role-badge { font-size:.7rem!important; }
+        .btn        { font-size:.84rem!important;padding:.5rem 1.1rem!important; }
+        .kpi-label  { font-size:.76rem!important; }
+        .kpi-val    { font-size:clamp(1.05rem,2vw,1.75rem)!important; }
+        .kpi-sub    { font-size:.82rem!important; }
+        .ctrl-label,.a-label { font-size:.78rem!important; }
+        .chart-title { font-size:.78rem!important; }
+        .ctab { font-size:.78rem!important; }
+        .table-title { font-size:.88rem!important; }
+        .total-label { font-size:.74rem!important; }
+        .total-amount { font-size:1.12rem!important; }
+        input[type="text"],input[type="date"],select { font-size:.9rem!important; }
+        /* Theme toggle */
+        #themeToggle { background:var(--surface-2);border:1px solid var(--border);color:var(--text-muted);border-radius:50px;padding:.42rem .9rem;font-size:.8rem;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;transition:.18s; }
+        #themeToggle:hover { border-color:var(--teal);color:var(--teal); }
         *{margin:0;padding:0;box-sizing:border-box;}
         body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:1.5rem;
              background-image:radial-gradient(ellipse 70% 50% at 10% -10%,rgba(41,182,200,.06) 0%,transparent 60%),
@@ -203,6 +235,7 @@ $username  = $_SESSION['username'];
         <?php endif; ?>
         <a href="janeth-input.php" class="btn btn-ghost">✏️ Entry</a>
         <a href="liquidation.php" class="btn btn-purple">💵 Liquidation</a>
+        <button id="themeToggle" onclick="toggleTheme()">☀️ Light</button>
         <button class="btn btn-danger" id="logoutBtn">Sign out</button>
     </div>
 </div>
@@ -320,6 +353,19 @@ $username  = $_SESSION['username'];
 
 <div class="footer">Last updated: <span id="lastUpdated">—</span> &nbsp;·&nbsp; ⚠️ Low ≤ threshold &nbsp;·&nbsp; 🏆 = Highest ₱ sold</div>
 </div>
+
+<!-- Modal -->
+<div id="modalOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);display:none;justify-content:center;align-items:center;z-index:1000;padding:1rem;">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2rem 2.25rem;max-width:420px;width:100%;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,.5);">
+        <div id="modalIcon" style="font-size:2rem;margin-bottom:.75rem">💬</div>
+        <p id="modalMsg" style="font-size:.9rem;color:var(--text);margin-bottom:1.5rem;line-height:1.5;font-weight:500">Are you sure?</p>
+        <div style="display:flex;gap:.75rem;justify-content:center">
+            <button id="modalOk" class="btn btn-ghost">OK</button>
+            <button id="modalCancel" class="btn btn-ghost">Cancel</button>
+        </div>
+    </div>
+</div>
+
 
 <script>
 const API  = 'janeth.php';
@@ -687,16 +733,4 @@ document.getElementById('toDate').value   = todayStr();
 loadDateSelector().then(()=>loadAnalytics());
 </script>
 
-<!-- Modal -->
-<div id="modalOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);display:none;justify-content:center;align-items:center;z-index:1000;padding:1rem;">
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2rem 2.25rem;max-width:420px;width:100%;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,.5);">
-        <div id="modalIcon" style="font-size:2rem;margin-bottom:.75rem">💬</div>
-        <p id="modalMsg" style="font-size:.9rem;color:var(--text);margin-bottom:1.5rem;line-height:1.5;font-weight:500">Are you sure?</p>
-        <div style="display:flex;gap:.75rem;justify-content:center">
-            <button id="modalOk" class="btn btn-ghost">OK</button>
-            <button id="modalCancel" class="btn btn-ghost">Cancel</button>
-        </div>
-    </div>
-</div>
 </body>
-</html>
