@@ -112,7 +112,10 @@ $username  = $_SESSION['username'];
 
         /* Date hero */
         .date-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-                   padding:1.75rem 2rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:2rem;flex-wrap:wrap;}
+                   padding:1.75rem 2rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:2rem;flex-wrap:wrap;
+                   position:relative;overflow:hidden;}
+        .date-hero::after{content:'';position:absolute;right:-40px;top:-40px;width:180px;height:180px;
+                          border-radius:50%;background:radial-gradient(circle,rgba(245,166,35,.06),transparent 70%);pointer-events:none;}
         .date-hero-left{flex:1;min-width:200px;}
         .hero-label{font-size:.85rem;text-transform:uppercase;letter-spacing:.12em;color:var(--text-muted);font-weight:600;margin-bottom:.5rem;}
         .hero-big{font-size:clamp(2rem,5vw,3.5rem);font-weight:700;letter-spacing:-.03em;line-height:1;}
@@ -244,12 +247,19 @@ $username  = $_SESSION['username'];
         .exp-empty{padding:2rem;text-align:center;color:var(--text-faint);font-size:.95rem;}
 
         /* Summary */
-        .summary-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.1rem;
+        .summary-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.1rem;
                      background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-                     padding:1.2rem 1.75rem;margin-bottom:1.25rem;}
-        .sum-item{display:flex;flex-direction:column;gap:.3rem;}
-        .sum-label{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);}
-        .sum-val{font-family:'DM Mono',monospace;font-size:1.4rem;font-weight:700;}
+                     padding:1.25rem 1.75rem;margin-bottom:1.25rem;}
+        .sum-item{display:flex;flex-direction:column;gap:.3rem;position:relative;padding-left:.75rem;}
+        .sum-item::before{content:'';position:absolute;left:0;top:.2rem;bottom:.2rem;width:3px;border-radius:2px;background:var(--border);}
+        .sum-item:nth-child(1)::before{background:var(--teal);}
+        .sum-item:nth-child(2)::before{background:var(--danger);}
+        .sum-item:nth-child(3)::before{background:var(--success);}
+        .sum-item:nth-child(4)::before{background:var(--accent);}
+        .sum-item:nth-child(5)::before{background:var(--danger);}
+        .sum-item:nth-child(6)::before{background:var(--success);}
+        .sum-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);}
+        .sum-val{font-family:'DM Mono',monospace;font-size:1.3rem;font-weight:700;color:var(--text-muted);}
         .sum-val.green{color:var(--success);}.sum-val.amber{color:var(--accent);}.sum-val.red{color:var(--danger);}.sum-val.teal{color:var(--teal);}
 
         /* Modal */

@@ -14,8 +14,6 @@ if (isset($_SESSION["user_id"])) {
     header("Location: janeth-input.php");
     exit;
 }
-
-// Otherwise show the HTML login form
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -46,24 +44,19 @@ if (isset($_SESSION["user_id"])) {
             --success:      #34d399;
             --success-dim:  rgba(52,211,153,0.1);
         }
-
-        [data-theme="light"] { --bg:#f0f4f9;--surface:#ffffff;--surface-2:#e8eef5;--surface-3:#d8e3ef;--border:rgba(0,0,0,0.09);--border-focus:rgba(41,182,200,0.6);--text:#0d1b2a;--text-muted:#4a6080;--text-faint:#7090b0;--danger-dim:rgba(248,113,113,0.1);--success-dim:rgba(52,211,153,0.1); }
-        [data-theme="light"] .card { box-shadow: 0 0 0 1px rgba(0,0,0,0.04), 0 20px 60px rgba(0,0,0,0.12), 0 0 80px -20px rgba(41,182,200,0.15); }
+        [data-theme="light"] {
+            --bg:#f0f4f9; --surface:#ffffff; --surface-2:#e8eef5; --surface-3:#d8e3ef;
+            --border:rgba(0,0,0,0.09); --border-focus:rgba(41,182,200,0.6);
+            --text:#0d1b2a; --text-muted:#4a6080; --text-faint:#7090b0;
+            --danger-dim:rgba(248,113,113,0.1); --success-dim:rgba(52,211,153,0.1);
+        }
+        [data-theme="light"] .card {
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.04), 0 20px 60px rgba(0,0,0,0.12), 0 0 80px -20px rgba(41,182,200,0.15);
+        }
         [data-theme="light"] .field input { background: var(--surface-2); }
         [data-theme="light"] .demo { background: var(--surface-2); }
-        /* Bigger fonts */
-        .brand-name { font-size: 1.75rem !important; }
-        .brand-sub  { font-size: .78rem !important; }
-        .field label { font-size: .74rem !important; }
-        .field input { font-size: .95rem !important; padding: .9rem 1rem !important; }
-        .btn-login { font-size: .95rem !important; }
-        .alert { font-size: .85rem !important; }
-        .demo-label { font-size: .7rem !important; }
-        .cred-val { font-size: .85rem !important; }
-        /* Theme toggle */
-        #themeToggle { position:fixed; top:1rem; right:1rem; z-index:10; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); color:#ccc; border-radius:50px; padding:.38rem .85rem; font-size:.78rem; font-weight:600; cursor:pointer; font-family:'Sora',sans-serif; backdrop-filter:blur(8px); transition:.18s; }
         [data-theme="light"] #themeToggle { background:rgba(0,0,0,0.06); border-color:rgba(0,0,0,0.12); color:#4a6080; }
-        #themeToggle:hover { border-color:var(--teal); color:var(--teal); }
+
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
@@ -78,13 +71,24 @@ if (isset($_SESSION["user_id"])) {
             position: relative;
         }
 
-        /* Animated background */
+        /* Theme toggle — fixed top-right */
+        #themeToggle {
+            position: fixed; top: 1rem; right: 1rem; z-index: 10;
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+            color: #ccc; border-radius: 50px; padding: .38rem .85rem;
+            font-size: .78rem; font-weight: 600; cursor: pointer;
+            font-family: 'Sora', sans-serif; backdrop-filter: blur(8px);
+            transition: .18s;
+        }
+        #themeToggle:hover { border-color: var(--teal); color: var(--teal); }
+
+        /* Animated background mesh */
         .bg-mesh {
             position: fixed; inset: 0; z-index: 0; pointer-events: none;
             background:
-                radial-gradient(ellipse 600px 500px at 10% 20%, rgba(41,182,200,0.06) 0%, transparent 70%),
-                radial-gradient(ellipse 500px 400px at 90% 80%, rgba(245,166,35,0.04) 0%, transparent 70%),
-                radial-gradient(ellipse 400px 300px at 60% 10%, rgba(41,182,200,0.03) 0%, transparent 60%);
+                radial-gradient(ellipse 600px 500px at 10% 20%, rgba(41,182,200,0.07) 0%, transparent 70%),
+                radial-gradient(ellipse 500px 400px at 90% 80%, rgba(245,166,35,0.05) 0%, transparent 70%),
+                radial-gradient(ellipse 400px 300px at 60% 10%, rgba(41,182,200,0.04) 0%, transparent 60%);
             animation: meshDrift 18s ease-in-out infinite alternate;
         }
         @keyframes meshDrift {
@@ -104,8 +108,7 @@ if (isset($_SESSION["user_id"])) {
         /* Floating particles */
         .particle {
             position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
-            background: var(--teal); opacity: 0;
-            animation: float linear infinite;
+            opacity: 0; animation: float linear infinite;
         }
         @keyframes float {
             0%   { opacity: 0; transform: translateY(0) scale(0); }
@@ -147,7 +150,7 @@ if (isset($_SESSION["user_id"])) {
             to   { opacity: 1;   width: 70%; }
         }
 
-        /* Corner accents */
+        /* Corner accent */
         .card::after {
             content: ''; position: absolute; inset: -1px;
             border-radius: 28px; pointer-events: none;
@@ -158,46 +161,43 @@ if (isset($_SESSION["user_id"])) {
 
         /* Brand */
         .brand {
-            text-align: center;
-            margin-bottom: 2.5rem;
+            text-align: center; margin-bottom: 2.5rem;
             animation: brandIn .5s .1s both ease-out;
         }
         @keyframes brandIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
         .brand-logo {
-            width: 68px; height: 68px; margin: 0 auto 1rem;
+            width: 72px; height: 72px; margin: 0 auto 1rem;
             background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
-            border-radius: 20px;
+            border-radius: 22px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.8rem;
+            font-size: 1.9rem;
             box-shadow: 0 8px 40px var(--teal-glow), 0 0 0 1px rgba(41,182,200,0.2);
-            position: relative;
-            transition: transform .2s, box-shadow .2s;
+            position: relative; transition: transform .2s, box-shadow .2s;
         }
-        .brand-logo:hover { transform: translateY(-2px) rotate(-3deg); box-shadow: 0 14px 50px var(--teal-glow); }
+        .brand-logo:hover { transform: translateY(-3px) rotate(-4deg); box-shadow: 0 16px 50px var(--teal-glow); }
         .brand-logo::after {
-            content: ''; position: absolute; inset: 0; border-radius: 20px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+            content: ''; position: absolute; inset: 0; border-radius: 22px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.18), transparent);
         }
         .brand-name {
-            font-size: 1.6rem; font-weight: 700;
-            letter-spacing: -.04em; color: var(--text);
-            line-height: 1.1;
+            font-size: 1.75rem; font-weight: 700;
+            letter-spacing: -.04em; color: var(--text); line-height: 1.1;
         }
         .brand-sub {
-            font-size: .68rem; color: var(--text-muted);
-            font-weight: 400; letter-spacing: .12em;
-            text-transform: uppercase; margin-top: .35rem;
+            font-size: .75rem; color: var(--text-muted);
+            font-weight: 400; letter-spacing: .14em;
+            text-transform: uppercase; margin-top: .4rem;
         }
 
         /* Fields */
         .fields { animation: fieldsIn .45s .18s both ease-out; }
         @keyframes fieldsIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
-        .field { margin-bottom: 1.15rem; }
+        .field { margin-bottom: 1.2rem; }
         .field label {
             display: flex; align-items: center; gap: .4rem;
-            font-size: .65rem; font-weight: 700;
+            font-size: .68rem; font-weight: 700;
             text-transform: uppercase; letter-spacing: .1em;
             color: var(--text-muted); margin-bottom: .5rem;
         }
@@ -208,11 +208,11 @@ if (isset($_SESSION["user_id"])) {
             width: 100%;
             background: var(--surface-2);
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 13px;
             color: var(--text);
             font-family: 'Sora', sans-serif;
-            font-size: .875rem;
-            padding: .85rem 1rem .85rem 1rem;
+            font-size: .95rem;
+            padding: .9rem 1rem;
             outline: none;
             transition: border-color .18s, background .18s, box-shadow .18s;
         }
@@ -222,15 +222,13 @@ if (isset($_SESSION["user_id"])) {
             background: rgba(41,182,200,0.04);
             box-shadow: 0 0 0 3px var(--teal-dim), 0 2px 8px rgba(0,0,0,0.3);
         }
-        .field input:not(:placeholder-shown):valid {
-            border-color: rgba(52,211,153,0.25);
-        }
+        /* BUG FIX: removed :valid rule that caused green border on empty autofilled fields */
 
         /* Password toggle */
         .pw-toggle {
             position: absolute; right: .85rem; top: 50%; transform: translateY(-50%);
             background: none; border: none; color: var(--text-muted);
-            cursor: pointer; padding: .2rem; font-size: .85rem; line-height: 1;
+            cursor: pointer; padding: .2rem; font-size: .9rem; line-height: 1;
             transition: color .15s;
         }
         .pw-toggle:hover { color: var(--teal); }
@@ -240,10 +238,9 @@ if (isset($_SESSION["user_id"])) {
             width: 100%; margin-top: .65rem;
             background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
             color: #05111e; border: none;
-            padding: .95rem;
-            border-radius: 50px;
+            padding: 1rem; border-radius: 50px;
             font-family: 'Sora', sans-serif;
-            font-size: .9rem; font-weight: 700;
+            font-size: .95rem; font-weight: 700;
             cursor: pointer; letter-spacing: .03em;
             transition: transform .18s, box-shadow .18s, opacity .18s;
             box-shadow: 0 4px 24px var(--teal-glow);
@@ -256,7 +253,7 @@ if (isset($_SESSION["user_id"])) {
         }
         .btn-login:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 8px 36px rgba(41,182,200,.5);
+            box-shadow: 0 10px 36px rgba(41,182,200,.55);
         }
         .btn-login:active:not(:disabled) { transform: translateY(0); }
         .btn-login:disabled { opacity: .5; cursor: not-allowed; }
@@ -268,34 +265,30 @@ if (isset($_SESSION["user_id"])) {
             border-top-color: #05111e;
             border-radius: 50%;
             animation: spin .7s linear infinite;
-            vertical-align: middle; margin-right: .4rem;
+            vertical-align: middle; margin-right: .45rem;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         /* Alerts */
         .alert {
             display: none; align-items: flex-start; gap: .55rem;
-            border-radius: 12px; padding: .75rem 1rem;
-            margin-top: 1rem; font-size: .78rem; font-weight: 500;
+            border-radius: 12px; padding: .8rem 1rem;
+            margin-top: .9rem; font-size: .85rem; font-weight: 500; line-height: 1.45;
         }
-        .alert.show { display: flex; }
+        .alert.show { display: flex; animation: alertIn .2s ease-out; }
+        @keyframes alertIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:none; } }
         .alert-icon { font-size: .9rem; flex-shrink: 0; margin-top: .05rem; }
+        .alert-error  { background: var(--danger-dim);  border: 1px solid rgba(248,113,113,.22); color: var(--danger); }
+        .alert-success { background: var(--success-dim); border: 1px solid rgba(52,211,153,.25);  color: var(--success); }
+        .alert-server  { background: var(--accent-dim);  border: 1px solid rgba(245,166,35,.22);  color: var(--accent); }
 
-        .alert-error {
-            background: var(--danger-dim);
-            border: 1px solid rgba(248,113,113,.18);
-            color: var(--danger);
+        /* Register link */
+        .register-link {
+            text-align: center; margin-top: 1.35rem;
+            font-size: .82rem; color: var(--text-muted);
         }
-        .alert-success {
-            background: var(--success-dim);
-            border: 1px solid rgba(52,211,153,.2);
-            color: var(--success);
-        }
-        .alert-server {
-            background: var(--accent-dim);
-            border: 1px solid rgba(245,166,35,.2);
-            color: var(--accent);
-        }
+        .register-link a { color: var(--teal); font-weight: 600; text-decoration: none; }
+        .register-link a:hover { text-decoration: underline; }
 
         /* Demo box */
         .demo {
@@ -307,31 +300,27 @@ if (isset($_SESSION["user_id"])) {
             animation: demoIn .45s .28s both ease-out;
         }
         @keyframes demoIn { from { opacity: 0; } to { opacity: 1; } }
-
         .demo-label {
-            font-size: .62rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: .1em; color: var(--text-faint); margin-bottom: .8rem;
+            font-size: .64rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .1em; color: var(--text-faint); margin-bottom: .85rem;
         }
         .demo-row { display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
         .cred-block { display: flex; flex-direction: column; gap: .3rem; }
         .cred-role  { font-size: .62rem; color: var(--text-faint); text-transform: uppercase; letter-spacing: .07em; }
         .cred-val {
-            font-family: 'DM Mono', monospace; font-size: .78rem;
+            font-family: 'DM Mono', monospace; font-size: .85rem;
             color: var(--teal); font-weight: 500; cursor: pointer;
-            padding: .2rem .5rem; border-radius: 6px;
+            padding: .25rem .6rem; border-radius: 7px;
             transition: background .15s, color .15s;
             border: 1px solid transparent;
         }
-        .cred-val:hover {
-            background: var(--teal-dim); color: #fff;
-            border-color: rgba(41,182,200,0.2);
-        }
+        .cred-val:hover { background: var(--teal-dim); color: #fff; border-color: rgba(41,182,200,0.2); }
         .demo-sep { width: 1px; background: var(--border); align-self: stretch; }
 
         /* Server help tip */
         .server-tip {
             display: none; margin-top: .6rem;
-            font-size: .72rem; color: var(--text-muted); line-height: 1.5;
+            font-size: .73rem; color: var(--text-muted); line-height: 1.5;
         }
         .server-tip.show { display: block; }
         .server-tip code {
@@ -339,31 +328,9 @@ if (isset($_SESSION["user_id"])) {
             background: var(--teal-dim); padding: .1rem .4rem; border-radius: 4px;
         }
     </style>
-<script src="theme.js"></script>
 </head>
 <body>
 <div class="bg-mesh"></div>
-
-<!-- Floating particles -->
-<script>
-(function(){
-    const colors = ['rgba(41,182,200,0.5)','rgba(245,166,35,0.4)','rgba(41,182,200,0.3)'];
-    for (let i = 0; i < 12; i++) {
-        const p = document.createElement('div');
-        p.className = 'particle';
-        const size = Math.random() * 3 + 1;
-        p.style.cssText = `
-            width:${size}px; height:${size}px;
-            left:${Math.random()*100}vw;
-            bottom:-10px;
-            background:${colors[Math.floor(Math.random()*colors.length)]};
-            animation-duration:${Math.random()*15+10}s;
-            animation-delay:${Math.random()*10}s;
-        `;
-        document.body.appendChild(p);
-    }
-})();
-</script>
 
 <div class="card">
     <div class="brand">
@@ -376,13 +343,13 @@ if (isset($_SESSION["user_id"])) {
         <div class="field">
             <label><span class="icon">👤</span> Username</label>
             <input type="text" id="username" placeholder="Enter your username"
-                   autofocus autocomplete="username" required>
+                   autofocus autocomplete="username">
         </div>
         <div class="field">
             <label><span class="icon">🔒</span> Password</label>
             <div class="input-wrap">
                 <input type="password" id="password" placeholder="••••••••"
-                       autocomplete="current-password" required>
+                       autocomplete="current-password">
                 <button class="pw-toggle" id="pwToggle" type="button" title="Show/hide password">👁</button>
             </div>
         </div>
@@ -395,12 +362,12 @@ if (isset($_SESSION["user_id"])) {
 
         <div class="server-tip" id="serverTip">
             Make sure XAMPP is running and you're opening this page via
-            <code>http://localhost/…/login.html</code> — not as a <code>file:///</code> URL.
+            <code>http://localhost/…/login.php</code> — not as a <code>file:///</code> URL.
         </div>
     </div>
 
-    <div style="text-align:center;margin-top:1.25rem;font-size:.74rem;color:var(--text-muted)">
-        Don't have an account? <a href="register.php" style="color:var(--teal);font-weight:600;text-decoration:none">Request one →</a>
+    <div class="register-link">
+        Don't have an account? <a href="register.php">Request one →</a>
     </div>
 
     <div class="demo">
@@ -419,7 +386,31 @@ if (isset($_SESSION["user_id"])) {
     </div>
 </div>
 
+<!-- BUG FIX: theme.js moved to end of <body> so DOM exists when the script runs
+     and the themeToggle button can be found immediately -->
+<script src="theme.js"></script>
+<button id="themeToggle" onclick="toggleTheme()">☀️ Light</button>
+
+<!-- Floating particles — after DOM is ready -->
 <script>
+(function(){
+    const colors = ['rgba(41,182,200,0.5)','rgba(245,166,35,0.4)','rgba(41,182,200,0.3)'];
+    for (let i = 0; i < 12; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = Math.random() * 3 + 1;
+        p.style.cssText = `
+            width:${size}px; height:${size}px;
+            left:${Math.random()*100}vw;
+            bottom:-10px;
+            background:${colors[Math.floor(Math.random()*colors.length)]};
+            animation-duration:${Math.random()*15+10}s;
+            animation-delay:${Math.random()*10}s;
+        `;
+        document.body.appendChild(p);
+    }
+})();
+
 const API = 'login_handler.php';
 
 // Password toggle
@@ -505,6 +496,5 @@ document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); })
     document.getElementById(id).addEventListener('input', hideAlerts)
 );
 </script>
-<button id="themeToggle" onclick="toggleTheme()">☀️ Light</button>
 </body>
 </html>

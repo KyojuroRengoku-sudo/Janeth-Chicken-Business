@@ -211,7 +211,37 @@ $username  = $_SESSION['username'];
         ::-webkit-scrollbar{width:6px;height:6px;}
         ::-webkit-scrollbar-track{background:transparent;}
         ::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:3px;}
+
+        /* BUG FIX: modal .active rule was missing — modal never showed.
+           The inline style sets display:none; classList.add('active') needs this rule. */
         #modalOverlay.active{display:flex!important;}
+
+        /* Design: smoother alert animation, larger buttons, improved spacing */
+        .btn { padding:.5rem 1.1rem; font-size:.82rem; }
+        .btn-ghost { background:var(--surface-2); }
+        .btn-ghost:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,0,0,.2); }
+        .btn-teal { font-weight:700; }
+
+        /* Design: KPI cards get gradient top border on hover */
+        .kpi { position:relative; overflow:hidden; }
+        .kpi::before {
+            content:''; position:absolute; top:0; left:0; right:0; height:2px;
+            background:linear-gradient(90deg, var(--teal), var(--accent));
+            transform:scaleX(0); transform-origin:left;
+            transition:transform .25s ease;
+        }
+        .kpi:hover::before { transform:scaleX(1); }
+
+        /* Design: chart cards */
+        .chart-card { border-radius:var(--radius); transition:box-shadow .2s; }
+        .chart-card:hover { box-shadow:0 8px 32px rgba(0,0,0,.25); }
+
+        /* Design: table header sort indicator */
+        th { position:relative; }
+        th:hover { background:var(--surface-3); }
+
+        /* Light mode: fix grid line colors inside charts */
+        [data-theme="light"] .chart-card { background:var(--surface); border-color:var(--border); }
 
         @media(max-width:768px){
             .sidebar{transform:translateX(-100%);}
@@ -397,6 +427,18 @@ $username  = $_SESSION['username'];
 const API = 'janeth.php';
 const ROLE = '<?= $user_role ?>';
 let fullRecords=[], expenses=[], analyticsData=null;
+
+// BUG FIX: chart grid/tick colors must adapt to light/dark theme.
+// Hardcoded rgba(255,255,255,.04) grids are invisible in light mode.
+function chartColors(){
+    const isLight = document.documentElement.getAttribute('data-theme')==='light';
+    return {
+        grid:   isLight ? 'rgba(0,0,0,0.06)'   : 'rgba(255,255,255,0.05)',
+        tick:   isLight ? '#4a6080'             : '#6b7a93',
+        legend: isLight ? '#4a6080'             : '#6b7a93',
+    };
+}
+
 let curTab='Chicken', curChartTab='Chicken', curChart2Tab='Chicken';
 let curPage=1;
 const PER_PAGE=15;
@@ -487,7 +529,8 @@ function renderChart(tab){
     const recs=getTabRecords(tab).filter(r=>r.sold>0).sort((a,b)=>b.sold_peso-a.sold_peso);
     const ctx=document.getElementById('salesChart').getContext('2d');
     if(salesChart)salesChart.destroy();
-    if(!recs.length){ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);ctx.font='13px Sora,sans-serif';ctx.fillStyle='#3d4d63';ctx.textAlign='center';ctx.fillText(`No ${tab} sales`,ctx.canvas.width/2,90);return;}
+    const cc=chartColors();
+    if(!recs.length){ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);ctx.font='13px Sora,sans-serif';ctx.fillStyle=cc.tick;ctx.textAlign='center';ctx.fillText(`No ${tab} sales`,ctx.canvas.width/2,90);return;}
     const isCh=tab==='Chicken';
     salesChart=new Chart(ctx,{type:'bar',
         data:{labels:recs.map(r=>r.product_name.length>16?r.product_name.slice(0,14)+'…':r.product_name),
@@ -495,53 +538,56 @@ function renderChart(tab){
                          backgroundColor:isCh?'rgba(251,191,36,.7)':'rgba(96,165,250,.7)',
                          borderColor:isCh?'rgba(251,191,36,1)':'rgba(96,165,250,1)',borderWidth:1,borderRadius:6,barPercentage:.65}]},
         options:{responsive:true,maintainAspectRatio:true,
-            plugins:{legend:{labels:{color:'#6b7a93',font:{family:'Sora',size:11}}},tooltip:{callbacks:{label:c=>' ₱'+parseFloat(c.parsed.y).toLocaleString('en-PH',{minimumFractionDigits:2})}}},
-            scales:{x:{ticks:{color:'#6b7a93',font:{family:'Sora',size:10}},grid:{color:'rgba(255,255,255,.04)'}},
-                    y:{ticks:{color:'#6b7a93',font:{family:'DM Mono',size:10},callback:v=>'₱'+v.toLocaleString('en-PH')},grid:{color:'rgba(255,255,255,.04)'},beginAtZero:true}}}});
+            plugins:{legend:{labels:{color:cc.legend,font:{family:'Sora',size:11}}},tooltip:{callbacks:{label:c=>' ₱'+parseFloat(c.parsed.y).toLocaleString('en-PH',{minimumFractionDigits:2})}}},
+            scales:{x:{ticks:{color:cc.tick,font:{family:'Sora',size:10}},grid:{color:cc.grid}},
+                    y:{ticks:{color:cc.tick,font:{family:'DM Mono',size:10},callback:v=>'₱'+v.toLocaleString('en-PH')},grid:{color:cc.grid},beginAtZero:true}}}});
 }
 
 function renderChart2(tab){
     const recs=getTabRecords(tab).sort((a,b)=>b.sold-a.sold);
     const ctx=document.getElementById('qtyChart').getContext('2d');
     if(qtyChart)qtyChart.destroy();
-    if(!recs.length){ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);ctx.font='13px Sora,sans-serif';ctx.fillStyle='#3d4d63';ctx.textAlign='center';ctx.fillText(`No ${tab} data`,ctx.canvas.width/2,90);return;}
+    const cc=chartColors();
+    if(!recs.length){ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);ctx.font='13px Sora,sans-serif';ctx.fillStyle=cc.tick;ctx.textAlign='center';ctx.fillText(`No ${tab} data`,ctx.canvas.width/2,90);return;}
     qtyChart=new Chart(ctx,{type:'bar',
         data:{labels:recs.map(r=>r.product_name.length>14?r.product_name.slice(0,12)+'…':r.product_name),
               datasets:[{label:'Qty Sold',data:recs.map(r=>r.sold),backgroundColor:'rgba(52,211,153,.7)',borderColor:'rgba(52,211,153,1)',borderWidth:1,borderRadius:4},
                         {label:'Remaining',data:recs.map(r=>r.remaining_qty),backgroundColor:'rgba(245,166,35,.45)',borderColor:'rgba(245,166,35,.8)',borderWidth:1,borderRadius:4}]},
         options:{responsive:true,maintainAspectRatio:true,
-            plugins:{legend:{labels:{color:'#6b7a93',font:{family:'Sora',size:11}}}},
-            scales:{x:{ticks:{color:'#6b7a93',font:{family:'Sora',size:10}},grid:{color:'rgba(255,255,255,.04)'}},
-                    y:{ticks:{color:'#6b7a93',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,.04)'},beginAtZero:true}}}});
+            plugins:{legend:{labels:{color:cc.legend,font:{family:'Sora',size:11}}}},
+            scales:{x:{ticks:{color:cc.tick,font:{family:'Sora',size:10}},grid:{color:cc.grid}},
+                    y:{ticks:{color:cc.tick,font:{family:'DM Mono',size:10}},grid:{color:cc.grid},beginAtZero:true}}}});
 }
 
 function renderWeeklyChart(data){
     const ctx=document.getElementById('weeklyChart').getContext('2d');
     if(weeklyChart)weeklyChart.destroy();
-    if(!data||!data.length){ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);ctx.font='13px Sora,sans-serif';ctx.fillStyle='#3d4d63';ctx.textAlign='center';ctx.fillText('No weekly data',ctx.canvas.width/2,90);return;}
+    const cc=chartColors();
+    if(!data||!data.length){ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);ctx.font='13px Sora,sans-serif';ctx.fillStyle=cc.tick;ctx.textAlign='center';ctx.fillText('No weekly data',ctx.canvas.width/2,90);return;}
     weeklyChart=new Chart(ctx,{type:'line',
         data:{labels:data.map(d=>d.record_date),
               datasets:[{label:'Daily Sales (₱)',data:data.map(d=>parseFloat(d.day_sales)||0),
                          borderColor:'rgba(41,182,200,1)',backgroundColor:'rgba(41,182,200,.1)',
                          fill:true,tension:.3,pointBackgroundColor:'rgba(41,182,200,1)',pointRadius:4}]},
         options:{responsive:true,maintainAspectRatio:true,
-            plugins:{legend:{labels:{color:'#6b7a93',font:{family:'Sora',size:11}}},tooltip:{callbacks:{label:c=>' ₱'+parseFloat(c.parsed.y).toLocaleString('en-PH',{minimumFractionDigits:2})}}},
-            scales:{x:{ticks:{color:'#6b7a93',font:{family:'Sora',size:10}},grid:{color:'rgba(255,255,255,.04)'}},
-                    y:{ticks:{color:'#6b7a93',font:{family:'DM Mono',size:10},callback:v=>'₱'+v.toLocaleString('en-PH')},grid:{color:'rgba(255,255,255,.04)'},beginAtZero:true}}}});
+            plugins:{legend:{labels:{color:cc.legend,font:{family:'Sora',size:11}}},tooltip:{callbacks:{label:c=>' ₱'+parseFloat(c.parsed.y).toLocaleString('en-PH',{minimumFractionDigits:2})}}},
+            scales:{x:{ticks:{color:cc.tick,font:{family:'Sora',size:10}},grid:{color:cc.grid}},
+                    y:{ticks:{color:cc.tick,font:{family:'DM Mono',size:10},callback:v=>'₱'+v.toLocaleString('en-PH')},grid:{color:cc.grid},beginAtZero:true}}}});
 }
 
 function renderMonthlyChart(data){
     const ctx=document.getElementById('monthlyChart').getContext('2d');
     if(monthlyChart)monthlyChart.destroy();
-    if(!data||!data.length){ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);ctx.font='13px Sora,sans-serif';ctx.fillStyle='#3d4d63';ctx.textAlign='center';ctx.fillText('No monthly data',ctx.canvas.width/2,90);return;}
+    const cc=chartColors();
+    if(!data||!data.length){ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);ctx.font='13px Sora,sans-serif';ctx.fillStyle=cc.tick;ctx.textAlign='center';ctx.fillText('No monthly data',ctx.canvas.width/2,90);return;}
     monthlyChart=new Chart(ctx,{type:'bar',
         data:{labels:data.map(d=>d.month),
               datasets:[{label:'Monthly Sales (₱)',data:data.map(d=>parseFloat(d.month_sales)||0),
                          backgroundColor:'rgba(167,139,250,.65)',borderColor:'rgba(167,139,250,1)',borderWidth:1,borderRadius:6}]},
         options:{responsive:true,maintainAspectRatio:true,
-            plugins:{legend:{labels:{color:'#6b7a93',font:{family:'Sora',size:11}}},tooltip:{callbacks:{label:c=>' ₱'+parseFloat(c.parsed.y).toLocaleString('en-PH',{minimumFractionDigits:2})}}},
-            scales:{x:{ticks:{color:'#6b7a93',font:{family:'Sora',size:10}},grid:{color:'rgba(255,255,255,.04)'}},
-                    y:{ticks:{color:'#6b7a93',font:{family:'DM Mono',size:10},callback:v=>'₱'+v.toLocaleString('en-PH')},grid:{color:'rgba(255,255,255,.04)'},beginAtZero:true}}}});
+            plugins:{legend:{labels:{color:cc.legend,font:{family:'Sora',size:11}}},tooltip:{callbacks:{label:c=>' ₱'+parseFloat(c.parsed.y).toLocaleString('en-PH',{minimumFractionDigits:2})}}},
+            scales:{x:{ticks:{color:cc.tick,font:{family:'Sora',size:10}},grid:{color:cc.grid}},
+                    y:{ticks:{color:cc.tick,font:{family:'DM Mono',size:10},callback:v=>'₱'+v.toLocaleString('en-PH')},grid:{color:cc.grid},beginAtZero:true}}}});
 }
 
 function sortBy(col){if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=-1;}renderTable(curTab);}
