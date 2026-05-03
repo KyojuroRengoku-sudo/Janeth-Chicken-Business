@@ -240,7 +240,7 @@ $username = $_SESSION['username'];
         </div>
     </div>
     <div style="display:flex;gap:.65rem;flex-wrap:wrap;align-items:center">
-        <a href="janeth-dashboard.php" class="btn btn-ghost">📊 Dashboard</a>
+        <a href="../public/janeth-dashboard.php" class="btn btn-ghost">📊 Dashboard</a>
         <a href="products.php" class="btn btn-ghost">⚙️ Products</a>
         <button id="themeToggle" onclick="toggleTheme()">☀️ Light</button>
         <a href="janeth-input.php" class="btn btn-ghost">← Entry</a>
