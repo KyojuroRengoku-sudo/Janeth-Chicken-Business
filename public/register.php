@@ -204,7 +204,7 @@
 </div>
 
 <script>
-const API = 'register.php';
+const API = 'register_handler.php';
 
 // Password toggles
 function setupToggle(toggleId, inputId) {
@@ -289,7 +289,7 @@ document.getElementById('registerBtn').addEventListener('click', async () => {
         if (data.success) {
             showSuccess(data.message || 'Registration request submitted! Awaiting admin approval.');
             btn.innerHTML = '✓ Request Sent!';
-            setTimeout(() => { window.location.href = 'login.html'; }, 2500);
+            setTimeout(() => { window.location.href = 'login.php'; }, 2500);
         } else {
             showError(data.message || 'Registration failed.');
             btn.disabled = false; btn.innerHTML = 'Request Account →';

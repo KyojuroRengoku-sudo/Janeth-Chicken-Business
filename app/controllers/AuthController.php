@@ -53,7 +53,7 @@ class AuthController
                 $p['path'], $p['domain'], $p['secure'], $p['httponly']);
         }
 
-        header('Location: /janeth-chicken-business/public/login.php');
+        header('Location:/Janeth_Business/Janeth-Chicken-Business/public/login.php');
         exit;
     }
 

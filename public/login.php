@@ -1,16 +1,17 @@
 <?php
+// Handle POST request (AJAX login) — index.php starts the session
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_once __DIR__ . '/index.php';
+    header('Content-Type: application/json');
+    (new \App\Controllers\AuthController())->login();
+    exit;
+}
+
 session_start();
 
 // If already logged in, redirect to the entry page
 if (isset($_SESSION["user_id"])) {
     header("Location: janeth-input.php");
-    exit;
-}
-
-// Handle POST request (AJAX login)
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    require_once __DIR__ . '/index.php';
-    (new \App\Controllers\AuthController())->login();
     exit;
 }
 
@@ -419,7 +420,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 
 <script>
-const API = 'login.php';
+const API = 'login_handler.php';
 
 // Password toggle
 document.getElementById('pwToggle').addEventListener('click', function() {

@@ -10,7 +10,7 @@ require_once __DIR__ . '/index.php';
 
 use App\Controllers\ProductController;
 
-session_start();
+// index.php already starts the session — do not call session_start() again here
 requireAuth(null, true);   // FIXED: was requireAuth(isApi: true)
 
 header('Content-Type: application/json');

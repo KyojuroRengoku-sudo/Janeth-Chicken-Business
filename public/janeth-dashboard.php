@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id'])) { header('Location: login.html'); exit; }
+if (!isset($_SESSION['user_id'])) { header('Location: login.php'); exit; }
 $user_role = $_SESSION['role'];
 $username  = $_SESSION['username'];
 ?>
@@ -230,11 +230,11 @@ $username  = $_SESSION['username'];
             <span class="role-badge"><?= $user_role ?></span>
         </div>
         <?php if ($user_role==='admin'): ?>
-        <a href="products.php" class="btn btn-ghost">⚙️ Products</a>
-        <a href="users.php" class="btn btn-ghost">👥 Users</a>
+        <a href="../admin/products.php" class="btn btn-ghost">⚙️ Products</a>
+        <a href="../admin/users.php" class="btn btn-ghost">👥 Users</a>
         <?php endif; ?>
         <a href="janeth-input.php" class="btn btn-ghost">✏️ Entry</a>
-        <a href="liquidation.php" class="btn btn-purple">💵 Liquidation</a>
+        <a href="janeth-liquidation.php" class="btn btn-purple">💵 Liquidation</a>
         <button id="themeToggle" onclick="toggleTheme()">☀️ Light</button>
         <button class="btn btn-danger" id="logoutBtn">Sign out</button>
     </div>

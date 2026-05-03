@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id'])) { header('Location: login.html'); exit; }
+if (!isset($_SESSION['user_id'])) { header('Location: login.php'); exit; }
 $user_role = $_SESSION['role'];
 $username  = $_SESSION['username'];
 ?>
@@ -297,7 +297,7 @@ $username  = $_SESSION['username'];
         </div>
         <?php if ($user_role === 'admin'): ?>
         <a href="../admin/products.php" class="btn btn-ghost">⚙️ Products</a>
-        <a href="users.php" class="btn btn-ghost">👥 Users</a>
+        <a href="../admin/users.php" class="btn btn-ghost">👥 Users</a>
         <?php endif; ?>
         <a href="janeth-dashboard.php" class="btn btn-ghost">📊 Dashboard</a>
         <button class="btn btn-purple" id="chooserBtn">☰ Choose Products</button>
