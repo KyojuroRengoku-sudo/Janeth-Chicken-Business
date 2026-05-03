@@ -1,4 +1,21 @@
-<?php session_start(); if (isset($_SESSION["user_id"])) { header("Location: janeth-input.php"); exit; } ?>
+<?php
+session_start();
+
+// If already logged in, redirect to the entry page
+if (isset($_SESSION["user_id"])) {
+    header("Location: janeth-input.php");
+    exit;
+}
+
+// Handle POST request (AJAX login)
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_once __DIR__ . '/index.php';
+    (new \App\Controllers\AuthController())->login();
+    exit;
+}
+
+// Otherwise show the HTML login form
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

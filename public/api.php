@@ -11,7 +11,7 @@ require_once __DIR__ . '/index.php';
 use App\Controllers\ProductController;
 
 session_start();
-requireAuth(isApi: true);
+requireAuth(null, true);   // FIXED: was requireAuth(isApi: true)
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');

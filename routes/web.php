@@ -44,7 +44,7 @@ if ($uri === '/logout' || $uri === '/logout.php') {
 // ── Authenticated API routes ──────────────────────────────────────────────
 
 if ($uri === '/api' || $uri === '/api/inventory') {
-    requireAuth(isApi: true);
+    requireAuth(null, true);   // FIXED: was requireAuth(isApi: true)
     header('Access-Control-Allow-Origin: *');
     header('Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type');
@@ -54,7 +54,7 @@ if ($uri === '/api' || $uri === '/api/inventory') {
 // ── Admin-only API routes ─────────────────────────────────────────────────
 
 if ($uri === '/api/users') {
-    requireAuth('admin', isApi: true);
+    requireAuth('admin', true);   // FIXED: was requireAuth('admin', isApi: true)
     header('Content-Type: application/json');
     (new UserController())->handle();
 }
