@@ -32,8 +32,8 @@ $username  = $_SESSION['username'];
             --border:rgba(0,0,0,0.08);--text:#0d1b2a;--text-muted:#4a6080;--text-faint:#7090b0;
         }
         [data-theme="light"] body{background-image:radial-gradient(ellipse 70% 50% at 10% -10%,rgba(41,182,200,.04) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 90% 110%,rgba(245,166,35,.03) 0%,transparent 60%);}
-        [data-theme="light"] input,[data-theme="light"] select{background:var(--surface-2);color:var(--text);border-color:var(--border);}
-        [data-theme="light"] select option{background:#e8eef5;color:#0d1b2a;}
+        [data-theme="light"] input,[data-theme="light"] select{background:var(--surface-2)!important;color:var(--text)!important;border-color:var(--border)!important;}
+        [data-theme="light"] select option{background:#e8eef5!important;color:#0d1b2a!important;}
         [data-theme="light"] tbody tr:hover{background:var(--surface-2);}
         [data-theme="light"] thead tr,[data-theme="light"] .controls,[data-theme="light"] .analytics-bar{background:var(--surface);}
         [data-theme="light"] .kpi:hover{box-shadow:0 8px 24px rgba(0,0,0,0.1);}

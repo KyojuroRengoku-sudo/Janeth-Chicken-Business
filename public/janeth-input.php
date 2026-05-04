@@ -31,8 +31,10 @@ $username  = $_SESSION['username'];
         }
         [data-theme="light"] body{background-image:radial-gradient(ellipse 70% 50% at 10% -10%,rgba(41,182,200,.04) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 90% 110%,rgba(245,166,35,.03) 0%,transparent 60%);}
         [data-theme="light"] input[type="text"],[data-theme="light"] input[type="date"],[data-theme="light"] input[type="number"],[data-theme="light"] select{background:var(--surface-2);color:var(--text);border-color:var(--border);}
-        [data-theme="light"] select option{background:#e8eef5;color:#0d1b2a;}
-        [data-theme="light"] .num-input{background:var(--surface-3);color:var(--text);}
+        [data-theme="light"] select option{background:#e8eef5!important;color:#0d1b2a!important;}
+
+        [data-theme="light"] .num-input{background:var(--surface-3)!important;color:var(--text)!important;border-color:var(--border)!important;}
+        [data-theme="light"] .num-input:focus{background:rgba(41,182,200,.07)!important;}
         [data-theme="light"] tbody tr:hover:not(.total-row){background:var(--surface-2);}
         [data-theme="light"] .total-row td{background:rgba(245,166,35,.08)!important;}
         [data-theme="light"] .section-hd,[data-theme="light"] thead tr,[data-theme="light"] .controls,[data-theme="light"] .date-hero{background:var(--surface);}
@@ -366,7 +368,7 @@ $username  = $_SESSION['username'];
         <div class="hero-sub" id="heroFull">Pick a date and click Load</div>
     </div>
     <div class="date-hero-right">
-        <div id="asChip" class="as-chip"><span class="as-dot"></span><span id="asLabel">Auto-save off</span></div>
+        <div id="asChip" class="as-chip saved"><span class="as-dot"></span><span id="asLabel">Auto-save on</span></div>
         <span id="statusChip" class="status-chip s-none">● No data loaded</span>
         <input type="date" id="recordDate">
         <button class="btn btn-teal" id="loadBtn">↻ Load</button>
@@ -383,7 +385,7 @@ $username  = $_SESSION['username'];
     <div class="controls-sep"></div>
     <div class="toggle-sw">
         <span>⚡ Auto-save</span>
-        <input type="checkbox" id="asToggle">
+        <input type="checkbox" id="asToggle" checked>
         <label for="asToggle"></label>
     </div>
     <button id="manualSaveBtn" class="btn btn-save">💾 Save</button>
@@ -450,8 +452,8 @@ $username  = $_SESSION['username'];
 <div class="se-section">
     <div class="se-hd">
         <span class="section-icon">🚚</span>
-        <span class="section-title" style="color:var(--teal)">Supplier Stock Received</span>
-        <span class="section-count" id="seCount">0 entries</span>
+        <span class="section-title" style="color:var(--teal)">Pickups / Supplier Stock Received</span>
+        <span class="section-count" id="seCount">0 entries</span><span style="font-size:.72rem;color:var(--text-faint);margin-left:auto;">💼 Cost price = Puhonan/Capital</span>
     </div>
     <div class="se-add-row">
         <div class="se-field"><label>Product</label><select id="seProduct" style="width:190px"><option value="">Select…</option></select></div>
@@ -513,7 +515,7 @@ let stockEntries   = [];
 let suppliers      = [];
 let navGrid        = [];
 let asTimer        = null;
-let asEnabled      = false;
+let asEnabled      = true;
 
 // Sidebar
 document.getElementById('hamburger').addEventListener('click',()=>{
