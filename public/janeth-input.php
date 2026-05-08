@@ -11,113 +11,58 @@ $username  = $_SESSION['username'];
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Daily Entry · Janeth's Business</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <script src="theme.js"></script>
     <style>
+        /* CSS variables are set by theme.js – no hardcoded colours here */
         :root {
-            --bg:#0a0e17;--surface:#111827;--surface-2:#1a2234;--surface-3:#222d42;
-            --border:rgba(255,255,255,0.07);--border-hi:rgba(255,255,255,0.12);
-            --accent:#f5a623;--accent-dim:rgba(245,166,35,.12);--accent-glow:rgba(245,166,35,.25);
-            --teal:#29b6c8;--teal-dim:rgba(41,182,200,.1);--teal-glow:rgba(41,182,200,.3);
-            --text:#e8edf5;--text-muted:#6b7a93;--text-faint:#3d4d63;
-            --danger:#f87171;--success:#34d399;--purple:#a78bfa;
-            --chicken:#fbbf24;--frozen:#60a5fa;--expense:#a78bfa;
-            --radius:16px;--radius-sm:10px;
+            --radius:16px; --radius-sm:10px;
             --sidebar-w:220px;
+            --accent:#f5a623; --accent-dim:rgba(245,166,35,.12); --accent-glow:rgba(245,166,35,.25);
+            --teal:#29b6c8;   --teal-dim:rgba(41,182,200,.1);    --teal-glow:rgba(41,182,200,.3);
+            --danger:#f87171; --success:#34d399; --purple:#a78bfa;
+            --chicken:#fbbf24; --frozen:#60a5fa; --expense:#a78bfa;
         }
-        [data-theme="light"] {
-            --bg:#f0f4f9;--surface:#ffffff;--surface-2:#e8eef5;--surface-3:#d8e3ef;
-            --border:rgba(0,0,0,0.08);--border-hi:rgba(0,0,0,0.14);
-            --text:#0d1b2a;--text-muted:#4a6080;--text-faint:#7090b0;
-        }
-        [data-theme="light"] body{background-image:radial-gradient(ellipse 70% 50% at 10% -10%,rgba(41,182,200,.04) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 90% 110%,rgba(245,166,35,.03) 0%,transparent 60%);}
-        [data-theme="light"] input[type="text"],[data-theme="light"] input[type="date"],[data-theme="light"] input[type="number"],[data-theme="light"] select{background:var(--surface-2);color:var(--text);border-color:var(--border);}
-        [data-theme="light"] select option{background:#e8eef5!important;color:#0d1b2a!important;}
-
-        [data-theme="light"] .num-input{background:var(--surface-3)!important;color:var(--text)!important;border-color:var(--border)!important;}
-        [data-theme="light"] .num-input:focus{background:rgba(41,182,200,.07)!important;}
-        [data-theme="light"] tbody tr:hover:not(.total-row){background:var(--surface-2);}
-        [data-theme="light"] .total-row td{background:rgba(245,166,35,.08)!important;}
-        [data-theme="light"] .section-hd,[data-theme="light"] thead tr,[data-theme="light"] .controls,[data-theme="light"] .date-hero{background:var(--surface);}
-        [data-theme="light"] .summary-bar{background:var(--surface);}
-        [data-theme="light"] .as-chip{background:var(--surface-2);border-color:var(--border);}
-        [data-theme="light"] .sidebar{background:var(--surface);border-right-color:var(--border);}
-        [data-theme="light"] .nav-item:hover{background:var(--surface-2);}
-        [data-theme="light"] .nav-item.active{background:rgba(41,182,200,.1);}
-
         *{margin:0;padding:0;box-sizing:border-box;}
         html{font-size:17px;}
         body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:1rem;
              background-image:radial-gradient(ellipse 70% 50% at 10% -10%,rgba(41,182,200,.06) 0%,transparent 60%),
                               radial-gradient(ellipse 60% 40% at 90% 110%,rgba(245,166,35,.04) 0%,transparent 60%);}
         .app{display:flex;min-height:100vh;}
-
-        /* ── Sidebar ── */
-        .sidebar{
-            width:var(--sidebar-w);min-width:var(--sidebar-w);
-            background:var(--surface);border-right:1px solid var(--border);
-            display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;
-            transition:transform .25s cubic-bezier(.4,0,.2,1);
-        }
+        /* Sidebar (unchanged) */
+        .sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:transform .25s cubic-bezier(.4,0,.2,1);}
         .sidebar-logo{display:flex;align-items:center;gap:.75rem;padding:1.4rem 1.2rem 1.2rem;border-bottom:1px solid var(--border);}
-        .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--teal),#1a9aab);border-radius:9px;
-                   display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 4px 12px rgba(41,182,200,.3);flex-shrink:0;}
+        .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--teal),#1a9aab);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 4px 12px rgba(41,182,200,.3);flex-shrink:0;}
         .logo-title{font-size:.95rem;font-weight:700;letter-spacing:-.02em;display:block;}
         .logo-sub{font-size:.6rem;color:var(--text-muted);font-weight:400;letter-spacing:.07em;text-transform:uppercase;}
         .user-section{padding:1rem 1.2rem;border-bottom:1px solid var(--border);}
         .user-chip{display:flex;align-items:center;gap:.55rem;}
-        .user-avatar{width:28px;height:28px;background:linear-gradient(135deg,var(--accent),#e8920f);border-radius:50%;
-                     display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;color:#0a0e17;flex-shrink:0;}
+        .user-avatar{width:28px;height:28px;background:linear-gradient(135deg,var(--accent),#e8920f);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;color:#0a0e17;flex-shrink:0;}
         .user-name{font-size:.82rem;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-        .role-badge{font-size:.58rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:.12rem .45rem;
-                    border-radius:50px;background:var(--accent-dim);color:var(--accent);border:1px solid rgba(245,166,35,.2);white-space:nowrap;}
+        .role-badge{font-size:.58rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:.12rem .45rem;border-radius:50px;background:var(--accent-dim);color:var(--accent);border:1px solid rgba(245,166,35,.2);white-space:nowrap;}
         .nav{flex:1;padding:.75rem 0;overflow-y:auto;}
-        .nav-label{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
-                   color:var(--text-faint);padding:.5rem 1.2rem .3rem;margin-top:.25rem;}
-        .nav-item{display:flex;align-items:center;gap:.7rem;padding:.6rem 1.2rem;
-                  font-size:.83rem;font-weight:500;color:var(--text-muted);cursor:pointer;
-                  text-decoration:none;transition:.15s;border-left:2px solid transparent;margin:1px 0;}
+        .nav-label{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);padding:.5rem 1.2rem .3rem;margin-top:.25rem;}
+        .nav-item{display:flex;align-items:center;gap:.7rem;padding:.6rem 1.2rem;font-size:.83rem;font-weight:500;color:var(--text-muted);cursor:pointer;text-decoration:none;transition:.15s;border-left:2px solid transparent;margin:1px 0;}
         .nav-item:hover{background:var(--surface-2);color:var(--text);}
         .nav-item.active{background:rgba(41,182,200,.08);color:var(--teal);border-left-color:var(--teal);font-weight:600;}
         .nav-icon{font-size:.95rem;width:20px;text-align:center;flex-shrink:0;}
         .nav-divider{height:1px;background:var(--border);margin:.5rem 1.2rem;}
         .sidebar-footer{padding:.85rem 1.2rem;border-top:1px solid var(--border);}
-        .btn-logout{width:100%;display:flex;align-items:center;justify-content:center;gap:.5rem;
-                    padding:.55rem;border-radius:var(--radius-sm);background:rgba(248,113,113,.08);
-                    border:1px solid rgba(248,113,113,.18);color:var(--danger);font-size:.8rem;
-                    font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;transition:.15s;}
+        .btn-logout{width:100%;display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.55rem;border-radius:var(--radius-sm);background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.18);color:var(--danger);font-size:.8rem;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;transition:.15s;}
         .btn-logout:hover{background:rgba(248,113,113,.15);}
-        .hamburger{display:none;position:fixed;top:.85rem;left:.85rem;z-index:200;
-                   background:var(--surface);border:1px solid var(--border);border-radius:8px;
-                   width:38px;height:38px;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;}
+        .hamburger{display:none;position:fixed;top:.85rem;left:.85rem;z-index:200;background:var(--surface);border:1px solid var(--border);border-radius:8px;width:38px;height:38px;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;}
         .sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:90;backdrop-filter:blur(2px);}
-
-        /* ── Main ── */
         .main{margin-left:var(--sidebar-w);flex:1;padding:1.5rem;min-width:0;}
-
-        /* Buttons */
-        .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1.25rem;border-radius:50px;
-             font-size:.95rem;font-weight:600;font-family:'Sora',sans-serif;cursor:pointer;border:none;
-             transition:.18s;text-decoration:none;white-space:nowrap;letter-spacing:.01em;}
+        /* Buttons, date hero, controls, tables etc. (same as original) */
+        .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1.25rem;border-radius:50px;font-size:.95rem;font-weight:600;font-family:'Sora',sans-serif;cursor:pointer;border:none;transition:.18s;text-decoration:none;white-space:nowrap;}
         .btn-primary{background:linear-gradient(135deg,var(--accent),#e8920f);color:#0a0e17;box-shadow:0 3px 12px var(--accent-glow);}
         .btn-primary:hover{box-shadow:0 6px 20px rgba(245,166,35,.4);transform:translateY(-1px);}
         .btn-ghost{background:var(--surface);border:1px solid var(--border);color:var(--text-muted);}
         .btn-ghost:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-dim);}
         .btn-teal{background:var(--teal-dim);border:1px solid rgba(41,182,200,.2);color:var(--teal);}
         .btn-teal:hover{background:rgba(41,182,200,.18);}
-        .btn-danger{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:var(--danger);}
         .btn-save{background:linear-gradient(135deg,var(--teal),#1a9aab);color:#0a0e17;font-weight:700;box-shadow:0 3px 12px rgba(41,182,200,.3);}
         .btn-save:hover{box-shadow:0 6px 20px rgba(41,182,200,.4);transform:translateY(-1px);}
-        .btn-purple{background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.2);color:var(--purple);}
-        .btn-purple:hover{background:rgba(167,139,250,.2);}
-        #themeToggle{background:none;border:none;color:var(--text-muted);font-family:'Sora',sans-serif;
-                     font-size:.83rem;font-weight:500;cursor:pointer;padding:0;width:100%;text-align:left;}
-
-        /* Date hero */
-        .date-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-                   padding:1.75rem 2rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:2rem;flex-wrap:wrap;
-                   position:relative;overflow:hidden;}
-        .date-hero::after{content:'';position:absolute;right:-40px;top:-40px;width:180px;height:180px;
-                          border-radius:50%;background:radial-gradient(circle,rgba(245,166,35,.06),transparent 70%);pointer-events:none;}
+        #themeToggle{background:none;border:none;color:var(--text-muted);font-family:'Sora',sans-serif;font-size:.83rem;font-weight:500;cursor:pointer;padding:0;width:100%;text-align:left;}
+        .date-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.75rem 2rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:2rem;flex-wrap:wrap;position:relative;overflow:hidden;}
         .date-hero-left{flex:1;min-width:200px;}
         .hero-label{font-size:.85rem;text-transform:uppercase;letter-spacing:.12em;color:var(--text-muted);font-weight:600;margin-bottom:.5rem;}
         .hero-big{font-size:clamp(2rem,5vw,3.5rem);font-weight:700;letter-spacing:-.03em;line-height:1;}
@@ -126,40 +71,26 @@ $username  = $_SESSION['username'];
         .date-hero-right{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;}
         .status-chip{display:inline-flex;align-items:center;gap:.4rem;padding:.4rem 1rem;border-radius:50px;font-size:.85rem;font-weight:700;letter-spacing:.04em;}
         .s-loaded{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);color:var(--success);}
-        .s-empty {background:var(--accent-dim);border:1px solid rgba(245,166,35,.25);color:var(--accent);}
-        .s-none  {background:var(--surface-2);border:1px solid var(--border);color:var(--text-muted);}
-        .as-chip{display:inline-flex;align-items:center;gap:.4rem;padding:.35rem .85rem;border-radius:50px;
-                 font-size:.82rem;font-weight:600;letter-spacing:.04em;transition:.3s;
-                 background:var(--surface-2);border:1px solid var(--border);color:var(--text-faint);}
+        .s-empty{background:var(--accent-dim);border:1px solid rgba(245,166,35,.25);color:var(--accent);}
+        .s-none{background:var(--surface-2);border:1px solid var(--border);color:var(--text-muted);}
+        .as-chip{display:inline-flex;align-items:center;gap:.4rem;padding:.35rem .85rem;border-radius:50px;font-size:.82rem;font-weight:600;letter-spacing:.04em;transition:.3s;background:var(--surface-2);border:1px solid var(--border);color:var(--text-faint);}
         .as-chip.saving{border-color:rgba(41,182,200,.3);color:var(--teal);background:var(--teal-dim);}
-        .as-chip.saved {border-color:rgba(52,211,153,.25);color:var(--success);background:rgba(52,211,153,.08);}
-        .as-chip.error {border-color:rgba(248,113,113,.25);color:var(--danger);background:rgba(248,113,113,.08);}
+        .as-chip.saved{border-color:rgba(52,211,153,.25);color:var(--success);background:rgba(52,211,153,.08);}
+        .as-chip.error{border-color:rgba(248,113,113,.25);color:var(--danger);background:rgba(248,113,113,.08);}
         .as-dot{width:7px;height:7px;border-radius:50%;background:currentColor;}
         .as-chip.saving .as-dot{animation:blink .8s infinite;}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-
-        /* Controls */
-        .controls{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;
-                  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-                  padding:1rem 1.4rem;margin-bottom:1.25rem;}
+        .controls{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.4rem;margin-bottom:1.25rem;}
         .controls-sep{flex:1;}
-        input[type="text"],input[type="date"],input[type="number"],select{
-            background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);
-            color:var(--text);font-family:'Sora',sans-serif;font-size:.95rem;
-            padding:.55rem 1rem;outline:none;transition:.18s;}
+        input[type="text"],input[type="date"],input[type="number"],select{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Sora',sans-serif;font-size:.95rem;padding:.55rem 1rem;outline:none;transition:.18s;}
         input:focus,select:focus{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-dim);}
-        select option{background:#1a2234;}
-        .toggle-sw{display:inline-flex;align-items:center;gap:.55rem;background:var(--surface-2);
-                   border-radius:50px;padding:.3rem .9rem .3rem 1rem;border:1px solid var(--border);}
+        select option{background:var(--surface-2);color:var(--text);}
+        .toggle-sw{display:inline-flex;align-items:center;gap:.55rem;background:var(--surface-2);border-radius:50px;padding:.3rem .9rem .3rem 1rem;border:1px solid var(--border);}
         .toggle-sw label{font-size:.85rem;font-weight:600;color:var(--text-muted);cursor:pointer;}
-        .toggle-sw input{width:36px;height:20px;appearance:none;background:var(--surface-3);border-radius:30px;
-                         position:relative;cursor:pointer;transition:.2s;}
+        .toggle-sw input{width:36px;height:20px;appearance:none;background:var(--surface-3);border-radius:30px;position:relative;cursor:pointer;transition:.2s;}
         .toggle-sw input:checked{background:var(--teal);}
-        .toggle-sw input::before{content:'';width:14px;height:14px;background:#fff;border-radius:50%;
-                                 position:absolute;top:3px;left:3px;transition:.2s;}
+        .toggle-sw input::before{content:'';width:14px;height:14px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:.2s;}
         .toggle-sw input:checked::before{left:19px;}
-
-        /* Sections */
         .section-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1.25rem;}
         .section-hd{display:flex;align-items:center;gap:.85rem;padding:1rem 1.4rem;border-bottom:1px solid var(--border);background:var(--surface-2);}
         .section-icon{font-size:1.4rem;}
@@ -168,8 +99,7 @@ $username  = $_SESSION['username'];
         .tbl-scroll{overflow-x:auto;}
         table{width:100%;border-collapse:collapse;min-width:820px;}
         thead tr{border-bottom:1px solid var(--border);}
-        th{padding:.8rem 1.1rem;text-align:center;font-size:.8rem;font-weight:700;text-transform:uppercase;
-           letter-spacing:.08em;color:var(--text-faint);background:var(--surface-2);white-space:nowrap;}
+        th{padding:.8rem 1.1rem;text-align:center;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);background:var(--surface-2);white-space:nowrap;}
         th:first-child{text-align:left;}
         tbody tr{border-bottom:1px solid var(--border);transition:background .12s;}
         tbody tr:last-child:not(.total-row){border-bottom:none;}
@@ -178,38 +108,28 @@ $username  = $_SESSION['username'];
         td:first-child{text-align:left;}
         .prod-name{font-weight:600;font-size:.95rem;}
         .prod-id{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--text-faint);background:var(--surface-3);padding:.1rem .45rem;border-radius:5px;margin-left:.5rem;}
-        .num-input{width:100px;background:var(--surface-3);border:1px solid var(--border);border-radius:var(--radius-sm);
-                   color:var(--text);font-family:'DM Mono',monospace;font-size:.95rem;
-                   padding:.5rem .7rem;text-align:center;outline:none;transition:.15s;}
+        .num-input{width:100px;background:var(--surface-3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'DM Mono',monospace;font-size:.95rem;padding:.5rem .7rem;text-align:center;outline:none;transition:.15s;}
         .num-input:focus{border-color:var(--teal);background:rgba(41,182,200,.05);box-shadow:0 0 0 3px var(--teal-dim);}
         .price-ro{font-family:'DM Mono',monospace;font-size:.9rem;color:var(--accent);}
         .yest-cell{font-family:'DM Mono',monospace;font-size:.95rem;font-weight:700;color:var(--teal);}
         .sold-cell{font-family:'DM Mono',monospace;font-size:.95rem;color:var(--success);}
         .total-cell-val{font-family:'DM Mono',monospace;font-size:.9rem;color:var(--accent);}
         .sold-warn{color:var(--danger);}.sold-ok{color:var(--success);}
-        .total-row td{background:rgba(245,166,35,.06)!important;border-top:1px solid rgba(245,166,35,.18)!important;
-                      color:var(--accent)!important;font-family:'DM Mono',monospace;font-size:.9rem;font-weight:700;}
-        .total-row .total-label{text-align:right!important;color:var(--text-muted)!important;
-                                font-family:'Sora',sans-serif!important;font-size:.8rem!important;
-                                font-weight:600!important;text-transform:uppercase;letter-spacing:.06em;padding-right:1.5rem!important;}
+        .total-row td{background:rgba(245,166,35,.06)!important;border-top:1px solid rgba(245,166,35,.18)!important;color:var(--accent)!important;font-family:'DM Mono',monospace;font-size:.9rem;font-weight:700;}
+        .total-row .total-label{text-align:right!important;color:var(--text-muted)!important;font-family:'Sora',sans-serif!important;font-size:.8rem!important;font-weight:600!important;text-transform:uppercase;letter-spacing:.06em;padding-right:1.5rem!important;}
         .empty-section{padding:3rem;text-align:center;color:var(--text-faint);font-size:.95rem;}
-
-        /* Chooser */
         .chooser-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1.25rem;display:none;}
         .chooser-panel.open{display:block;}
         .chooser-hd{display:flex;align-items:center;gap:.85rem;padding:1rem 1.4rem;border-bottom:1px solid var(--border);background:var(--surface-2);}
         .chooser-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:.85rem;padding:1.4rem;}
-        .chooser-item{display:flex;align-items:center;gap:.85rem;background:var(--surface-2);border:1px solid var(--border);
-                      border-radius:var(--radius-sm);padding:.85rem 1rem;cursor:pointer;transition:.15s;}
+        .chooser-item{display:flex;align-items:center;gap:.85rem;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.85rem 1rem;cursor:pointer;transition:.15s;}
         .chooser-item:hover{border-color:var(--teal);background:var(--teal-dim);}
         .chooser-item.active{border-color:var(--success);background:rgba(52,211,153,.07);}
         .chooser-cb{width:20px;height:20px;accent-color:var(--teal);cursor:pointer;flex-shrink:0;}
         .chooser-name{font-size:.95rem;font-weight:600;flex:1;}
         .chooser-cat{font-size:.72rem;padding:.15rem .55rem;border-radius:50px;font-weight:700;}
         .cc-chicken{background:rgba(251,191,36,.15);color:var(--chicken);}
-        .cc-frozen {background:rgba(96,165,250,.12);color:var(--frozen);}
-
-        /* Stock entries */
+        .cc-frozen{background:rgba(96,165,250,.12);color:var(--frozen);}
         .se-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1.25rem;}
         .se-hd{display:flex;align-items:center;gap:.85rem;padding:1rem 1.4rem;border-bottom:1px solid var(--border);background:var(--surface-2);}
         .se-add-row{display:flex;flex-wrap:wrap;gap:.75rem;align-items:flex-end;padding:1.2rem 1.4rem;border-bottom:1px solid var(--border);}
@@ -227,8 +147,6 @@ $username  = $_SESSION['username'];
         .se-del:hover{color:var(--danger);background:rgba(248,113,113,.1);}
         .se-total-bar{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.4rem;background:rgba(248,113,113,.05);border-top:1px solid rgba(248,113,113,.15);}
         .se-empty{padding:2rem;text-align:center;color:var(--text-faint);font-size:.95rem;}
-
-        /* Expenses */
         .exp-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1.25rem;}
         .exp-hd{display:flex;align-items:center;gap:.85rem;padding:1rem 1.4rem;border-bottom:1px solid var(--border);background:var(--surface-2);}
         .exp-add-row{display:flex;flex-wrap:wrap;gap:.75rem;align-items:flex-end;padding:1.2rem 1.4rem;border-bottom:1px solid var(--border);}
@@ -247,11 +165,7 @@ $username  = $_SESSION['username'];
         .exp-total-label{font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-faint);}
         .exp-total-val{font-family:'DM Mono',monospace;font-size:1.3rem;font-weight:700;color:var(--danger);}
         .exp-empty{padding:2rem;text-align:center;color:var(--text-faint);font-size:.95rem;}
-
-        /* Summary */
-        .summary-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.1rem;
-                     background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-                     padding:1.25rem 1.75rem;margin-bottom:1.25rem;}
+        .summary-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.1rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.75rem;margin-bottom:1.25rem;}
         .sum-item{display:flex;flex-direction:column;gap:.3rem;position:relative;padding-left:.75rem;}
         .sum-item::before{content:'';position:absolute;left:0;top:.2rem;bottom:.2rem;width:3px;border-radius:2px;background:var(--border);}
         .sum-item:nth-child(1)::before{background:var(--teal);}
@@ -263,23 +177,16 @@ $username  = $_SESSION['username'];
         .sum-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);}
         .sum-val{font-family:'DM Mono',monospace;font-size:1.3rem;font-weight:700;color:var(--text-muted);}
         .sum-val.green{color:var(--success);}.sum-val.amber{color:var(--accent);}.sum-val.red{color:var(--danger);}.sum-val.teal{color:var(--teal);}
-
-        /* Modal */
-        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);
-                       display:none;justify-content:center;align-items:center;z-index:1000;padding:1rem;}
+        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);display:none;justify-content:center;align-items:center;z-index:1000;padding:1rem;}
         .modal-overlay.active{display:flex;}
-        .modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-               padding:2.25rem 2.5rem;max-width:460px;width:100%;text-align:center;
-               box-shadow:0 25px 60px rgba(0,0,0,.5);animation:popIn .2s cubic-bezier(.34,1.56,.64,1);}
+        .modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2.25rem 2.5rem;max-width:460px;width:100%;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,.5);animation:popIn .2s cubic-bezier(.34,1.56,.64,1);}
         @keyframes popIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
         .modal-icon{font-size:2.5rem;margin-bottom:.85rem;}
         .modal-msg{font-size:1.05rem;color:var(--text);margin-bottom:1.75rem;line-height:1.55;font-weight:500;}
         .modal-btns{display:flex;gap:.85rem;justify-content:center;}
-
         ::-webkit-scrollbar{width:7px;height:7px;}
         ::-webkit-scrollbar-track{background:transparent;}
         ::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:4px;}
-
         @media print{
             .sidebar,.controls,.date-hero-right,.modal-overlay,.exp-add-row,.exp-del,.se-add-row,.se-del,.chooser-panel{display:none!important;}
             body{background:#fff!important;color:#111!important;padding:.5rem;}
@@ -302,17 +209,12 @@ $username  = $_SESSION['username'];
 </head>
 <body>
 <div class="app">
-
 <button class="hamburger" id="hamburger">☰</button>
 <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
-
 <nav class="sidebar" id="sidebar">
     <div class="sidebar-logo">
         <div class="logo-icon">📦</div>
-        <div>
-            <span class="logo-title">Janeth's</span>
-            <span class="logo-sub">Business</span>
-        </div>
+        <div><span class="logo-title">Janeth's</span><span class="logo-sub">Business</span></div>
     </div>
     <div class="user-section">
         <div class="user-chip">
@@ -346,21 +248,17 @@ $username  = $_SESSION['username'];
         <button class="btn-logout" id="logoutBtn">🚪 Sign out</button>
     </div>
 </nav>
-
 <div class="main">
-
-<!-- Modal -->
 <div id="modalOverlay" class="modal-overlay">
     <div class="modal">
         <div class="modal-icon" id="modalIcon">💬</div>
         <p class="modal-msg" id="modalMsg">Are you sure?</p>
         <div class="modal-btns">
-            <button id="modalOk"  class="btn btn-primary">OK</button>
+            <button id="modalOk" class="btn btn-primary">OK</button>
             <button id="modalCancel" class="btn btn-ghost" style="display:none">Cancel</button>
         </div>
     </div>
 </div>
-
 <div class="date-hero">
     <div class="date-hero-left">
         <div class="hero-label">Selected Date</div>
@@ -374,7 +272,6 @@ $username  = $_SESSION['username'];
         <button class="btn btn-teal" id="loadBtn">↻ Load</button>
     </div>
 </div>
-
 <div class="controls">
     <input type="text" id="searchInput" placeholder="🔍 Search product…" style="width:200px">
     <select id="catFilter">
@@ -391,8 +288,6 @@ $username  = $_SESSION['username'];
     <button id="manualSaveBtn" class="btn btn-save">💾 Save</button>
     <button id="resetBtn" class="btn btn-ghost">⟳ Reset</button>
 </div>
-
-<!-- Chooser panel -->
 <div class="chooser-panel" id="chooserPanel">
     <div class="chooser-hd">
         <span class="section-icon">☰</span>
@@ -401,8 +296,6 @@ $username  = $_SESSION['username'];
     </div>
     <div class="chooser-grid" id="chooserGrid"></div>
 </div>
-
-<!-- Summary -->
 <div class="summary-bar" id="summaryBar">
     <div class="sum-item"><div class="sum-label">Stock In Value</div><div class="sum-val teal" id="sumStockIn">₱0.00</div></div>
     <div class="sum-item"><div class="sum-label">Supplier Cost</div><div class="sum-val red" id="sumSupplierCost">₱0.00</div></div>
@@ -411,8 +304,6 @@ $username  = $_SESSION['username'];
     <div class="sum-item"><div class="sum-label">Daily Expenses</div><div class="sum-val red" id="sumExpenses">₱0.00</div></div>
     <div class="sum-item"><div class="sum-label">Est. Net Income</div><div class="sum-val" id="sumNet">₱0.00</div></div>
 </div>
-
-<!-- Chicken table -->
 <div class="section-wrap" id="chickenSection">
     <div class="section-hd">
         <span class="section-icon">🐔</span>
@@ -421,16 +312,11 @@ $username  = $_SESSION['username'];
     </div>
     <div class="tbl-scroll">
         <table>
-            <thead><tr>
-                <th>Product</th><th>Selling Price (₱)</th><th>Yesterday</th>
-                <th>Stock In</th><th>Remaining</th><th>Sold (calc.)</th><th>Sales Value (₱)</th>
-            </tr></thead>
+            <thead><tr><th>Product</th><th>Selling Price (₱)</th><th>Yesterday</th><th>Stock In</th><th>Remaining</th><th>Sold (calc.)</th><th>Sales Value (₱)</th></tr></thead>
             <tbody id="chickenBody"></tbody>
         </table>
     </div>
 </div>
-
-<!-- Frozen table -->
 <div class="section-wrap" id="frozenSection">
     <div class="section-hd">
         <span class="section-icon">❄️</span>
@@ -439,21 +325,17 @@ $username  = $_SESSION['username'];
     </div>
     <div class="tbl-scroll">
         <table>
-            <thead><tr>
-                <th>Product</th><th>Selling Price (₱)</th><th>Yesterday</th>
-                <th>Stock In</th><th>Remaining</th><th>Sold (calc.)</th><th>Sales Value (₱)</th>
-            </tr></thead>
+            <thead><tr><th>Product</th><th>Selling Price (₱)</th><th>Yesterday</th><th>Stock In</th><th>Remaining</th><th>Sold (calc.)</th><th>Sales Value (₱)</th></tr></thead>
             <tbody id="frozenBody"></tbody>
         </table>
     </div>
 </div>
-
-<!-- Stock entries -->
 <div class="se-section">
     <div class="se-hd">
         <span class="section-icon">🚚</span>
         <span class="section-title" style="color:var(--teal)">Pickups / Supplier Stock Received</span>
-        <span class="section-count" id="seCount">0 entries</span><span style="font-size:.72rem;color:var(--text-faint);margin-left:auto;">💼 Cost price = Puhonan/Capital</span>
+        <span class="section-count" id="seCount">0 entries</span>
+        <span style="font-size:.72rem;color:var(--text-faint);margin-left:auto;">💼 Cost price = Puhonan/Capital</span>
     </div>
     <div class="se-add-row">
         <div class="se-field"><label>Product</label><select id="seProduct" style="width:190px"><option value="">Select…</option></select></div>
@@ -464,13 +346,8 @@ $username  = $_SESSION['username'];
         <button class="btn btn-teal" id="addSeBtn" style="align-self:flex-end">+ Add</button>
     </div>
     <div class="se-list" id="seList"><div class="se-empty">No stock entries recorded yet.</div></div>
-    <div class="se-total-bar">
-        <span class="exp-total-label">Total Supplier Cost</span>
-        <span class="exp-total-val" id="seTotalVal">₱0.00</span>
-    </div>
+    <div class="se-total-bar"><span class="exp-total-label">Total Supplier Cost</span><span class="exp-total-val" id="seTotalVal">₱0.00</span></div>
 </div>
-
-<!-- Expenses -->
 <div class="exp-section">
     <div class="exp-hd">
         <span class="section-icon">💸</span>
@@ -478,30 +355,16 @@ $username  = $_SESSION['username'];
         <span class="section-count" id="expCount">0 items</span>
     </div>
     <div class="exp-add-row">
-        <div class="exp-field"><label>Category</label>
-            <select id="expCat" style="width:155px">
-                <option>Utilities</option><option>Transport</option>
-                <option>Food & Snacks</option><option>Supplies</option>
-                <option>Labour</option><option>Other</option>
-            </select>
-        </div>
+        <div class="exp-field"><label>Category</label><select id="expCat" style="width:155px"><option>Utilities</option><option>Transport</option><option>Food & Snacks</option><option>Supplies</option><option>Labour</option><option>Other</option></select></div>
         <div class="exp-field" style="flex:1;min-width:200px"><label>Description</label><input type="text" id="expDesc" placeholder="e.g. Ice for the stall" style="width:100%"></div>
         <div class="exp-field"><label>Amount (₱)</label><input type="number" id="expAmount" placeholder="0.00" step="0.01" min="0" style="width:120px"></div>
         <button class="btn btn-primary" id="addExpBtn" style="align-self:flex-end">+ Add</button>
     </div>
     <div class="exp-list" id="expList"><div class="exp-empty">No expenses recorded yet.</div></div>
-    <div class="exp-total-bar">
-        <span class="exp-total-label">Total Expenses</span>
-        <span class="exp-total-val" id="expTotalVal">₱0.00</span>
-    </div>
+    <div class="exp-total-bar"><span class="exp-total-label">Total Expenses</span><span class="exp-total-val" id="expTotalVal">₱0.00</span></div>
 </div>
-
-<div style="padding-bottom:2rem;text-align:center;font-size:.85rem;color:var(--text-faint);font-family:'DM Mono',monospace">
-    ✦ Sold = Yesterday + Stock In − Remaining &nbsp;·&nbsp; Yesterday auto-fills from previous day's Remaining
-</div>
-
-</div><!-- /.main -->
-</div><!-- /.app -->
+<div style="padding-bottom:2rem;text-align:center;font-size:.85rem;color:var(--text-faint);font-family:'DM Mono',monospace">✦ Sold = Yesterday + Stock In − Remaining &nbsp;·&nbsp; Yesterday auto-fills from previous day's Remaining</div>
+</div></div>
 
 <script>
 const API  = 'janeth.php';
@@ -513,11 +376,10 @@ let masterRecords  = [];
 let expenses       = [];
 let stockEntries   = [];
 let suppliers      = [];
-let navGrid        = [];
 let asTimer        = null;
 let asEnabled      = true;
 
-// Sidebar
+// Sidebar toggle
 document.getElementById('hamburger').addEventListener('click',()=>{
     document.getElementById('sidebar').classList.add('open');
     document.getElementById('sidebarBackdrop').classList.add('open');
@@ -540,8 +402,8 @@ function modal(msg, onOk, onCancel=null, icon='💬', okLabel='OK', cancelLabel=
     const can = document.getElementById('modalCancel').cloneNode(true);
     document.getElementById('modalOk').replaceWith(ok);
     document.getElementById('modalCancel').replaceWith(can);
-    ok.addEventListener('click',  () => { close(); onOk    && onOk(); });
-    can.addEventListener('click', () => { close(); onCancel && onCancel(); });
+    ok.addEventListener('click',  () => { close(); if(onOk) onOk(); });
+    can.addEventListener('click', () => { close(); if(onCancel) onCancel(); });
 }
 function alert2(msg, isErr=false, autoClose=2800) {
     modal(msg, null, null, isErr?'⚠️':'✅', 'OK', '');
@@ -549,7 +411,7 @@ function alert2(msg, isErr=false, autoClose=2800) {
 }
 
 function prevDate(d){const dt=new Date(d+'T00:00:00');dt.setDate(dt.getDate()-1);return dt.toISOString().split('T')[0];}
-function peso(n){'₱';return '₱'+(parseFloat(n)||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function peso(n){return '₱'+(parseFloat(n)||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function setStatus(t){
     const c=document.getElementById('statusChip');
     c.className='status-chip';
@@ -600,20 +462,23 @@ async function doSave(){
 
 async function fetchAllProducts(){
     try{
-        const [visProd,allProd,sups]=await Promise.all([
-            fetch(`${API}?products=1&page=input`).then(r=>r.json()),
-            fetch(`${API}?products=1`).then(r=>r.json()),
-            fetch(`${API}?suppliers=1`).then(r=>r.json())
+        const [visProd, allProd, sups] = await Promise.all([
+            fetch(`${API}?products=1&page=input`).then(r=>r.json()).catch(()=>({products:[]})),
+            fetch(`${API}?products=1`).then(r=>r.json()).catch(()=>({products:[]})),
+            fetch(`${API}?suppliers=1`).then(r=>r.json()).catch(()=>({suppliers:[]}))
         ]);
-        masterProducts=visProd.products||[];
-        allProducts   =allProd.products ||[];
-        suppliers     =sups.suppliers   ||[];
-        buildChooser();buildSeDropdowns();
-        masterRecords=masterProducts.map(p=>({...p,price:parseFloat(p.price)||0,yesterday:0,stockIn:0,remaining:0,yesterdayFromPrev:false}));
+        const normalize = p => ({ ...p, price: parseFloat(p.selling_price ?? p.price ?? 0) });
+        allProducts    = (allProd.products  || []).map(normalize);
+        masterProducts = (visProd.products  || []).map(normalize);
+        suppliers      = sups.suppliers || [];
+        if (!masterProducts.length && allProducts.length) masterProducts = [...allProducts];
+        buildChooser();
+        buildSeDropdowns();
+        masterRecords = masterProducts.map(p => ({ ...p, yesterday:0, stockIn:0, remaining:0, yesterdayFromPrev:false }));
         renderSections();
-        const saved=localStorage.getItem('janeth_date');
-        if(saved){document.getElementById('recordDate').value=saved;await loadDate(saved,true);}
-    }catch(e){console.error('Failed to fetch products:',e);}
+        const saved = localStorage.getItem('janeth_date');
+        if (saved) { document.getElementById('recordDate').value = saved; await loadDate(saved, true); }
+    } catch(e) { console.error(e); alert2('Could not load products. Check the server and database connection.', true); }
 }
 
 function buildChooser(){
@@ -651,15 +516,15 @@ document.getElementById('saveChooserBtn').addEventListener('click',async()=>{
 });
 
 function buildSeDropdowns(){
-    const pSel=document.getElementById('seProduct');
-    const sSel=document.getElementById('seSupplier');
-    pSel.innerHTML='<option value="">Select product…</option>'+
-        allProducts.filter(p=>p.visible_input==1).map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
-    sSel.innerHTML='<option value="">Select supplier…</option>'+
-        suppliers.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
+    const pSel = document.getElementById('seProduct');
+    const sSel = document.getElementById('seSupplier');
+    pSel.innerHTML = '<option value="">Select product…</option>' + allProducts.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
+    if (suppliers.length) {
+        sSel.innerHTML = '<option value="">Select supplier…</option>' + suppliers.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
+    } else { sSel.innerHTML = '<option value="">⚠ No suppliers in DB yet</option>'; }
 }
 
-async function loadDate(d,silent=false){
+async function loadDate(d, silent=false){
     if(!d) return;
     setHero(d);
     try{
@@ -668,130 +533,184 @@ async function loadDate(d,silent=false){
             fetch(`${API}?expenses=${d}`),
             fetch(`${API}?stock_entries=${d}`)
         ]);
-        const data=await res.json();
-        const expData=await expRes.json();
-        const seData=await seRes.json();
-        expenses=expData.expenses||[];
-        stockEntries=seData.stock_entries||[];
-        if(data.records&&data.records.length){
+        const data    = await res.json();
+        const expData = await expRes.json();
+        const seData  = await seRes.json();
+        expenses     = expData.expenses      || [];
+        stockEntries = seData.stock_entries  || [];
+        if(data.records && data.records.length){
             const hasData=data.records.some(r=>+r.sold>0||+r.stock_in>0||+r.remaining_qty>0);
             if(hasData){
                 masterRecords=data.records.map(r=>({
-                    ...r,id:r.product_id,name:r.product_name,category:r.product_category,
-                    price:parseFloat(r.price)||0,
+                    ...r,
+                    id:       r.product_id,
+                    name:     r.product_name,
+                    category: r.product_category,
+                    price:    parseFloat(r.selling_price ?? r.price ?? 0),
                     yesterday:parseInt(r.yesterday_qty)||0,
-                    stockIn:parseInt(r.stock_in)||0,
+                    stockIn:  parseInt(r.stock_in)||0,
                     remaining:parseInt(r.remaining_qty)||0,
                     yesterdayFromPrev:false
                 }));
                 setStatus('loaded');
             }else{
                 const prev=await fetchPrev(d);
-                masterRecords=masterProducts.map(p=>({...p,price:parseFloat(p.price)||0,yesterday:0,stockIn:0,remaining:0,yesterdayFromPrev:false}));
-                if(prev)applyPrev(prev);
+                masterRecords=masterProducts.map(p=>({...p,yesterday:0,stockIn:0,remaining:0,yesterdayFromPrev:false}));
+                if(prev) applyPrev(prev);
                 setStatus('empty');
             }
         }else{
             const prev=await fetchPrev(d);
-            masterRecords=masterProducts.map(p=>({...p,price:parseFloat(p.price)||0,yesterday:0,stockIn:0,remaining:0,yesterdayFromPrev:false}));
-            if(prev)applyPrev(prev);
+            masterRecords=masterProducts.map(p=>({...p,yesterday:0,stockIn:0,remaining:0,yesterdayFromPrev:false}));
+            if(prev) applyPrev(prev);
             setStatus('empty');
         }
-        renderSections();renderExpenses();renderStockEntries();updateSummary();
-        if(!silent)alert2(`Loaded data for ${d}`);
-    }catch(e){alert2('Failed to load data. Check your server connection.',true);}
+        renderSections(); renderExpenses(); renderStockEntries(); updateSummary();
+        if(!silent) alert2(`Loaded data for ${d}`);
+    } catch(e){ alert2('Failed to load data. Check your server connection.',true); }
 }
 
 async function fetchPrev(d){
     try{const res=await fetch(`${API}?date=${prevDate(d)}&for=input`);const data=await res.json();
-        return data.records?.some(r=>+r.remaining_qty>0)?data.records:null;}
-    catch{return null;}
+        return data.records?.some(r=>+r.remaining_qty>0)?data.records:null;} catch{return null;}
 }
 function applyPrev(prev){
     masterRecords.forEach(r=>{
         const p=prev.find(x=>x.product_id===r.id||x.product_id==r.id);
-        if(p&&+p.remaining_qty>0){r.yesterday=+p.remaining_qty;r.yesterdayFromPrev=true;}
+        if(p && +p.remaining_qty>0){ r.yesterday=+p.remaining_qty; r.yesterdayFromPrev=true; }
     });
 }
 
-// BUG FIX: category filter — use r.category===cat instead of hard-coded category names
+// --- FIXED: render body once, then attach listeners that update only the changed row ---
 function renderSections(){
-    const search=document.getElementById('searchInput').value.toLowerCase();
-    const cat=document.getElementById('catFilter').value;
-    const chicken=masterRecords.filter(r=>r.category==='Chicken'&&r.name.toLowerCase().includes(search)&&(!cat||r.category===cat));
-    const frozen =masterRecords.filter(r=>r.category==='Frozen' &&r.name.toLowerCase().includes(search)&&(!cat||r.category===cat));
-    document.getElementById('chickenCount').textContent=`${chicken.length} item${chicken.length!==1?'s':''}`;
-    document.getElementById('frozenCount').textContent =`${frozen.length} item${frozen.length!==1?'s':''}`;
-    document.getElementById('chickenSection').style.display=(!cat||cat==='Chicken')?'':'none';
-    document.getElementById('frozenSection').style.display =(!cat||cat==='Frozen') ?'':'none';
-    renderBody('chickenBody',chicken,0);
-    renderBody('frozenBody', frozen, chicken.length);
-    rebuildNav();updateSummary();
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const cat    = document.getElementById('catFilter').value;
+    const chicken = masterRecords.filter(r => r.category==='Chicken' && r.name.toLowerCase().includes(search) && (!cat || r.category===cat));
+    const frozen  = masterRecords.filter(r => r.category==='Frozen'  && r.name.toLowerCase().includes(search) && (!cat || r.category===cat));
+    document.getElementById('chickenCount').textContent = `${chicken.length} item${chicken.length!==1?'s':''}`;
+    document.getElementById('frozenCount').textContent  = `${frozen.length} item${frozen.length!==1?'s':''}`;
+    document.getElementById('chickenSection').style.display = (!cat || cat==='Chicken') ? '' : 'none';
+    document.getElementById('frozenSection').style.display  = (!cat || cat==='Frozen')  ? '' : 'none';
+    renderTableBody('chickenBody', chicken);
+    renderTableBody('frozenBody',  frozen);
+    updateSummary();
+    // Re-attach input listeners after rendering new DOM
+    attachInputListeners();
 }
 
-function renderBody(bodyId,recs,startRow){
-    const tbody=document.getElementById(bodyId);
-    if(!recs.length){tbody.innerHTML=`<tr><td colspan="7" class="empty-section">No products to show.</td></tr>`;return;}
-    let totalStockIn=0,totalSold=0,totalVal=0;
-    const rows=recs.map((r,i)=>{
-        const row=startRow+i;
-        const sold=calcSold(r);
-        const val=sold*r.price;
-        totalStockIn+=r.stockIn*r.price;totalSold+=sold;totalVal+=val;
-        const soldCls=sold<0?'sold-warn':'sold-ok';
-        return `<tr>
+function renderTableBody(bodyId, recs){
+    const tbody = document.getElementById(bodyId);
+    if(!recs.length){
+        tbody.innerHTML = `<tr><td colspan="7" class="empty-section">No products to show. Use "☰ Choose Products" in the sidebar to enable products.</td></tr>`;
+        return;
+    }
+    let rowsHtml = '';
+    recs.forEach(r => {
+        const sold = calcSold(r);
+        const val = sold * r.price;
+        const soldCls = sold<0 ? 'sold-warn' : 'sold-ok';
+        rowsHtml += `<tr data-product-id="${r.id}">
             <td><span class="prod-name">${esc(r.name)}</span><span class="prod-id">#${r.id}</span></td>
             <td><span class="price-ro">₱${(r.price||0).toFixed(2)}</span></td>
             <td class="yest-cell">${r.yesterday}</td>
-            <td><input class="num-input" type="number" min="0" value="${r.stockIn}" data-pid="${r.id}" data-field="stockIn" data-row="${row}" data-col="1"></td>
-            <td><input class="num-input" type="number" min="0" value="${r.remaining}" data-pid="${r.id}" data-field="remaining" data-row="${row}" data-col="2"></td>
-            <td class="sold-cell ${soldCls}">${sold}</td>
-            <td class="total-cell-val">${peso(val)}</td>
+            <td><input class="num-input stockIn-input" type="number" min="0" value="${r.stockIn}" data-id="${r.id}" data-field="stockIn"></td>
+            <td><input class="num-input remaining-input" type="number" min="0" value="${r.remaining}" data-id="${r.id}" data-field="remaining"></td>
+            <td class="sold-cell ${soldCls}" data-sold="${r.id}">${sold}</td>
+            <td class="total-cell-val" data-sales="${r.id}">${peso(val)}</td>
         </tr>`;
     });
-    rows.push(`<tr class="total-row"><td colspan="5" class="total-label">Totals</td>
-        <td>${totalSold}</td><td>${peso(totalVal)}</td></tr>`);
-    tbody.innerHTML=rows.join('');
-    tbody.querySelectorAll('.num-input').forEach(inp=>{
-        inp.addEventListener('input',()=>{
-            const pid=inp.dataset.pid,field=inp.dataset.field,val=Math.max(0,parseInt(inp.value)||0);
-            const r=masterRecords.find(x=>x.id==pid||x.product_id==pid);
-            if(r){r[field]=val;renderSections();rebuildNav();triggerAutoSave();}
-        });
+    // Add totals row
+    const totalSold = recs.reduce((sum, r) => sum + calcSold(r), 0);
+    const totalVal  = recs.reduce((sum, r) => sum + (calcSold(r) * r.price), 0);
+    rowsHtml += `<tr class="total-row"><td colspan="5" class="total-label">Totals</td><td>${totalSold}</td><td>${peso(totalVal)}</td></tr>`;
+    tbody.innerHTML = rowsHtml;
+}
+
+// Attach event listeners to the newly created input fields
+function attachInputListeners(){
+    document.querySelectorAll('.stockIn-input, .remaining-input').forEach(inp => {
+        inp.removeEventListener('input', handleInputChange);
+        inp.addEventListener('input', handleInputChange);
     });
 }
 
-function rebuildNav(){
-    navGrid=Array.from(document.querySelectorAll('.num-input')).map(i=>({el:i,row:+i.dataset.row,col:+i.dataset.col,tbody:i.closest('tbody')}));
+function handleInputChange(e){
+    const inp = e.target;
+    const id = parseInt(inp.dataset.id);
+    const field = inp.dataset.field;
+    let val = parseInt(inp.value);
+    if(isNaN(val) || val < 0) val = 0;
+    const record = masterRecords.find(r => r.id === id);
+    if(record){
+        record[field] = val;
+        // Update only the affected row's computed columns
+        const row = inp.closest('tr');
+        if(row){
+            const sold = calcSold(record);
+            const soldCell = row.querySelector('.sold-cell');
+            const salesCell = row.querySelector('.total-cell-val');
+            if(soldCell){
+                soldCell.textContent = sold;
+                soldCell.className = `sold-cell ${sold<0 ? 'sold-warn' : 'sold-ok'}`;
+            }
+            if(salesCell) salesCell.textContent = peso(sold * record.price);
+            // Update totals row (both chicken and frozen totals are recomputed via updateSummary)
+            updateSummary();
+        }
+        triggerAutoSave();
+    }
 }
-document.addEventListener('keydown',e=>{
-    if(e.key!=='ArrowDown'&&e.key!=='ArrowUp') return;
-    const a=document.activeElement;
-    if(!a||!a.classList.contains('num-input')) return;
-    e.preventDefault();
-    const next=navGrid.find(n=>n.col===+a.dataset.col&&n.row===+a.dataset.row+(e.key==='ArrowDown'?1:-1)&&n.tbody===a.closest('tbody'));
-    if(next){next.el.focus();next.el.select();}
-});
 
 function updateSummary(){
-    let stockIn=0,sold=0,remaining=0;
-    masterRecords.forEach(r=>{stockIn+=r.stockIn*r.price;sold+=calcSold(r)*r.price;remaining+=r.remaining*r.price;});
-    const expTotal=expenses.reduce((s,e)=>s+parseFloat(e.amount||0),0);
-    const seTotal =stockEntries.reduce((s,e)=>s+parseFloat(e.total_cost||0),0);
-    const net=sold-expTotal-seTotal;
-    document.getElementById('sumStockIn').textContent=peso(stockIn);
-    document.getElementById('sumSupplierCost').textContent=peso(seTotal);
-    document.getElementById('sumSold').textContent=peso(sold);
-    document.getElementById('sumRemaining').textContent=peso(remaining);
-    document.getElementById('sumExpenses').textContent=peso(expTotal);
-    const netEl=document.getElementById('sumNet');
-    netEl.textContent=peso(net);
-    netEl.className='sum-val '+(net>=0?'green':'red');
+    let stockIn=0, sold=0, remaining=0;
+    masterRecords.forEach(r=>{
+        stockIn += r.stockIn * r.price;
+        sold    += calcSold(r) * r.price;
+        remaining += r.remaining * r.price;
+    });
+    const expTotal = expenses.reduce((s,e)=>s+parseFloat(e.amount||0),0);
+    const seTotal  = stockEntries.reduce((s,e)=>s+parseFloat(e.total_cost||0),0);
+    const net = sold - expTotal - seTotal;
+    document.getElementById('sumStockIn').textContent = peso(stockIn);
+    document.getElementById('sumSupplierCost').textContent = peso(seTotal);
+    document.getElementById('sumSold').textContent = peso(sold);
+    document.getElementById('sumRemaining').textContent = peso(remaining);
+    document.getElementById('sumExpenses').textContent = peso(expTotal);
+    const netEl = document.getElementById('sumNet');
+    netEl.textContent = peso(net);
+    netEl.className = 'sum-val '+(net>=0?'green':'red');
+    // Also update the table totals rows
+    const sections = ['chickenBody', 'frozenBody'];
+    sections.forEach(bodyId => {
+        const tbody = document.getElementById(bodyId);
+        if(!tbody) return;
+        const rows = Array.from(tbody.querySelectorAll('tr:not(.total-row)'));
+        let totalSold = 0, totalVal = 0;
+        rows.forEach(row => {
+            const id = parseInt(row.dataset.productId);
+            if(id){
+                const rec = masterRecords.find(r=>r.id===id);
+                if(rec){
+                    const sold = calcSold(rec);
+                    totalSold += sold;
+                    totalVal  += sold * rec.price;
+                }
+            }
+        });
+        const totalRow = tbody.querySelector('.total-row');
+        if(totalRow){
+            const cells = totalRow.querySelectorAll('td');
+            if(cells.length >= 2){
+                cells[cells.length-2].textContent = totalSold;
+                cells[cells.length-1].textContent = peso(totalVal);
+            }
+        }
+    });
 }
 
+// Stock entries & expenses (unchanged from original except minor fixes)
 async function loadStockEntries(date){
-    try{const r=await fetch(`${API}?stock_entries=${date}`);const d=await r.json();stockEntries=d.stock_entries||[];}
-    catch{stockEntries=[];}
+    try{const r=await fetch(`${API}?stock_entries=${date}`);const d=await r.json();stockEntries=d.stock_entries||[];} catch{stockEntries=[];}
     renderStockEntries();
 }
 function renderStockEntries(){
@@ -811,23 +730,28 @@ function renderStockEntries(){
         </div>`).join('');
 }
 document.getElementById('addSeBtn').addEventListener('click',async()=>{
-    const date=document.getElementById('recordDate').value;
-    const pid =document.getElementById('seProduct').value;
-    const sid =document.getElementById('seSupplier').value;
-    const qty =parseInt(document.getElementById('seQty').value)||0;
-    const cost=parseFloat(document.getElementById('seCost').value)||0;
-    const notes=document.getElementById('seNotes').value;
-    if(!date) return alert2('Please load a date first.',true);
-    if(!pid)  return alert2('Select a product.',true);
-    if(!sid)  return alert2('Select a supplier.',true);
+    const date  = document.getElementById('recordDate').value;
+    const pid   = document.getElementById('seProduct').value;
+    const sid   = document.getElementById('seSupplier').value;
+    const qty   = parseInt(document.getElementById('seQty').value)||0;
+    const cost  = parseFloat(document.getElementById('seCost').value)||0;
+    const notes = document.getElementById('seNotes').value;
+    if(!date)  return alert2('Please load a date first.',true);
+    if(!pid)   return alert2('Select a product.',true);
+    if(!sid)   return alert2('Select a supplier.',true);
     if(qty<=0) return alert2('Qty must be greater than 0.',true);
-    const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({save_stock_entry:1,entry_date:date,product_id:pid,supplier_id:sid,qty,cost_price:cost,notes})});
-    const data=await res.json();
-    if(data.success){
-        document.getElementById('seQty').value='';document.getElementById('seCost').value='';document.getElementById('seNotes').value='';
-        await loadStockEntries(date);alert2('Stock entry saved!');
-    }else alert2('Failed to save stock entry.',true);
+    try{
+        const res  = await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({save_stock_entry:1,entry_date:date,product_id:pid,supplier_id:sid,qty,cost_price:cost,notes})});
+        const data = await res.json();
+        if(data.success){
+            document.getElementById('seQty').value='';
+            document.getElementById('seCost').value='';
+            document.getElementById('seNotes').value='';
+            await loadStockEntries(date);
+            alert2('Stock entry saved!');
+        } else { alert2('Failed to save stock entry: '+(data.error||'Unknown error'),true); }
+    } catch(e) { alert2('Network error. Check the server connection.',true); }
 });
 async function delStockEntry(id){
     modal('Delete this stock entry?',async()=>{
@@ -837,10 +761,8 @@ async function delStockEntry(id){
         else alert2('Failed to delete.',true);
     },null,'🗑️','Delete','Cancel');
 }
-
 async function loadExpenses(date){
-    try{const r=await fetch(`${API}?expenses=${date}`);const d=await r.json();expenses=d.expenses||[];}
-    catch{expenses=[];}
+    try{const r=await fetch(`${API}?expenses=${date}`);const d=await r.json();expenses=d.expenses||[];} catch{expenses=[];}
     renderExpenses();
 }
 function renderExpenses(){
@@ -863,8 +785,8 @@ document.getElementById('addExpBtn').addEventListener('click',async()=>{
     const cat=document.getElementById('expCat').value;
     const desc=document.getElementById('expDesc').value.trim();
     const amount=parseFloat(document.getElementById('expAmount').value);
-    if(!date)          return alert2('Please load a date first.',true);
-    if(!desc)          return alert2('Please enter a description.',true);
+    if(!date) return alert2('Please load a date first.',true);
+    if(!desc) return alert2('Please enter a description.',true);
     if(!amount||amount<=0) return alert2('Please enter a valid amount.',true);
     const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({save_expense:1,expense_date:date,category:cat,description:desc,amount})});
@@ -884,6 +806,7 @@ async function delExpense(id){
     },null,'🗑️','Delete','Cancel');
 }
 
+// Event listeners for date, load, save, reset, print, logout
 document.getElementById('recordDate').addEventListener('change',async()=>{
     const d=document.getElementById('recordDate').value;
     localStorage.setItem('janeth_date',d);
@@ -894,43 +817,40 @@ document.getElementById('loadBtn').addEventListener('click',async()=>{
     if(!d) return alert2('Please select a date.',true);
     await loadDate(d,false);
 });
-
-// BUG FIX: manual save — show success/error based on doSave() return value, not unconditionally
 document.getElementById('manualSaveBtn').addEventListener('click',async()=>{
     const date=document.getElementById('recordDate').value;
     if(!date) return alert2('Please select a date first.',true);
     const ok=await doSave();
     if(ok) alert2('Data saved successfully!');
-    else   alert2('Failed to save. Please try again.',true);
+    else alert2('Failed to save. Please try again.',true);
 });
-
 document.getElementById('resetBtn').addEventListener('click',()=>{
     modal('Clear all entries? Unsaved changes will be lost.',async()=>{
         const d=document.getElementById('recordDate').value;
         const prev=await fetchPrev(d);
-        masterRecords=masterProducts.map(p=>({...p,price:parseFloat(p.price)||0,yesterday:0,stockIn:0,remaining:0,yesterdayFromPrev:false}));
-        if(prev)applyPrev(prev);
-        setStatus('empty');renderSections();alert2('Form reset.');
+        masterRecords=masterProducts.map(p=>({...p,yesterday:0,stockIn:0,remaining:0,yesterdayFromPrev:false}));
+        if(prev) applyPrev(prev);
+        setStatus('empty'); renderSections(); alert2('Form reset.');
     },null,'⚠️','Reset','Cancel');
 });
-
 document.getElementById('printNavBtn').addEventListener('click',()=>{
     if(!document.getElementById('recordDate').value) return alert2('Please select a date first.',true);
     window.print();
 });
-
 document.getElementById('logoutBtn').addEventListener('click',()=>{
     modal('Are you sure you want to sign out? Any unsaved changes will be lost.',
         ()=>{ window.location.href='logout.php'; },
         null,'👋','Yes, sign out','Stay');
 });
-
-document.getElementById('searchInput').addEventListener('input',renderSections);
-document.getElementById('catFilter').addEventListener('change',renderSections);
+document.getElementById('searchInput').addEventListener('input', renderSections);
+document.getElementById('catFilter').addEventListener('change', renderSections);
 
 function esc(s){return String(s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));}
 
 fetchAllProducts();
 </script>
+
+<!-- theme.js must be loaded after DOM is ready -->
+<script src="../public/assets/js/theme.js"></script>
 </body>
 </html>

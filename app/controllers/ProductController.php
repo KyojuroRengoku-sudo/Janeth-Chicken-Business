@@ -1,12 +1,13 @@
 <?php
+/**
+ * app/controllers/ProductController.php
+ * Handles all inventory API requests (GET + POST).
+ */
+
 namespace App\Controllers;
 
 use App\Models\Product;
 
-/**
- * ProductController – handles all GET/POST requests to the inventory API.
- * Replaces the old janeth.php monolith.
- */
 class ProductController
 {
     private Product $product;
@@ -16,220 +17,228 @@ class ProductController
         $this->product = new Product();
     }
 
-    // ── Router ────────────────────────────────────────────────────────────
-
     public function handle(): void
     {
         $method = $_SERVER['REQUEST_METHOD'];
 
-        if ($method === 'OPTIONS') exit(0);
-        if ($method === 'GET')    $this->handleGet();
-        if ($method === 'POST')   $this->handlePost();
-
-        send(['error' => 'Method not allowed'], 405);
+        if ($method === 'GET') {
+            $this->handleGet();
+        } elseif ($method === 'POST') {
+            $body = json_decode(file_get_contents('php://input'), true) ?? [];
+            $this->handlePost($body);
+        } else {
+            send(['error' => 'Method not allowed'], 405);
+        }
     }
 
-    // ── GET ───────────────────────────────────────────────────────────────
+    // ── GET ───────────────────────────────────────────────────────────────────
 
     private function handleGet(): void
     {
+        // ?products=1&page=input|dashboard|all
         if (isset($_GET['products'])) {
-            send(['products' => $this->product->all($_GET['page'] ?? 'all')]);
+            $page = $_GET['page'] ?? 'all';
+            $products = $this->product->getProducts($page);
+            send(['products' => $products]);
+            return;
         }
 
-        if (isset($_GET['deleted_products'])) {
-            send(['products' => $this->product->deleted()]);
-        }
-
+        // ?suppliers=1  ← REQUIRED for stock-entry dropdown
         if (isset($_GET['suppliers'])) {
-            send(['suppliers' => $this->product->allSuppliers()]);
+            $suppliers = $this->product->getSuppliers();
+            send(['suppliers' => $suppliers]);
+            return;
         }
 
-        if (isset($_GET['list_dates'])) {
-            send(['dates' => $this->product->distinctDates()]);
-        }
-
-        if (isset($_GET['date'])) {
-            $date = $_GET['date'];
-            if (!validDate($date)) send(['error' => 'Invalid date format'], 400);
-            $forPage = $_GET['for'] ?? 'input';
-            send([
-                'records'       => $this->product->recordsForDate($date, $forPage),
-                'stock_entries' => $this->product->stockEntriesForDate($date),
-            ]);
-        }
-
+        // ?stock_entries=YYYY-MM-DD  ← REQUIRED for stock entry list
         if (isset($_GET['stock_entries'])) {
-            $date = $_GET['stock_entries'];
-            if (!validDate($date)) send(['error' => 'Invalid date format'], 400);
-            send(['stock_entries' => $this->product->stockEntriesForDate($date)]);
+            $date = validDate($_GET['stock_entries']);
+            if (!$date) { send(['error' => 'Invalid date'], 400); return; }
+            $entries = $this->product->getStockEntries($date);
+            send(['stock_entries' => $entries]);
+            return;
         }
 
+        // ?date=YYYY-MM-DD&for=input|dashboard
+        if (isset($_GET['date'])) {
+            $date = validDate($_GET['date']);
+            if (!$date) { send(['error' => 'Invalid date'], 400); return; }
+            $for  = $_GET['for'] ?? 'input';
+            $records = $this->product->getRecords($date, $for);
+            send(['records' => $records, 'date' => $date]);
+            return;
+        }
+
+        // ?expenses=YYYY-MM-DD
         if (isset($_GET['expenses'])) {
-            $date = $_GET['expenses'];
-            if (!validDate($date)) send(['error' => 'Invalid date format'], 400);
-            send(['expenses' => $this->product->expensesForDate($date)]);
+            $date = validDate($_GET['expenses']);
+            if (!$date) { send(['error' => 'Invalid date'], 400); return; }
+            $expenses = $this->product->getExpenses($date);
+            send(['expenses' => $expenses]);
+            return;
         }
 
+        // ?liquidation=YYYY-MM-DD
         if (isset($_GET['liquidation'])) {
-            $date = $_GET['liquidation'];
-            if (!validDate($date)) send(['error' => 'Invalid date format'], 400);
-            $liq = $this->product->liquidationForDate($date);
-            send(['liquidation' => $liq ?: null]);
+            $date = validDate($_GET['liquidation']);
+            if (!$date) { send(['error' => 'Invalid date'], 400); return; }
+            $data = $this->product->getLiquidation($date);
+            send($data);
+            return;
         }
 
+        // ?analytics=1&from=YYYY-MM-DD&to=YYYY-MM-DD
         if (isset($_GET['analytics'])) {
-            $from = $_GET['from'] ?? date('Y-m-01');
-            $to   = $_GET['to']   ?? date('Y-m-d');
-            if (!validDate($from) || !validDate($to)) send(['error' => 'Invalid date range'], 400);
-            send($this->product->analytics($from, $to));
+            $from = validDate($_GET['from'] ?? '');
+            $to   = validDate($_GET['to']   ?? '');
+            if (!$from || !$to) { send(['error' => 'Invalid date range'], 400); return; }
+            $data = $this->product->getAnalytics($from, $to);
+            send($data);
+            return;
         }
 
-        send(['error' => 'Missing parameters'], 400);
+        send(['error' => 'Unknown GET request'], 400);
     }
 
-    // ── POST ──────────────────────────────────────────────────────────────
+    // ── POST ──────────────────────────────────────────────────────────────────
 
-    private function handlePost(): void
+    private function handlePost(array $body): void
     {
-        $input = json_decode(file_get_contents('php://input'), true);
-
-        // Save inventory records
-        if (isset($input['date'], $input['records'])) {
-            $date = $input['date'];
-            if (!validDate($date)) send(['error' => 'Invalid date format'], 400);
-            try {
-                $this->product->saveRecords($date, $input['records']);
-                send(['success' => true, 'message' => "Saved for $date"]);
-            } catch (\Exception $e) {
-                send(['error' => $e->getMessage()], 500);
+        // Save daily inventory records
+        if (isset($body['records'])) {
+            $date    = validDate($body['date'] ?? '');
+            $records = $body['records'] ?? [];
+            if (!$date || !is_array($records)) {
+                send(['success' => false, 'error' => 'Invalid payload: date or records missing']);
+                return;
             }
+            try {
+                $ok = $this->product->saveRecords($date, $records);
+                send(['success' => $ok]);
+            } catch (\PDOException $e) {
+                error_log("saveRecords PDO error: " . $e->getMessage());
+                send(['success' => false, 'error' => 'Database error: ' . $e->getMessage()]);
+            } catch (\Exception $e) {
+                error_log("saveRecords general error: " . $e->getMessage());
+                send(['success' => false, 'error' => 'Server error: ' . $e->getMessage()]);
+            }
+            return;
         }
 
-        // Save stock entry
-        if (isset($input['save_stock_entry'])) {
-            $date       = $input['entry_date']  ?? '';
-            $productId  = (int)($input['product_id']  ?? 0);
-            $supplierId = (int)($input['supplier_id'] ?? 1);
-            $qty        = (int)($input['qty']         ?? 0);
-            $costPrice  = (float)($input['cost_price']?? 0);
-            $notes      = trim($input['notes'] ?? '');
+        // ── Stock entries ──────────────────────────────────────────────────
 
-            if (!validDate($date))    send(['error' => 'Invalid date'], 400);
-            if ($productId  <= 0)     send(['error' => 'Product required'], 400);
-            if ($supplierId <= 0)     send(['error' => 'Supplier required'], 400);
-            if ($qty <= 0)            send(['error' => 'Qty must be > 0'], 400);
-            if ($costPrice < 0)       send(['error' => 'Cost price cannot be negative'], 400);
+        // Save stock entry (supplier pickup)
+        if (isset($body['save_stock_entry'])) {
+            $date       = validDate($body['entry_date'] ?? '');
+            $product_id = (int)($body['product_id']  ?? 0);
+            $supplier_id= (int)($body['supplier_id'] ?? 0);
+            $qty        = (int)($body['qty']          ?? 0);
+            $cost_price = (float)($body['cost_price'] ?? 0);
+            $notes      = trim($body['notes']         ?? '');
 
-            $id = $this->product->saveStockEntry($date, $productId, $supplierId, $qty, $costPrice, $notes);
-            send(['success' => true, 'id' => $id]);
+            if (!$date || !$product_id || !$supplier_id || $qty <= 0) {
+                send(['success' => false, 'error' => 'Missing or invalid fields']);
+                return;
+            }
+
+            $id = $this->product->saveStockEntry($date, $product_id, $supplier_id, $qty, $cost_price, $notes);
+            send(['success' => (bool)$id, 'id' => $id]);
+            return;
         }
 
         // Delete stock entry
-        if (isset($input['delete_stock_entry'])) {
-            $this->product->deleteStockEntry((int)$input['delete_stock_entry']);
-            send(['success' => true]);
+        if (isset($body['delete_stock_entry'])) {
+            $id = (int)$body['delete_stock_entry'];
+            $ok = $this->product->deleteStockEntry($id);
+            send(['success' => $ok]);
+            return;
         }
 
+        // ── Expenses ───────────────────────────────────────────────────────
+
         // Save expense
-        if (isset($input['save_expense'])) {
-            $date   = $input['expense_date']  ?? '';
-            $cat    = trim($input['category']    ?? 'General');
-            $desc   = trim($input['description'] ?? '');
-            $amount = (float)($input['amount'] ?? 0);
+        if (isset($body['save_expense'])) {
+            $date        = validDate($body['expense_date'] ?? '');
+            $category    = trim($body['category']    ?? 'Other');
+            $description = trim($body['description'] ?? '');
+            $amount      = (float)($body['amount']   ?? 0);
 
-            if (!validDate($date)) send(['error' => 'Invalid date'], 400);
-            if (empty($desc))      send(['error' => 'Description required'], 400);
-            if ($amount <= 0)      send(['error' => 'Amount must be > 0'], 400);
+            if (!$date || !$description || $amount <= 0) {
+                send(['success' => false, 'error' => 'Missing fields']);
+                return;
+            }
 
-            $id = $this->product->saveExpense($date, $cat, $desc, $amount);
-            send(['success' => true, 'id' => $id]);
+            $id = $this->product->saveExpense($date, $category, $description, $amount);
+            send(['success' => (bool)$id, 'id' => $id]);
+            return;
         }
 
         // Delete expense
-        if (isset($input['delete_expense'])) {
-            $this->product->deleteExpense((int)$input['delete_expense']);
-            send(['success' => true]);
+        if (isset($body['delete_expense'])) {
+            $id = (int)$body['delete_expense'];
+            $ok = $this->product->deleteExpense($id);
+            send(['success' => $ok]);
+            return;
         }
 
-        // Save liquidation
-        if (isset($input['save_liquidation'])) {
-            $date = $input['liquidation_date'] ?? '';
-            if (!validDate($date)) send(['error' => 'Invalid date'], 400);
-            $this->product->saveLiquidation(
-                $date,
-                (float)($input['opening_cash']   ?? 0),
-                (float)($input['cash_sales']     ?? 0),
-                (float)($input['total_expenses'] ?? 0),
-                (float)($input['stock_cost']     ?? 0),
-                (float)($input['actual_cash']    ?? 0),
-                trim($input['notes'] ?? '')
-            );
-            send(['success' => true]);
+        // ── Liquidation (fully extended with JSON) ───────────────────────────
+
+        if (isset($body['save_liquidation'])) {
+            $date = validDate($body['date'] ?? '');
+            if (!$date) {
+                send(['success' => false, 'error' => 'Invalid or missing date']);
+                return;
+            }
+
+            // Basic fields (already present in liquidations table)
+            $openingCash = (float)($body['opening_cash'] ?? 0);
+            $cashSales   = (float)($body['cash_sales'] ?? 0);
+            $totalExpenses= (float)($body['total_expenses'] ?? 0);
+            $stockCost   = (float)($body['stock_cost'] ?? 0);
+            $actualCash  = (float)($body['actual_cash'] ?? 0);
+            $notes       = trim($body['notes'] ?? '');
+
+            // Extended fields (to be stored in JSON column `extra_data`)
+            $extra = [
+                'cash_bills'       => (float)($body['cash_bills'] ?? 0),
+                'cash_coins'       => (float)($body['cash_coins'] ?? 0),
+                'cash_ice'         => (float)($body['cash_ice'] ?? 0),
+                'cash_ticket'      => (float)($body['cash_ticket'] ?? 0),
+                'cash_suga'        => (float)($body['cash_suga'] ?? 0),
+                'cash_plastic'     => (float)($body['cash_plastic'] ?? 0),
+                'cash_meal'        => (float)($body['cash_meal'] ?? 0),
+                'cash_plete'       => (float)($body['cash_plete'] ?? 0),
+                'cash_pu'          => (float)($body['cash_pu'] ?? 0),
+                'debts'            => $body['debts'] ?? [],
+                'payables'         => $body['payables'] ?? [],
+                'discounts'        => $body['discounts'] ?? [],
+                'supplier_return'  => (float)($body['supplier_return'] ?? 0),
+            ];
+
+            $ok = $this->product->saveLiquidationExtended($date, $openingCash, $cashSales, $totalExpenses, $stockCost, $actualCash, $notes, $extra);
+            send(['success' => $ok]);
+            return;
         }
 
-        // Update price
-        if (isset($input['update_price'])) {
-            $price = (float)$input['price'];
-            if ($price < 0) send(['error' => 'Price cannot be negative'], 400);
-            $this->product->updatePrice((int)$input['product_id'], $price);
-            send(['success' => true]);
+        // ── Product management (admin) ─────────────────────────────────────
+
+        if (isset($body['add_product'])) {
+            requireAuth('admin', true);
+            $id = $this->product->addProduct($body);
+            send(['success' => (bool)$id, 'id' => $id]);
+            return;
         }
 
-        // Update visibility
-        if (isset($input['update_visibility'])) {
-            $id      = (int)$input['product_id'];
-            $visIn   = isset($input['visible_input'])     ? (int)(bool)$input['visible_input']     : null;
-            $visDash = isset($input['visible_dashboard']) ? (int)(bool)$input['visible_dashboard'] : null;
-            $this->product->updateVisibility($id, $visIn, $visDash);
-            send(['success' => true]);
+        // Update product visibility (chooser panel)
+        if (isset($body['update_visibility'])) {
+            $product_id       = (int)$body['product_id'];
+            $visible_input    = (int)($body['visible_input']     ?? 0);
+            $visible_dashboard= (int)($body['visible_dashboard'] ?? 0);
+            $ok = $this->product->updateVisibility($product_id, $visible_input, $visible_dashboard);
+            send(['success' => $ok]);
+            return;
         }
 
-        // Soft-delete product
-        if (isset($input['delete_product'])) {
-            $this->product->softDelete((int)$input['delete_product']);
-            send(['success' => true]);
-        }
-
-        // Restore product
-        if (isset($input['restore_product'])) {
-            $this->product->restore((int)$input['restore_product']);
-            send(['success' => true]);
-        }
-
-        // Add product
-        if (isset($input['add_product'])) {
-            $name      = trim($input['name']      ?? '');
-            $category  = $input['category']       ?? 'Chicken';
-            $price     = (float)($input['price']  ?? 0);
-            $threshold = (int)($input['threshold']?? 10);
-            if (empty($name)) send(['error' => 'Name required'], 400);
-            if ($price < 0)   send(['error' => 'Price cannot be negative'], 400);
-            if ($this->product->nameExists($name)) send(['error' => 'Product with this name already exists'], 409);
-            $id = $this->product->create($name, $category, $price, $threshold);
-            send(['success' => true, 'id' => $id]);
-        }
-
-        // Update product
-        if (isset($input['update_product'])) {
-            $id = (int)$input['product_id'];
-            $name = trim($input['name'] ?? '');
-            if (empty($name)) send(['error' => 'Name required'], 400);
-            $this->product->update($id, $name, $input['category'] ?? 'Chicken',
-                (float)($input['price'] ?? 0), (int)($input['threshold'] ?? 10));
-            send(['success' => true]);
-        }
-
-        // Save supplier
-        if (isset($input['save_supplier'])) {
-            $id   = (int)($input['id'] ?? 0);
-            $name = trim($input['name'] ?? '');
-            if (empty($name)) send(['error' => 'Supplier name required'], 400);
-            $newId = $this->product->saveSupplier($id, $name,
-                trim($input['contact'] ?? ''), trim($input['notes'] ?? ''));
-            send(['success' => true, 'id' => $newId]);
-        }
-
-        send(['error' => 'Invalid payload'], 400);
+        send(['error' => 'Unknown POST action'], 400);
     }
 }
