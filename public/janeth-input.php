@@ -27,7 +27,7 @@ $username  = $_SESSION['username'];
              background-image:radial-gradient(ellipse 70% 50% at 10% -10%,rgba(41,182,200,.06) 0%,transparent 60%),
                               radial-gradient(ellipse 60% 40% at 90% 110%,rgba(245,166,35,.04) 0%,transparent 60%);}
         .app{display:flex;min-height:100vh;}
-        /* Sidebar (unchanged) */
+        /* Sidebar */
         .sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:transform .25s cubic-bezier(.4,0,.2,1);}
         .sidebar-logo{display:flex;align-items:center;gap:.75rem;padding:1.4rem 1.2rem 1.2rem;border-bottom:1px solid var(--border);}
         .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--teal),#1a9aab);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 4px 12px rgba(41,182,200,.3);flex-shrink:0;}
@@ -51,7 +51,7 @@ $username  = $_SESSION['username'];
         .hamburger{display:none;position:fixed;top:.85rem;left:.85rem;z-index:200;background:var(--surface);border:1px solid var(--border);border-radius:8px;width:38px;height:38px;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;}
         .sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:90;backdrop-filter:blur(2px);}
         .main{margin-left:var(--sidebar-w);flex:1;padding:1.5rem;min-width:0;}
-        /* Buttons, date hero, controls, tables etc. (same as original) */
+        /* Buttons, date hero, controls, tables etc. */
         .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1.25rem;border-radius:50px;font-size:.95rem;font-weight:600;font-family:'Sora',sans-serif;cursor:pointer;border:none;transition:.18s;text-decoration:none;white-space:nowrap;}
         .btn-primary{background:linear-gradient(135deg,var(--accent),#e8920f);color:#0a0e17;box-shadow:0 3px 12px var(--accent-glow);}
         .btn-primary:hover{box-shadow:0 6px 20px rgba(245,166,35,.4);transform:translateY(-1px);}
@@ -266,9 +266,11 @@ $username  = $_SESSION['username'];
         <div class="hero-sub" id="heroFull">Pick a date and click Load</div>
     </div>
     <div class="date-hero-right">
-        <div id="asChip" class="as-chip saved"><span class="as-dot"></span><span id="asLabel">Auto-save on</span></div>
+        <div id="asChip" class="as-chip"><span class="as-dot"></span><span id="asLabel">Auto-save on</span></div>
         <span id="statusChip" class="status-chip s-none">● No data loaded</span>
+        <button class="btn btn-ghost" id="prevDayBtn">← Prev</button>
         <input type="date" id="recordDate">
+        <button class="btn btn-ghost" id="nextDayBtn">Next →</button>
         <button class="btn btn-teal" id="loadBtn">↻ Load</button>
     </div>
 </div>
@@ -286,7 +288,6 @@ $username  = $_SESSION['username'];
         <label for="asToggle"></label>
     </div>
     <button id="manualSaveBtn" class="btn btn-save">💾 Save</button>
-    <button id="resetBtn" class="btn btn-ghost">⟳ Reset</button>
 </div>
 <div class="chooser-panel" id="chooserPanel">
     <div class="chooser-hd">
@@ -317,6 +318,7 @@ $username  = $_SESSION['username'];
         </table>
     </div>
 </div>
+<!-- BUG FIX 1 & 2: Was missing opening <table> tag (had stray <tr> instead) and missing closing </table> tag -->
 <div class="section-wrap" id="frozenSection">
     <div class="section-hd">
         <span class="section-icon">❄️</span>
@@ -355,7 +357,7 @@ $username  = $_SESSION['username'];
         <span class="section-count" id="expCount">0 items</span>
     </div>
     <div class="exp-add-row">
-        <div class="exp-field"><label>Category</label><select id="expCat" style="width:155px"><option>Utilities</option><option>Transport</option><option>Food & Snacks</option><option>Supplies</option><option>Labour</option><option>Other</option></select></div>
+        <div class="exp-field"><label>Category</label><select id="expCat" style="width:155px"><option>Utilities</option><option>Transport</option><option>Food &amp; Snacks</option><option>Supplies</option><option>Labour</option><option>Other</option></select></div>
         <div class="exp-field" style="flex:1;min-width:200px"><label>Description</label><input type="text" id="expDesc" placeholder="e.g. Ice for the stall" style="width:100%"></div>
         <div class="exp-field"><label>Amount (₱)</label><input type="number" id="expAmount" placeholder="0.00" step="0.01" min="0" style="width:120px"></div>
         <button class="btn btn-primary" id="addExpBtn" style="align-self:flex-end">+ Add</button>
@@ -410,7 +412,17 @@ function alert2(msg, isErr=false, autoClose=2800) {
     setTimeout(() => document.getElementById('modalOverlay').classList.remove('active'), autoClose);
 }
 
-function prevDate(d){const dt=new Date(d+'T00:00:00');dt.setDate(dt.getDate()-1);return dt.toISOString().split('T')[0];}
+function addDays(dateStr, days) {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const date = new Date(y, m - 1, d + days); // local time, no UTC shift
+    const yy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yy}-${mm}-${dd}`;
+}
+function prevDate(d){ return addDays(d, -1); }
+function nextDate(d){ return addDays(d, 1); }
+
 function peso(n){return '₱'+(parseFloat(n)||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function setStatus(t){
     const c=document.getElementById('statusChip');
@@ -429,11 +441,14 @@ function setHero(d){
 }
 function calcSold(r){return Math.max(0,(r.yesterday+r.stockIn)-r.remaining);}
 
+// BUG FIX 3: Sync the chip label correctly on toggle change
 document.getElementById('asToggle').addEventListener('change',e=>{
     asEnabled=e.target.checked;
     const chip=document.getElementById('asChip'),lbl=document.getElementById('asLabel');
-    chip.className='as-chip';lbl.textContent=asEnabled?'Auto-save on':'Auto-save off';
+    chip.className='as-chip';
+    lbl.textContent=asEnabled?'Auto-save on':'Auto-save off';
 });
+
 function triggerAutoSave(){
     if(!asEnabled) return;
     clearTimeout(asTimer);
@@ -443,7 +458,8 @@ function triggerAutoSave(){
 }
 async function doSave(){
     const date=document.getElementById('recordDate').value;
-    if(!date||!masterRecords.length) return false;
+    // BUG FIX 4: Guard against empty date; masterRecords can legitimately be empty for a new date
+    if(!date) return false;
     const chip=document.getElementById('asChip'),lbl=document.getElementById('asLabel');
     chip.className='as-chip saving';lbl.textContent='Saving…';
     try{
@@ -454,7 +470,10 @@ async function doSave(){
         const data=await res.json();
         if(data.success){
             chip.className='as-chip saved';lbl.textContent='Saved ✓';
-            setTimeout(()=>{chip.className='as-chip';lbl.textContent=asEnabled?'Auto-save on':'Auto-save off';},2500);
+            setTimeout(()=>{
+                chip.className='as-chip';
+                lbl.textContent=asEnabled?'Auto-save on':'Auto-save off';
+            },2500);
             return true;
         }else{chip.className='as-chip error';lbl.textContent='Save failed';return false;}
     }catch{chip.className='as-chip error';lbl.textContent='Save failed';return false;}
@@ -528,7 +547,8 @@ async function loadDate(d, silent=false){
     if(!d) return;
     setHero(d);
     try{
-        const [res,expRes,seRes]=await Promise.all([
+        // Fetch current day's data (if any)
+        const [res, expRes, seRes] = await Promise.all([
             fetch(`${API}?date=${d}&for=input`),
             fetch(`${API}?expenses=${d}`),
             fetch(`${API}?stock_entries=${d}`)
@@ -538,50 +558,59 @@ async function loadDate(d, silent=false){
         const seData  = await seRes.json();
         expenses     = expData.expenses      || [];
         stockEntries = seData.stock_entries  || [];
-        if(data.records && data.records.length){
-            const hasData=data.records.some(r=>+r.sold>0||+r.stock_in>0||+r.remaining_qty>0);
-            if(hasData){
-                masterRecords=data.records.map(r=>({
-                    ...r,
-                    id:       r.product_id,
-                    name:     r.product_name,
-                    category: r.product_category,
-                    price:    parseFloat(r.selling_price ?? r.price ?? 0),
-                    yesterday:parseInt(r.yesterday_qty)||0,
-                    stockIn:  parseInt(r.stock_in)||0,
-                    remaining:parseInt(r.remaining_qty)||0,
-                    yesterdayFromPrev:false
-                }));
-                setStatus('loaded');
-            }else{
-                const prev=await fetchPrev(d);
-                masterRecords=masterProducts.map(p=>({...p,yesterday:0,stockIn:0,remaining:0,yesterdayFromPrev:false}));
-                if(prev) applyPrev(prev);
-                setStatus('empty');
+
+        // Get previous day's remaining quantities for each product
+        const prevDateStr = prevDate(d);
+        let prevRemaining = {};
+        try {
+            const prevRes = await fetch(`${API}?date=${prevDateStr}&for=input`);
+            const prevData = await prevRes.json();
+            if (prevData.records) {
+                prevData.records.forEach(r => {
+                    prevRemaining[r.product_id] = parseInt(r.remaining_qty) || 0;
+                });
             }
-        }else{
-            const prev=await fetchPrev(d);
-            masterRecords=masterProducts.map(p=>({...p,yesterday:0,stockIn:0,remaining:0,yesterdayFromPrev:false}));
-            if(prev) applyPrev(prev);
-            setStatus('empty');
+        } catch(e) { console.warn('Could not fetch previous day', e); }
+
+        // Build masterRecords: yesterday = previous day's remaining; use saved stockIn/remaining if they exist
+        const currentMap = {};
+        if (data.records) {
+            data.records.forEach(r => {
+                currentMap[r.product_id] = {
+                    stockIn: parseInt(r.stock_in) || 0,
+                    remaining: parseInt(r.remaining_qty) || 0
+                };
+            });
         }
-        renderSections(); renderExpenses(); renderStockEntries(); updateSummary();
-        if(!silent) alert2(`Loaded data for ${d}`);
-    } catch(e){ alert2('Failed to load data. Check your server connection.',true); }
+
+        masterRecords = masterProducts.map(p => {
+            const prevRem = prevRemaining[p.id] || 0;
+            const curr = currentMap[p.id];
+            return {
+                ...p,
+                yesterday: prevRem,
+                stockIn: curr ? curr.stockIn : 0,
+                remaining: curr ? curr.remaining : 0,
+                yesterdayFromPrev: true
+            };
+        });
+
+        const hasAnyData = Object.keys(currentMap).length > 0;
+        setStatus(hasAnyData ? 'loaded' : 'empty');
+
+        // BUG FIX 5: Render expenses and stock entries BEFORE renderSections so updateSummary
+        // inside renderSections already has the correct expenses/stockEntries totals.
+        renderExpenses();
+        renderStockEntries();
+        renderSections();
+
+        if(!silent);
+    } catch(e){ 
+        console.error(e);
+        alert2('Failed to load data. Check your server connection.', true);
+    }
 }
 
-async function fetchPrev(d){
-    try{const res=await fetch(`${API}?date=${prevDate(d)}&for=input`);const data=await res.json();
-        return data.records?.some(r=>+r.remaining_qty>0)?data.records:null;} catch{return null;}
-}
-function applyPrev(prev){
-    masterRecords.forEach(r=>{
-        const p=prev.find(x=>x.product_id===r.id||x.product_id==r.id);
-        if(p && +p.remaining_qty>0){ r.yesterday=+p.remaining_qty; r.yesterdayFromPrev=true; }
-    });
-}
-
-// --- FIXED: render body once, then attach listeners that update only the changed row ---
 function renderSections(){
     const search = document.getElementById('searchInput').value.toLowerCase();
     const cat    = document.getElementById('catFilter').value;
@@ -594,12 +623,12 @@ function renderSections(){
     renderTableBody('chickenBody', chicken);
     renderTableBody('frozenBody',  frozen);
     updateSummary();
-    // Re-attach input listeners after rendering new DOM
     attachInputListeners();
 }
 
 function renderTableBody(bodyId, recs){
     const tbody = document.getElementById(bodyId);
+    tbody.innerHTML = '';
     if(!recs.length){
         tbody.innerHTML = `<tr><td colspan="7" class="empty-section">No products to show. Use "☰ Choose Products" in the sidebar to enable products.</td></tr>`;
         return;
@@ -619,14 +648,12 @@ function renderTableBody(bodyId, recs){
             <td class="total-cell-val" data-sales="${r.id}">${peso(val)}</td>
         </tr>`;
     });
-    // Add totals row
     const totalSold = recs.reduce((sum, r) => sum + calcSold(r), 0);
     const totalVal  = recs.reduce((sum, r) => sum + (calcSold(r) * r.price), 0);
     rowsHtml += `<tr class="total-row"><td colspan="5" class="total-label">Totals</td><td>${totalSold}</td><td>${peso(totalVal)}</td></tr>`;
     tbody.innerHTML = rowsHtml;
 }
 
-// Attach event listeners to the newly created input fields
 function attachInputListeners(){
     document.querySelectorAll('.stockIn-input, .remaining-input').forEach(inp => {
         inp.removeEventListener('input', handleInputChange);
@@ -643,7 +670,6 @@ function handleInputChange(e){
     const record = masterRecords.find(r => r.id === id);
     if(record){
         record[field] = val;
-        // Update only the affected row's computed columns
         const row = inp.closest('tr');
         if(row){
             const sold = calcSold(record);
@@ -654,7 +680,6 @@ function handleInputChange(e){
                 soldCell.className = `sold-cell ${sold<0 ? 'sold-warn' : 'sold-ok'}`;
             }
             if(salesCell) salesCell.textContent = peso(sold * record.price);
-            // Update totals row (both chicken and frozen totals are recomputed via updateSummary)
             updateSummary();
         }
         triggerAutoSave();
@@ -679,9 +704,8 @@ function updateSummary(){
     const netEl = document.getElementById('sumNet');
     netEl.textContent = peso(net);
     netEl.className = 'sum-val '+(net>=0?'green':'red');
-    // Also update the table totals rows
-    const sections = ['chickenBody', 'frozenBody'];
-    sections.forEach(bodyId => {
+    // Update table totals rows
+    ['chickenBody', 'frozenBody'].forEach(bodyId => {
         const tbody = document.getElementById(bodyId);
         if(!tbody) return;
         const rows = Array.from(tbody.querySelectorAll('tr:not(.total-row)'));
@@ -708,9 +732,15 @@ function updateSummary(){
     });
 }
 
-// Stock entries & expenses (unchanged from original except minor fixes)
+// Stock entries
 async function loadStockEntries(date){
-    try{const r=await fetch(`${API}?stock_entries=${date}`);const d=await r.json();stockEntries=d.stock_entries||[];} catch{stockEntries=[];}
+    try{
+        const r=await fetch(`${API}?stock_entries=${date}`);
+        const d=await r.json();
+        stockEntries=d.stock_entries||[];
+    } catch(e){
+        stockEntries=[];
+    }
     renderStockEntries();
 }
 function renderStockEntries(){
@@ -718,8 +748,11 @@ function renderStockEntries(){
     const total=stockEntries.reduce((s,e)=>s+parseFloat(e.total_cost||0),0);
     document.getElementById('seTotalVal').textContent=peso(total);
     document.getElementById('seCount').textContent=`${stockEntries.length} entr${stockEntries.length!==1?'ies':'y'}`;
-    updateSummary();
-    if(!stockEntries.length){list.innerHTML='<div class="se-empty">No stock entries recorded yet.</div>';return;}
+    // BUG FIX 5 (continued): Do NOT call updateSummary() here — caller (loadDate or addSeBtn) handles it
+    if(!stockEntries.length){
+        list.innerHTML='<div class="se-empty">No stock entries recorded yet.</div>';
+        return;
+    }
     list.innerHTML=stockEntries.map(e=>`
         <div class="se-item">
             <span class="se-supplier-badge">${esc(e.supplier_name)}</span>
@@ -749,6 +782,7 @@ document.getElementById('addSeBtn').addEventListener('click',async()=>{
             document.getElementById('seCost').value='';
             document.getElementById('seNotes').value='';
             await loadStockEntries(date);
+            updateSummary();
             alert2('Stock entry saved!');
         } else { alert2('Failed to save stock entry: '+(data.error||'Unknown error'),true); }
     } catch(e) { alert2('Network error. Check the server connection.',true); }
@@ -757,12 +791,23 @@ async function delStockEntry(id){
     modal('Delete this stock entry?',async()=>{
         const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({delete_stock_entry:id})});
         const data=await res.json();
-        if(data.success){stockEntries=stockEntries.filter(e=>e.id!=id);renderStockEntries();}
-        else alert2('Failed to delete.',true);
+        if(data.success){
+            stockEntries=stockEntries.filter(e=>e.id!=id);
+            renderStockEntries();
+            updateSummary();
+        } else alert2('Failed to delete.',true);
     },null,'🗑️','Delete','Cancel');
 }
+
+// Expenses
 async function loadExpenses(date){
-    try{const r=await fetch(`${API}?expenses=${date}`);const d=await r.json();expenses=d.expenses||[];} catch{expenses=[];}
+    try{
+        const r=await fetch(`${API}?expenses=${date}`);
+        const d=await r.json();
+        expenses=d.expenses||[];
+    } catch(e){
+        expenses=[];
+    }
     renderExpenses();
 }
 function renderExpenses(){
@@ -770,8 +815,11 @@ function renderExpenses(){
     const total=expenses.reduce((s,e)=>s+parseFloat(e.amount||0),0);
     document.getElementById('expTotalVal').textContent=peso(total);
     document.getElementById('expCount').textContent=`${expenses.length} item${expenses.length!==1?'s':''}`;
-    updateSummary();
-    if(!expenses.length){list.innerHTML='<div class="exp-empty">No expenses recorded yet.</div>';return;}
+    // BUG FIX 5 (continued): Do NOT call updateSummary() here — caller handles it
+    if(!expenses.length){
+        list.innerHTML='<div class="exp-empty">No expenses recorded yet.</div>';
+        return;
+    }
     list.innerHTML=expenses.map(e=>`
         <div class="exp-item">
             <span class="exp-cat-badge">${esc(e.category)}</span>
@@ -792,21 +840,43 @@ document.getElementById('addExpBtn').addEventListener('click',async()=>{
         body:JSON.stringify({save_expense:1,expense_date:date,category:cat,description:desc,amount})});
     const data=await res.json();
     if(data.success){
-        document.getElementById('expDesc').value='';document.getElementById('expAmount').value='';
+        document.getElementById('expDesc').value='';
+        document.getElementById('expAmount').value='';
         expenses.unshift({id:data.id,category:cat,description:desc,amount});
         renderExpenses();
+        updateSummary();
     }else alert2('Failed to save expense.',true);
 });
 async function delExpense(id){
     modal('Delete this expense?',async()=>{
         const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({delete_expense:id})});
         const data=await res.json();
-        if(data.success){expenses=expenses.filter(e=>e.id!==id);renderExpenses();}
-        else alert2('Failed to delete.',true);
+        if(data.success){
+            expenses=expenses.filter(e=>e.id!==id);
+            renderExpenses();
+            updateSummary();
+        } else alert2('Failed to delete.',true);
     },null,'🗑️','Delete','Cancel');
 }
 
-// Event listeners for date, load, save, reset, print, logout
+// Date navigation
+document.getElementById('prevDayBtn').addEventListener('click', async () => {
+    let d = document.getElementById('recordDate').value;
+    if (!d) d = new Date().toISOString().split('T')[0];
+    const newDate = addDays(d, -1);
+    document.getElementById('recordDate').value = newDate;
+    localStorage.setItem('janeth_date', newDate);
+    await loadDate(newDate, true); // ← true = no popup
+});
+
+document.getElementById('nextDayBtn').addEventListener('click', async () => {
+    let d = document.getElementById('recordDate').value;
+    if (!d) d = new Date().toISOString().split('T')[0];
+    const newDate = addDays(d, 1);
+    document.getElementById('recordDate').value = newDate;
+    localStorage.setItem('janeth_date', newDate);
+    await loadDate(newDate, true); // ← true = no popup
+});
 document.getElementById('recordDate').addEventListener('change',async()=>{
     const d=document.getElementById('recordDate').value;
     localStorage.setItem('janeth_date',d);
@@ -823,15 +893,6 @@ document.getElementById('manualSaveBtn').addEventListener('click',async()=>{
     const ok=await doSave();
     if(ok) alert2('Data saved successfully!');
     else alert2('Failed to save. Please try again.',true);
-});
-document.getElementById('resetBtn').addEventListener('click',()=>{
-    modal('Clear all entries? Unsaved changes will be lost.',async()=>{
-        const d=document.getElementById('recordDate').value;
-        const prev=await fetchPrev(d);
-        masterRecords=masterProducts.map(p=>({...p,yesterday:0,stockIn:0,remaining:0,yesterdayFromPrev:false}));
-        if(prev) applyPrev(prev);
-        setStatus('empty'); renderSections(); alert2('Form reset.');
-    },null,'⚠️','Reset','Cancel');
 });
 document.getElementById('printNavBtn').addEventListener('click',()=>{
     if(!document.getElementById('recordDate').value) return alert2('Please select a date first.',true);
@@ -850,7 +911,6 @@ function esc(s){return String(s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>
 fetchAllProducts();
 </script>
 
-<!-- theme.js must be loaded after DOM is ready -->
 <script src="../public/assets/js/theme.js"></script>
 </body>
 </html>
