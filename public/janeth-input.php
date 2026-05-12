@@ -318,7 +318,6 @@ $username  = $_SESSION['username'];
         </table>
     </div>
 </div>
-<!-- BUG FIX 1 & 2: Was missing opening <table> tag (had stray <tr> instead) and missing closing </table> tag -->
 <div class="section-wrap" id="frozenSection">
     <div class="section-hd">
         <span class="section-icon">❄️</span>
@@ -414,7 +413,7 @@ function alert2(msg, isErr=false, autoClose=2800) {
 
 function addDays(dateStr, days) {
     const [y, m, d] = dateStr.split('-').map(Number);
-    const date = new Date(y, m - 1, d + days); // local time, no UTC shift
+    const date = new Date(y, m - 1, d + days);
     const yy = date.getFullYear();
     const mm = String(date.getMonth() + 1).padStart(2, '0');
     const dd = String(date.getDate()).padStart(2, '0');
@@ -441,7 +440,6 @@ function setHero(d){
 }
 function calcSold(r){return Math.max(0,(r.yesterday+r.stockIn)-r.remaining);}
 
-// BUG FIX 3: Sync the chip label correctly on toggle change
 document.getElementById('asToggle').addEventListener('change',e=>{
     asEnabled=e.target.checked;
     const chip=document.getElementById('asChip'),lbl=document.getElementById('asLabel');
@@ -458,7 +456,6 @@ function triggerAutoSave(){
 }
 async function doSave(){
     const date=document.getElementById('recordDate').value;
-    // BUG FIX 4: Guard against empty date; masterRecords can legitimately be empty for a new date
     if(!date) return false;
     const chip=document.getElementById('asChip'),lbl=document.getElementById('asLabel');
     chip.className='as-chip saving';lbl.textContent='Saving…';
@@ -489,8 +486,11 @@ async function fetchAllProducts(){
         const normalize = p => ({ ...p, price: parseFloat(p.selling_price ?? p.price ?? 0) });
         allProducts    = (allProd.products  || []).map(normalize);
         masterProducts = (visProd.products  || []).map(normalize);
+        // 🔹 SORT PRODUCTS BY ID (ascending)
+        masterProducts.sort((a, b) => a.id - b.id);
         suppliers      = sups.suppliers || [];
         if (!masterProducts.length && allProducts.length) masterProducts = [...allProducts];
+        if (!masterProducts.length && allProducts.length) masterProducts.sort((a, b) => a.id - b.id);
         buildChooser();
         buildSeDropdowns();
         masterRecords = masterProducts.map(p => ({ ...p, yesterday:0, stockIn:0, remaining:0, yesterdayFromPrev:false }));
@@ -547,7 +547,6 @@ async function loadDate(d, silent=false){
     if(!d) return;
     setHero(d);
     try{
-        // Fetch current day's data (if any)
         const [res, expRes, seRes] = await Promise.all([
             fetch(`${API}?date=${d}&for=input`),
             fetch(`${API}?expenses=${d}`),
@@ -559,7 +558,6 @@ async function loadDate(d, silent=false){
         expenses     = expData.expenses      || [];
         stockEntries = seData.stock_entries  || [];
 
-        // Get previous day's remaining quantities for each product
         const prevDateStr = prevDate(d);
         let prevRemaining = {};
         try {
@@ -572,7 +570,6 @@ async function loadDate(d, silent=false){
             }
         } catch(e) { console.warn('Could not fetch previous day', e); }
 
-        // Build masterRecords: yesterday = previous day's remaining; use saved stockIn/remaining if they exist
         const currentMap = {};
         if (data.records) {
             data.records.forEach(r => {
@@ -598,8 +595,6 @@ async function loadDate(d, silent=false){
         const hasAnyData = Object.keys(currentMap).length > 0;
         setStatus(hasAnyData ? 'loaded' : 'empty');
 
-        // BUG FIX 5: Render expenses and stock entries BEFORE renderSections so updateSummary
-        // inside renderSections already has the correct expenses/stockEntries totals.
         renderExpenses();
         renderStockEntries();
         renderSections();
@@ -748,7 +743,6 @@ function renderStockEntries(){
     const total=stockEntries.reduce((s,e)=>s+parseFloat(e.total_cost||0),0);
     document.getElementById('seTotalVal').textContent=peso(total);
     document.getElementById('seCount').textContent=`${stockEntries.length} entr${stockEntries.length!==1?'ies':'y'}`;
-    // BUG FIX 5 (continued): Do NOT call updateSummary() here — caller (loadDate or addSeBtn) handles it
     if(!stockEntries.length){
         list.innerHTML='<div class="se-empty">No stock entries recorded yet.</div>';
         return;
@@ -815,7 +809,6 @@ function renderExpenses(){
     const total=expenses.reduce((s,e)=>s+parseFloat(e.amount||0),0);
     document.getElementById('expTotalVal').textContent=peso(total);
     document.getElementById('expCount').textContent=`${expenses.length} item${expenses.length!==1?'s':''}`;
-    // BUG FIX 5 (continued): Do NOT call updateSummary() here — caller handles it
     if(!expenses.length){
         list.innerHTML='<div class="exp-empty">No expenses recorded yet.</div>';
         return;
@@ -866,7 +859,7 @@ document.getElementById('prevDayBtn').addEventListener('click', async () => {
     const newDate = addDays(d, -1);
     document.getElementById('recordDate').value = newDate;
     localStorage.setItem('janeth_date', newDate);
-    await loadDate(newDate, true); // ← true = no popup
+    await loadDate(newDate, true);
 });
 
 document.getElementById('nextDayBtn').addEventListener('click', async () => {
@@ -875,7 +868,7 @@ document.getElementById('nextDayBtn').addEventListener('click', async () => {
     const newDate = addDays(d, 1);
     document.getElementById('recordDate').value = newDate;
     localStorage.setItem('janeth_date', newDate);
-    await loadDate(newDate, true); // ← true = no popup
+    await loadDate(newDate, true);
 });
 document.getElementById('recordDate').addEventListener('change',async()=>{
     const d=document.getElementById('recordDate').value;

@@ -8,19 +8,32 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['add'])) {
     $category  = $_POST['category']       ?? 'Chicken';
     $price     = floatval($_POST['price'] ?? 0);
     $threshold = intval($_POST['threshold'] ?? 10);
+    $customId  = isset($_POST['custom_id']) ? intval($_POST['custom_id']) : 0;
 
     if (empty($name))   { echo json_encode(['success'=>false,'message'=>'Product name is required.']);  exit; }
     if ($price < 0)     { echo json_encode(['success'=>false,'message'=>'Price cannot be negative.']);  exit; }
     if ($threshold < 0) { echo json_encode(['success'=>false,'message'=>'Threshold cannot be negative.']); exit; }
 
+    // Check duplicate name
     $chk = $pdo->prepare("SELECT id FROM products WHERE name=? AND is_deleted=0");
     $chk->execute([$name]);
     if ($chk->fetch()) { echo json_encode(['success'=>false,'message'=>'A product with this name already exists.']); exit; }
 
-    $pdo->prepare(
-        "INSERT INTO products (name,category,selling_price,low_stock_threshold,visible_input,visible_dashboard)
-         VALUES (?,?,?,?,1,1)"
-    )->execute([$name,$category,$price,$threshold]);
+    // If a custom ID was provided, check it's not already used by an active product
+    if ($customId > 0) {
+        $chkId = $pdo->prepare("SELECT id FROM products WHERE id=? AND is_deleted=0");
+        $chkId->execute([$customId]);
+        if ($chkId->fetch()) {
+            echo json_encode(['success'=>false,'message'=>'Product ID already exists. Choose a different ID or leave empty for auto-assign.']);
+            exit;
+        }
+        $stmt = $pdo->prepare("INSERT INTO products (id, name, category, selling_price, low_stock_threshold, visible_input, visible_dashboard) VALUES (?,?,?,?,?,1,1)");
+        $stmt->execute([$customId, $name, $category, $price, $threshold]);
+    } else {
+        $stmt = $pdo->prepare("INSERT INTO products (name, category, selling_price, low_stock_threshold, visible_input, visible_dashboard) VALUES (?,?,?,?,1,1)");
+        $stmt->execute([$name, $category, $price, $threshold]);
+    }
+
     echo json_encode(['success'=>true,'message'=>'Product added successfully.']);
     exit;
 }
@@ -29,7 +42,6 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['add'])) {
 if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['delete_id'])) {
     header('Content-Type: application/json');
     $id = intval($_POST['delete_id']);
-    // Soft-delete: set is_deleted=1 and record the time
     $pdo->prepare("UPDATE products SET is_deleted=1, deleted_at=NOW() WHERE id=?")->execute([$id]);
     echo json_encode(['success'=>true,'message'=>'Product moved to Recently Deleted.']);
     exit;
@@ -59,13 +71,13 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['purge_id'])) {
     exit;
 }
 
-// ── Batch update (name, category, price, threshold, visibility) ──────────
+// ── Batch update (name, category, price, threshold, visibility, but NOT id) ──
 if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['batch_update'])) {
     $names      = $_POST['name']             ?? [];
     $categories = $_POST['category']         ?? [];
     $prices     = $_POST['price']            ?? [];
     $thresholds = $_POST['threshold']        ?? [];
-    $vis_input  = $_POST['visible_input']    ?? [];   // checkboxes — only present when checked
+    $vis_input  = $_POST['visible_input']    ?? [];
     $vis_dash   = $_POST['visible_dashboard']?? [];
 
     $pdo->beginTransaction();
@@ -93,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['batch_update'])) {
     exit;
 }
 
-// ── Ensure deleted_at column exists (runs silently if already present) ───
+// ── Ensure required columns exist (silently) ───────────────────────────
 try {
     $pdo->exec("ALTER TABLE products ADD COLUMN IF NOT EXISTS deleted_at DATETIME NULL DEFAULT NULL");
     $pdo->exec("ALTER TABLE products ADD COLUMN IF NOT EXISTS visible_input TINYINT(1) NOT NULL DEFAULT 1");
@@ -110,7 +122,7 @@ $catF   = $_GET['category'] ?? 'all';
 $limit  = 20; $offset = ($page-1)*$limit;
 
 $where = "is_deleted=0 AND name LIKE :s" . ($catF!=='all' ? " AND category=:c" : "");
-$stmt  = $pdo->prepare("SELECT * FROM products WHERE $where ORDER BY category,name LIMIT :l OFFSET :o");
+$stmt  = $pdo->prepare("SELECT * FROM products WHERE $where ORDER BY id, category, name LIMIT :l OFFSET :o");
 $stmt->bindValue(':s', "%$search%");
 if ($catF!=='all') $stmt->bindValue(':c', $catF);
 $stmt->bindValue(':l', $limit, PDO::PARAM_INT);
@@ -289,7 +301,7 @@ $deleted = $pdo->query(
         /* ── Add-product grid ── */
         .add-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            grid-template-columns: auto 2fr 1fr 1fr 1fr auto;
             gap: .75rem; align-items: end;
         }
         .fg { display: flex; flex-direction: column; gap: .3rem; }
@@ -312,7 +324,7 @@ $deleted = $pdo->query(
         .rec-count   { font-family: 'DM Mono', monospace; font-size: .72rem; color: var(--text-faint); }
         .tbl-scroll  { overflow-x: auto; }
 
-        table { width: 100%; border-collapse: collapse; min-width: 820px; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
         thead tr { border-bottom: 1px solid var(--border); }
         th {
             padding: .7rem 1rem; text-align: left;
@@ -327,6 +339,7 @@ $deleted = $pdo->query(
         td { padding: .6rem 1rem; font-size: .82rem; color: var(--text); vertical-align: middle; }
         td.center { text-align: center; }
         .row-num { font-family: 'DM Mono', monospace; font-size: .7rem; color: var(--text-faint); }
+        .id-col { font-family: 'DM Mono', monospace; font-weight: 600; color: var(--teal); background: var(--surface-3); padding: .35rem .7rem; border-radius: var(--radius-sm); display: inline-block; text-align: center; width: 60px; }
 
         /* ── Inline table inputs ── */
         .tbl-in {
@@ -491,7 +504,6 @@ $deleted = $pdo->query(
         <a href="../public/janeth-input.php"    class="btn btn-ghost">✏️ Entry</a>
         <a href="../public/janeth-dashboard.php" class="btn btn-ghost">📊 Dashboard</a>
         <a href="users.php"                      class="btn btn-ghost">👥 Users</a>
-        <!-- BUG FIX: single #themeToggle button; theme.js moved to end of body -->
         <button id="themeToggle" onclick="toggleTheme()">☀️ Light</button>
     </div>
 </div>
@@ -523,10 +535,14 @@ $deleted = $pdo->query(
     </form>
 </div>
 
-<!-- Add product panel -->
+<!-- Add product panel (now includes optional ID) -->
 <div class="panel">
     <div class="panel-title">➕ Add New Product</div>
     <div class="add-grid">
+        <div class="fg">
+            <label>ID (optional)</label>
+            <input type="number" id="nId" placeholder="Auto" min="1" style="width:80px">
+        </div>
         <div class="fg">
             <label>Product Name</label>
             <input type="text" id="nName" placeholder="e.g. Whole Chicken">
@@ -548,6 +564,7 @@ $deleted = $pdo->query(
         </div>
         <button class="btn btn-primary" id="addBtn" style="align-self:end">+ Add Product</button>
     </div>
+    <div class="hint" style="margin-top: 0.75rem;">💡 If you leave the ID empty, the system will assign the next available number automatically.</div>
 </div>
 
 <!-- Confirmation modal -->
@@ -562,7 +579,7 @@ $deleted = $pdo->query(
     </div>
 </div>
 
-<!-- Products table -->
+<!-- Products table (now shows ID column as read-only) -->
 <div class="table-wrap">
     <div class="table-hd-bar">
         <span class="table-title">📦 Active Products</span>
@@ -577,7 +594,7 @@ $deleted = $pdo->query(
             <table>
                 <thead>
                     <tr>
-                        <th style="width:36px">#</th>
+                        <th style="width:70px">ID</th>
                         <th>Product Name</th>
                         <th style="width:130px">Category</th>
                         <th style="width:110px">Price (₱)</th>
@@ -593,10 +610,9 @@ $deleted = $pdo->query(
                 <?php if (empty($products)): ?>
                     <tr class="empty-row"><td colspan="8">No products found. Add one above.</td></tr>
                 <?php else:
-                    $rowNum = ($page-1)*$limit + 1;
                     foreach ($products as $p): ?>
                 <tr>
-                    <td class="row-num"><?= $rowNum++ ?></td>
+                    <td><span class="id-col"><?= (int)$p['id'] ?></span></td>
                     <td>
                         <input class="tbl-in" type="text"
                                name="name[<?= $p['id'] ?>]"
@@ -726,10 +742,6 @@ $deleted = $pdo->query(
     </div>
 </div>
 
-<!-- BUG FIX: theme.js and themeToggle moved to END of body.
-     In the original, theme.js was in <head> and ran before the DOM was parsed —
-     applyTheme() couldn't find #themeToggle, so the button label never updated.
-     Loading here guarantees the button exists when the script executes. -->
 <script src="../public/theme.js"></script>
 <script>
 /* ── Modal helper ──────────────────────────────────────────────────── */
@@ -754,8 +766,9 @@ function alert2(msg, isErr=false) {
     setTimeout(() => document.getElementById('modalOverlay').classList.remove('active'), 2400);
 }
 
-/* ── Add product ───────────────────────────────────────────────────── */
+/* ── Add product with optional ID ───────────────────────────────────── */
 document.getElementById('addBtn').addEventListener('click', async () => {
+    const customId = document.getElementById('nId').value.trim();
     const name  = document.getElementById('nName').value.trim();
     const cat   = document.getElementById('nCat').value;
     const price = parseFloat(document.getElementById('nPrice').value);
@@ -764,8 +777,16 @@ document.getElementById('addBtn').addEventListener('click', async () => {
     if (isNaN(price)||price<0) return alert2('Enter a valid price.', true);
     if (isNaN(thr)||thr<0)    return alert2('Enter a valid threshold.', true);
     const fd = new FormData();
-    fd.append('add','1'); fd.append('name',name); fd.append('category',cat);
-    fd.append('price',price); fd.append('threshold',thr);
+    fd.append('add','1');
+    fd.append('name',name);
+    fd.append('category',cat);
+    fd.append('price',price);
+    fd.append('threshold',thr);
+    if (customId !== '') {
+        const idNum = parseInt(customId);
+        if (isNaN(idNum) || idNum <= 0) return alert2('ID must be a positive number or leave empty.', true);
+        fd.append('custom_id', idNum);
+    }
     try {
         const res    = await fetch(window.location.href, { method:'POST', body:fd });
         const result = await res.json();
@@ -818,7 +839,6 @@ function purgeProduct(id, name) {
             const result = await res.json();
             if (result.success) {
                 document.getElementById('del-row-'+id)?.remove();
-                // Update badge count
                 const remaining = document.querySelectorAll('[id^="del-row-"]').length;
                 document.getElementById('deletedCount').textContent = remaining;
                 if (!remaining) document.getElementById('deletedSection').style.display='none';
@@ -847,13 +867,12 @@ function toggleDeleted() {
     const count = parseInt(document.getElementById('deletedCount')?.textContent || '0');
     if (count > 0) {
         sec.style.display = '';
-        // Start collapsed — user clicks to expand
         document.getElementById('deletedBody').style.display = 'none';
     }
 })();
 
 /* ── Enter key on add form ───────────────────────────────────────────── */
-['nName','nPrice','nThreshold'].forEach(id => {
+['nId','nName','nPrice','nThreshold'].forEach(id => {
     document.getElementById(id)?.addEventListener('keydown', e => {
         if (e.key === 'Enter') document.getElementById('addBtn').click();
     });
