@@ -12,7 +12,9 @@ $username  = $_SESSION['username'];
     <title>Daily Entry · Janeth's Business</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        /* CSS variables are set by theme.js – no hardcoded colours here */
+        .num-input::-webkit-outer-spin-button,
+        .num-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .num-input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
         :root {
             --radius:16px; --radius-sm:10px;
             --sidebar-w:220px;
@@ -27,7 +29,7 @@ $username  = $_SESSION['username'];
              background-image:radial-gradient(ellipse 70% 50% at 10% -10%,rgba(41,182,200,.06) 0%,transparent 60%),
                               radial-gradient(ellipse 60% 40% at 90% 110%,rgba(245,166,35,.04) 0%,transparent 60%);}
         .app{display:flex;min-height:100vh;}
-        /* Sidebar */
+        /* ── Sidebar ── */
         .sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:transform .25s cubic-bezier(.4,0,.2,1);}
         .sidebar-logo{display:flex;align-items:center;gap:.75rem;padding:1.4rem 1.2rem 1.2rem;border-bottom:1px solid var(--border);}
         .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--teal),#1a9aab);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 4px 12px rgba(41,182,200,.3);flex-shrink:0;}
@@ -51,7 +53,7 @@ $username  = $_SESSION['username'];
         .hamburger{display:none;position:fixed;top:.85rem;left:.85rem;z-index:200;background:var(--surface);border:1px solid var(--border);border-radius:8px;width:38px;height:38px;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;}
         .sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:90;backdrop-filter:blur(2px);}
         .main{margin-left:var(--sidebar-w);flex:1;padding:1.5rem;min-width:0;}
-        /* Buttons, date hero, controls, tables etc. */
+        /* ── Buttons ── */
         .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1.25rem;border-radius:50px;font-size:.95rem;font-weight:600;font-family:'Sora',sans-serif;cursor:pointer;border:none;transition:.18s;text-decoration:none;white-space:nowrap;}
         .btn-primary{background:linear-gradient(135deg,var(--accent),#e8920f);color:#0a0e17;box-shadow:0 3px 12px var(--accent-glow);}
         .btn-primary:hover{box-shadow:0 6px 20px rgba(245,166,35,.4);transform:translateY(-1px);}
@@ -61,7 +63,9 @@ $username  = $_SESSION['username'];
         .btn-teal:hover{background:rgba(41,182,200,.18);}
         .btn-save{background:linear-gradient(135deg,var(--teal),#1a9aab);color:#0a0e17;font-weight:700;box-shadow:0 3px 12px rgba(41,182,200,.3);}
         .btn-save:hover{box-shadow:0 6px 20px rgba(41,182,200,.4);transform:translateY(-1px);}
+        /* ── Theme toggle ── */
         #themeToggle{background:none;border:none;color:var(--text-muted);font-family:'Sora',sans-serif;font-size:.83rem;font-weight:500;cursor:pointer;padding:0;width:100%;text-align:left;}
+        /* ── Date hero ── */
         .date-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.75rem 2rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:2rem;flex-wrap:wrap;position:relative;overflow:hidden;}
         .date-hero-left{flex:1;min-width:200px;}
         .hero-label{font-size:.85rem;text-transform:uppercase;letter-spacing:.12em;color:var(--text-muted);font-weight:600;margin-bottom:.5rem;}
@@ -69,6 +73,7 @@ $username  = $_SESSION['username'];
         .hero-big .day-num{color:var(--accent);}
         .hero-sub{font-size:.9rem;color:var(--text-muted);margin-top:.4rem;font-family:'DM Mono',monospace;}
         .date-hero-right{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;}
+        /* ── Status & autosave chips ── */
         .status-chip{display:inline-flex;align-items:center;gap:.4rem;padding:.4rem 1rem;border-radius:50px;font-size:.85rem;font-weight:700;letter-spacing:.04em;}
         .s-loaded{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);color:var(--success);}
         .s-empty{background:var(--accent-dim);border:1px solid rgba(245,166,35,.25);color:var(--accent);}
@@ -80,6 +85,7 @@ $username  = $_SESSION['username'];
         .as-dot{width:7px;height:7px;border-radius:50%;background:currentColor;}
         .as-chip.saving .as-dot{animation:blink .8s infinite;}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+        /* ── Controls bar ── */
         .controls{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.4rem;margin-bottom:1.25rem;}
         .controls-sep{flex:1;}
         input[type="text"],input[type="date"],input[type="number"],select{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Sora',sans-serif;font-size:.95rem;padding:.55rem 1rem;outline:none;transition:.18s;}
@@ -91,6 +97,14 @@ $username  = $_SESSION['username'];
         .toggle-sw input:checked{background:var(--teal);}
         .toggle-sw input::before{content:'';width:14px;height:14px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:.2s;}
         .toggle-sw input:checked::before{left:19px;}
+        /* ── Loading overlay ── */
+        .loading-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(3px);display:none;justify-content:center;align-items:center;z-index:500;}
+        .loading-overlay.active{display:flex;}
+        .loading-spinner{display:flex;flex-direction:column;align-items:center;gap:1rem;}
+        .spinner{width:40px;height:40px;border:3px solid var(--surface-3);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite;}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .spinner-label{font-size:.9rem;color:var(--text-muted);font-weight:600;}
+        /* ── Table sections ── */
         .section-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1.25rem;}
         .section-hd{display:flex;align-items:center;gap:.85rem;padding:1rem 1.4rem;border-bottom:1px solid var(--border);background:var(--surface-2);}
         .section-icon{font-size:1.4rem;}
@@ -118,6 +132,7 @@ $username  = $_SESSION['username'];
         .total-row td{background:rgba(245,166,35,.06)!important;border-top:1px solid rgba(245,166,35,.18)!important;color:var(--accent)!important;font-family:'DM Mono',monospace;font-size:.9rem;font-weight:700;}
         .total-row .total-label{text-align:right!important;color:var(--text-muted)!important;font-family:'Sora',sans-serif!important;font-size:.8rem!important;font-weight:600!important;text-transform:uppercase;letter-spacing:.06em;padding-right:1.5rem!important;}
         .empty-section{padding:3rem;text-align:center;color:var(--text-faint);font-size:.95rem;}
+        /* ── Chooser ── */
         .chooser-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1.25rem;display:none;}
         .chooser-panel.open{display:block;}
         .chooser-hd{display:flex;align-items:center;gap:.85rem;padding:1rem 1.4rem;border-bottom:1px solid var(--border);background:var(--surface-2);}
@@ -130,6 +145,7 @@ $username  = $_SESSION['username'];
         .chooser-cat{font-size:.72rem;padding:.15rem .55rem;border-radius:50px;font-weight:700;}
         .cc-chicken{background:rgba(251,191,36,.15);color:var(--chicken);}
         .cc-frozen{background:rgba(96,165,250,.12);color:var(--frozen);}
+        /* ── Stock entries ── */
         .se-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1.25rem;}
         .se-hd{display:flex;align-items:center;gap:.85rem;padding:1rem 1.4rem;border-bottom:1px solid var(--border);background:var(--surface-2);}
         .se-add-row{display:flex;flex-wrap:wrap;gap:.75rem;align-items:flex-end;padding:1.2rem 1.4rem;border-bottom:1px solid var(--border);}
@@ -147,6 +163,7 @@ $username  = $_SESSION['username'];
         .se-del:hover{color:var(--danger);background:rgba(248,113,113,.1);}
         .se-total-bar{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.4rem;background:rgba(248,113,113,.05);border-top:1px solid rgba(248,113,113,.15);}
         .se-empty{padding:2rem;text-align:center;color:var(--text-faint);font-size:.95rem;}
+        /* ── Expenses ── */
         .exp-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1.25rem;}
         .exp-hd{display:flex;align-items:center;gap:.85rem;padding:1rem 1.4rem;border-bottom:1px solid var(--border);background:var(--surface-2);}
         .exp-add-row{display:flex;flex-wrap:wrap;gap:.75rem;align-items:flex-end;padding:1.2rem 1.4rem;border-bottom:1px solid var(--border);}
@@ -165,6 +182,7 @@ $username  = $_SESSION['username'];
         .exp-total-label{font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-faint);}
         .exp-total-val{font-family:'DM Mono',monospace;font-size:1.3rem;font-weight:700;color:var(--danger);}
         .exp-empty{padding:2rem;text-align:center;color:var(--text-faint);font-size:.95rem;}
+        /* ── Summary bar ── */
         .summary-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.1rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.75rem;margin-bottom:1.25rem;}
         .sum-item{display:flex;flex-direction:column;gap:.3rem;position:relative;padding-left:.75rem;}
         .sum-item::before{content:'';position:absolute;left:0;top:.2rem;bottom:.2rem;width:3px;border-radius:2px;background:var(--border);}
@@ -177,18 +195,26 @@ $username  = $_SESSION['username'];
         .sum-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);}
         .sum-val{font-family:'DM Mono',monospace;font-size:1.3rem;font-weight:700;color:var(--text-muted);}
         .sum-val.green{color:var(--success);}.sum-val.amber{color:var(--accent);}.sum-val.red{color:var(--danger);}.sum-val.teal{color:var(--teal);}
-        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);display:none;justify-content:center;align-items:center;z-index:1000;padding:1rem;}
+        /* ── Modal ── */
+        .modal-overlay{position:fixed;inset:0;background:var(--modal-bg, rgba(0,0,0,.65));backdrop-filter:blur(8px);display:none;justify-content:center;align-items:center;z-index:1000;padding:1rem;}
         .modal-overlay.active{display:flex;}
         .modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2.25rem 2.5rem;max-width:460px;width:100%;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,.5);animation:popIn .2s cubic-bezier(.34,1.56,.64,1);}
         @keyframes popIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
         .modal-icon{font-size:2.5rem;margin-bottom:.85rem;}
         .modal-msg{font-size:1.05rem;color:var(--text);margin-bottom:1.75rem;line-height:1.55;font-weight:500;}
         .modal-btns{display:flex;gap:.85rem;justify-content:center;}
+        /* ── Toast notification ── */
+        #toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:2000;display:flex;align-items:center;gap:.6rem;padding:.75rem 1.25rem;border-radius:50px;font-size:.88rem;font-weight:600;font-family:'Sora',sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.3);transform:translateY(120%);opacity:0;transition:transform .3s cubic-bezier(.34,1.56,.64,1), opacity .3s ease;pointer-events:none;}
+        #toast.show{transform:translateY(0);opacity:1;}
+        #toast.ok{background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.3);color:var(--success);}
+        #toast.err{background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.3);color:var(--danger);}
+        /* ── Scrollbar ── */
         ::-webkit-scrollbar{width:7px;height:7px;}
         ::-webkit-scrollbar-track{background:transparent;}
         ::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:4px;}
+        /* ── Print ── */
         @media print{
-            .sidebar,.controls,.date-hero-right,.modal-overlay,.exp-add-row,.exp-del,.se-add-row,.se-del,.chooser-panel{display:none!important;}
+            .sidebar,.controls,.date-hero-right,.modal-overlay,.exp-add-row,.exp-del,.se-add-row,.se-del,.chooser-panel,#toast,.loading-overlay{display:none!important;}
             body{background:#fff!important;color:#111!important;padding:.5rem;}
             .main{margin-left:0!important;}
             .section-hd{background:#f5f5f5!important;}
@@ -196,6 +222,7 @@ $username  = $_SESSION['username'];
             td{color:#111!important;}
             .num-input{border:none!important;background:transparent!important;width:auto!important;}
         }
+        /* ── Mobile ── */
         @media(max-width:768px){
             .sidebar{transform:translateX(-100%);}
             .sidebar.open{transform:translateX(0);}
@@ -209,6 +236,18 @@ $username  = $_SESSION['username'];
 </head>
 <body>
 <div class="app">
+
+<!-- Loading overlay (shown during date navigation) -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">
+        <div class="spinner"></div>
+        <div class="spinner-label">Loading…</div>
+    </div>
+</div>
+
+<!-- Toast notification -->
+<div id="toast"></div>
+
 <button class="hamburger" id="hamburger">☰</button>
 <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 <nav class="sidebar" id="sidebar">
@@ -236,11 +275,11 @@ $username  = $_SESSION['username'];
         <?php endif; ?>
         <div class="nav-divider"></div>
         <div class="nav-label">Tools</div>
-        <div class="nav-item" id="chooserNavBtn" style="cursor:pointer;"><span class="nav-icon">☰</span>Choose Products</div>
-        <div class="nav-item" id="printNavBtn" style="cursor:pointer;"><span class="nav-icon">📄</span>Print</div>
+        <div class="nav-item" id="chooserNavBtn"><span class="nav-icon">☰</span>Choose Products</div>
+        <div class="nav-item" id="printNavBtn"><span class="nav-icon">📄</span>Print</div>
         <div class="nav-divider"></div>
         <div class="nav-label">Appearance</div>
-        <div class="nav-item" onclick="toggleTheme()" style="cursor:pointer;">
+        <div class="nav-item" onclick="toggleTheme()">
             <span class="nav-icon">🌓</span><button id="themeToggle">☀️ Light mode</button>
         </div>
     </div>
@@ -248,7 +287,10 @@ $username  = $_SESSION['username'];
         <button class="btn-logout" id="logoutBtn">🚪 Sign out</button>
     </div>
 </nav>
+
 <div class="main">
+
+<!-- Confirm/alert modal -->
 <div id="modalOverlay" class="modal-overlay">
     <div class="modal">
         <div class="modal-icon" id="modalIcon">💬</div>
@@ -259,6 +301,8 @@ $username  = $_SESSION['username'];
         </div>
     </div>
 </div>
+
+<!-- Date hero -->
 <div class="date-hero">
     <div class="date-hero-left">
         <div class="hero-label">Selected Date</div>
@@ -274,6 +318,8 @@ $username  = $_SESSION['username'];
         <button class="btn btn-teal" id="loadBtn">↻ Load</button>
     </div>
 </div>
+
+<!-- Controls -->
 <div class="controls">
     <input type="text" id="searchInput" placeholder="🔍 Search product…" style="width:200px">
     <select id="catFilter">
@@ -289,6 +335,8 @@ $username  = $_SESSION['username'];
     </div>
     <button id="manualSaveBtn" class="btn btn-save">💾 Save</button>
 </div>
+
+<!-- Product chooser -->
 <div class="chooser-panel" id="chooserPanel">
     <div class="chooser-hd">
         <span class="section-icon">☰</span>
@@ -297,6 +345,8 @@ $username  = $_SESSION['username'];
     </div>
     <div class="chooser-grid" id="chooserGrid"></div>
 </div>
+
+<!-- Summary bar -->
 <div class="summary-bar" id="summaryBar">
     <div class="sum-item"><div class="sum-label">Stock In Value</div><div class="sum-val teal" id="sumStockIn">₱0.00</div></div>
     <div class="sum-item"><div class="sum-label">Supplier Cost</div><div class="sum-val red" id="sumSupplierCost">₱0.00</div></div>
@@ -305,6 +355,8 @@ $username  = $_SESSION['username'];
     <div class="sum-item"><div class="sum-label">Daily Expenses</div><div class="sum-val red" id="sumExpenses">₱0.00</div></div>
     <div class="sum-item"><div class="sum-label">Est. Net Income</div><div class="sum-val" id="sumNet">₱0.00</div></div>
 </div>
+
+<!-- Chicken table -->
 <div class="section-wrap" id="chickenSection">
     <div class="section-hd">
         <span class="section-icon">🐔</span>
@@ -318,6 +370,8 @@ $username  = $_SESSION['username'];
         </table>
     </div>
 </div>
+
+<!-- Frozen table -->
 <div class="section-wrap" id="frozenSection">
     <div class="section-hd">
         <span class="section-icon">❄️</span>
@@ -331,6 +385,8 @@ $username  = $_SESSION['username'];
         </table>
     </div>
 </div>
+
+<!-- Stock entries -->
 <div class="se-section">
     <div class="se-hd">
         <span class="section-icon">🚚</span>
@@ -349,6 +405,8 @@ $username  = $_SESSION['username'];
     <div class="se-list" id="seList"><div class="se-empty">No stock entries recorded yet.</div></div>
     <div class="se-total-bar"><span class="exp-total-label">Total Supplier Cost</span><span class="exp-total-val" id="seTotalVal">₱0.00</span></div>
 </div>
+
+<!-- Expenses -->
 <div class="exp-section">
     <div class="exp-hd">
         <span class="section-icon">💸</span>
@@ -364,8 +422,13 @@ $username  = $_SESSION['username'];
     <div class="exp-list" id="expList"><div class="exp-empty">No expenses recorded yet.</div></div>
     <div class="exp-total-bar"><span class="exp-total-label">Total Expenses</span><span class="exp-total-val" id="expTotalVal">₱0.00</span></div>
 </div>
-<div style="padding-bottom:2rem;text-align:center;font-size:.85rem;color:var(--text-faint);font-family:'DM Mono',monospace">✦ Sold = Yesterday + Stock In − Remaining &nbsp;·&nbsp; Yesterday auto-fills from previous day's Remaining</div>
-</div></div>
+
+<div style="padding-bottom:2rem;text-align:center;font-size:.85rem;color:var(--text-faint);font-family:'DM Mono',monospace">
+    ✦ Sold = Yesterday + Stock In − Remaining &nbsp;·&nbsp; Yesterday auto-fills from previous day's Remaining
+</div>
+
+</div><!-- .main -->
+</div><!-- .app -->
 
 <script>
 const API  = 'janeth.php';
@@ -379,23 +442,35 @@ let stockEntries   = [];
 let suppliers      = [];
 let asTimer        = null;
 let asEnabled      = true;
+let isLoading      = false;
 
-// Sidebar toggle
-document.getElementById('hamburger').addEventListener('click',()=>{
+// ── Sidebar ──────────────────────────────────────────────────────────────────
+document.getElementById('hamburger').addEventListener('click', () => {
     document.getElementById('sidebar').classList.add('open');
     document.getElementById('sidebarBackdrop').classList.add('open');
 });
-document.getElementById('sidebarBackdrop').addEventListener('click',()=>{
+document.getElementById('sidebarBackdrop').addEventListener('click', () => {
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('sidebarBackdrop').classList.remove('open');
 });
 
-function modal(msg, onOk, onCancel=null, icon='💬', okLabel='OK', cancelLabel='Cancel') {
+// ── Toast (replaces alert2 for non-critical messages) ────────────────────────
+let toastTimer = null;
+function toast(msg, isErr = false) {
+    const el = document.getElementById('toast');
+    el.textContent = (isErr ? '⚠ ' : '✓ ') + msg;
+    el.className = 'show ' + (isErr ? 'err' : 'ok');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.className = isErr ? 'err' : 'ok'; }, 2800);
+}
+
+// ── Modal (confirm dialogs only) ─────────────────────────────────────────────
+function modal(msg, onOk, onCancel = null, icon = '💬', okLabel = 'OK', cancelLabel = 'Cancel') {
     document.getElementById('modalMsg').textContent  = msg;
     document.getElementById('modalIcon').textContent = icon;
     document.getElementById('modalOk').textContent   = okLabel;
     const cancelBtn = document.getElementById('modalCancel');
-    cancelBtn.textContent = cancelLabel;
+    cancelBtn.textContent   = cancelLabel;
     cancelBtn.style.display = cancelLabel ? '' : 'none';
     document.getElementById('modalOverlay').classList.add('active');
     const close = () => document.getElementById('modalOverlay').classList.remove('active');
@@ -403,351 +478,428 @@ function modal(msg, onOk, onCancel=null, icon='💬', okLabel='OK', cancelLabel=
     const can = document.getElementById('modalCancel').cloneNode(true);
     document.getElementById('modalOk').replaceWith(ok);
     document.getElementById('modalCancel').replaceWith(can);
-    ok.addEventListener('click',  () => { close(); if(onOk) onOk(); });
-    can.addEventListener('click', () => { close(); if(onCancel) onCancel(); });
-}
-function alert2(msg, isErr=false, autoClose=2800) {
-    modal(msg, null, null, isErr?'⚠️':'✅', 'OK', '');
-    setTimeout(() => document.getElementById('modalOverlay').classList.remove('active'), autoClose);
+    ok.addEventListener('click',  () => { close(); if (onOk)     onOk(); });
+    can.addEventListener('click', () => { close(); if (onCancel) onCancel(); });
 }
 
+// ── Loading overlay ───────────────────────────────────────────────────────────
+function setLoading(on) {
+    isLoading = on;
+    document.getElementById('loadingOverlay').classList.toggle('active', on);
+}
+
+// ── Date helpers (local time — no UTC shift) ─────────────────────────────────
 function addDays(dateStr, days) {
     const [y, m, d] = dateStr.split('-').map(Number);
-    const date = new Date(y, m - 1, d + days);
-    const yy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const dd = String(date.getDate()).padStart(2, '0');
-    return `${yy}-${mm}-${dd}`;
+    const dt = new Date(y, m - 1, d + days);
+    return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
 }
-function prevDate(d){ return addDays(d, -1); }
-function nextDate(d){ return addDays(d, 1); }
+function prevDate(d) { return addDays(d, -1); }
+function nextDate(d) { return addDays(d,  1); }
 
-function peso(n){return '₱'+(parseFloat(n)||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});}
-function setStatus(t){
-    const c=document.getElementById('statusChip');
-    c.className='status-chip';
-    if(t==='loaded'){c.classList.add('s-loaded');c.textContent='● Data loaded';}
-    else if(t==='empty'){c.classList.add('s-empty');c.textContent='● New entry';}
-    else{c.classList.add('s-none');c.textContent='● No data loaded';}
+// ── Formatting ────────────────────────────────────────────────────────────────
+function peso(n) {
+    return '₱' + (parseFloat(n) || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
-function setHero(d){
-    if(!d){document.getElementById('heroDay').innerHTML='—';document.getElementById('heroFull').textContent='Pick a date and click Load';return;}
-    const dt=new Date(d+'T00:00:00');
-    const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-    const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
-    document.getElementById('heroDay').innerHTML=`${days[dt.getDay()]}, <span class="day-num">${dt.getDate()}</span>`;
-    document.getElementById('heroFull').textContent=`${months[dt.getMonth()]} ${dt.getFullYear()}`;
-}
-function calcSold(r){return Math.max(0,(r.yesterday+r.stockIn)-r.remaining);}
 
-document.getElementById('asToggle').addEventListener('change',e=>{
-    asEnabled=e.target.checked;
-    const chip=document.getElementById('asChip'),lbl=document.getElementById('asLabel');
-    chip.className='as-chip';
-    lbl.textContent=asEnabled?'Auto-save on':'Auto-save off';
+function setStatus(t) {
+    const c = document.getElementById('statusChip');
+    c.className = 'status-chip';
+    if (t === 'loaded')      { c.classList.add('s-loaded'); c.textContent = '● Data loaded'; }
+    else if (t === 'empty')  { c.classList.add('s-empty');  c.textContent = '● New entry'; }
+    else                     { c.classList.add('s-none');   c.textContent = '● No data loaded'; }
+}
+
+function setHero(d) {
+    if (!d) {
+        document.getElementById('heroDay').innerHTML = '—';
+        document.getElementById('heroFull').textContent = 'Pick a date and click Load';
+        return;
+    }
+    const dt = new Date(d + 'T00:00:00');
+    const days   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    document.getElementById('heroDay').innerHTML   = `${days[dt.getDay()]}, <span class="day-num">${dt.getDate()}</span>`;
+    document.getElementById('heroFull').textContent = `${months[dt.getMonth()]} ${dt.getFullYear()}`;
+}
+
+function calcSold(r) { return Math.max(0, (r.yesterday + r.stockIn) - r.remaining); }
+
+// ── Auto-save toggle ──────────────────────────────────────────────────────────
+document.getElementById('asToggle').addEventListener('change', e => {
+    asEnabled = e.target.checked;
+    const chip = document.getElementById('asChip'), lbl = document.getElementById('asLabel');
+    chip.className = 'as-chip';
+    lbl.textContent = asEnabled ? 'Auto-save on' : 'Auto-save off';
 });
 
-function triggerAutoSave(){
-    if(!asEnabled) return;
+function triggerAutoSave() {
+    if (!asEnabled) return;
     clearTimeout(asTimer);
-    asTimer=setTimeout(doSave,1800);
-    const chip=document.getElementById('asChip'),lbl=document.getElementById('asLabel');
-    chip.className='as-chip saving';lbl.textContent='Saving…';
-}
-async function doSave(){
-    const date=document.getElementById('recordDate').value;
-    if(!date) return false;
-    const chip=document.getElementById('asChip'),lbl=document.getElementById('asLabel');
-    chip.className='as-chip saving';lbl.textContent='Saving…';
-    try{
-        const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({date,records:masterRecords.map(r=>({
-                product_id:r.id,yesterday_qty:r.yesterday,stock_in:r.stockIn,remaining_qty:r.remaining
-            }))})});
-        const data=await res.json();
-        if(data.success){
-            chip.className='as-chip saved';lbl.textContent='Saved ✓';
-            setTimeout(()=>{
-                chip.className='as-chip';
-                lbl.textContent=asEnabled?'Auto-save on':'Auto-save off';
-            },2500);
-            return true;
-        }else{chip.className='as-chip error';lbl.textContent='Save failed';return false;}
-    }catch{chip.className='as-chip error';lbl.textContent='Save failed';return false;}
+    asTimer = setTimeout(doSave, 1800);
+    const chip = document.getElementById('asChip'), lbl = document.getElementById('asLabel');
+    chip.className = 'as-chip saving';
+    lbl.textContent = 'Saving…';
 }
 
-async function fetchAllProducts(){
-    try{
+async function doSave() {
+    const date = document.getElementById('recordDate').value;
+    if (!date) return false;
+    const chip = document.getElementById('asChip'), lbl = document.getElementById('asLabel');
+    chip.className = 'as-chip saving';
+    lbl.textContent = 'Saving…';
+    try {
+        const res  = await fetch(API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                date,
+                records: masterRecords.map(r => ({
+                    product_id:    r.id,
+                    yesterday_qty: r.yesterday,
+                    stock_in:      r.stockIn,
+                    remaining_qty: r.remaining
+                }))
+            })
+        });
+        const data = await res.json();
+        if (data.success) {
+            chip.className = 'as-chip saved';
+            lbl.textContent = 'Saved ✓';
+            setTimeout(() => {
+                chip.className  = 'as-chip';
+                lbl.textContent = asEnabled ? 'Auto-save on' : 'Auto-save off';
+            }, 2500);
+            return true;
+        } else {
+            chip.className  = 'as-chip error';
+            lbl.textContent = 'Save failed';
+            return false;
+        }
+    } catch {
+        chip.className  = 'as-chip error';
+        lbl.textContent = 'Save failed';
+        return false;
+    }
+}
+
+// ── Fetch products, suppliers on boot ────────────────────────────────────────
+async function fetchAllProducts() {
+    try {
         const [visProd, allProd, sups] = await Promise.all([
-            fetch(`${API}?products=1&page=input`).then(r=>r.json()).catch(()=>({products:[]})),
-            fetch(`${API}?products=1`).then(r=>r.json()).catch(()=>({products:[]})),
-            fetch(`${API}?suppliers=1`).then(r=>r.json()).catch(()=>({suppliers:[]}))
+            fetch(`${API}?products=1&page=input`).then(r => r.json()).catch(() => ({ products: [] })),
+            fetch(`${API}?products=1`).then(r => r.json()).catch(() => ({ products: [] })),
+            fetch(`${API}?suppliers=1`).then(r => r.json()).catch(() => ({ suppliers: [] }))
         ]);
         const normalize = p => ({ ...p, price: parseFloat(p.selling_price ?? p.price ?? 0) });
-        allProducts    = (allProd.products  || []).map(normalize);
-        masterProducts = (visProd.products  || []).map(normalize);
-        // 🔹 SORT PRODUCTS BY ID (ascending)
-        masterProducts.sort((a, b) => a.id - b.id);
+        allProducts    = (allProd.products || []).map(normalize);
+        masterProducts = (visProd.products || []).map(normalize).sort((a, b) => a.id - b.id);
         suppliers      = sups.suppliers || [];
-        if (!masterProducts.length && allProducts.length) masterProducts = [...allProducts];
-        if (!masterProducts.length && allProducts.length) masterProducts.sort((a, b) => a.id - b.id);
+        if (!masterProducts.length && allProducts.length) masterProducts = [...allProducts].sort((a, b) => a.id - b.id);
         buildChooser();
         buildSeDropdowns();
-        masterRecords = masterProducts.map(p => ({ ...p, yesterday:0, stockIn:0, remaining:0, yesterdayFromPrev:false }));
+        masterRecords = masterProducts.map(p => ({ ...p, yesterday: 0, stockIn: 0, remaining: 0 }));
         renderSections();
         const saved = localStorage.getItem('janeth_date');
-        if (saved) { document.getElementById('recordDate').value = saved; await loadDate(saved, true); }
-    } catch(e) { console.error(e); alert2('Could not load products. Check the server and database connection.', true); }
+        if (saved) {
+            document.getElementById('recordDate').value = saved;
+            await loadDate(saved, true);
+        }
+    } catch (e) {
+        console.error(e);
+        toast('Could not load products. Check server connection.', true);
+    }
 }
 
-function buildChooser(){
-    const grid=document.getElementById('chooserGrid');
-    grid.innerHTML=allProducts.map(p=>{
-        const checked=p.visible_input==1;
-        const catCls=p.category==='Chicken'?'cc-chicken':'cc-frozen';
-        return `<div class="chooser-item${checked?' active':''}" data-id="${p.id}">
-            <input type="checkbox" class="chooser-cb" id="ch_${p.id}" ${checked?'checked':''}>
+// ── Chooser ───────────────────────────────────────────────────────────────────
+function buildChooser() {
+    const grid = document.getElementById('chooserGrid');
+    grid.innerHTML = allProducts.map(p => {
+        const checked = p.visible_input == 1;
+        const catCls  = p.category === 'Chicken' ? 'cc-chicken' : 'cc-frozen';
+        return `<div class="chooser-item${checked ? ' active' : ''}" data-id="${p.id}">
+            <input type="checkbox" class="chooser-cb" id="ch_${p.id}" ${checked ? 'checked' : ''}>
             <span class="chooser-name">${esc(p.name)}</span>
             <span class="chooser-cat ${catCls}">${p.category}</span>
         </div>`;
     }).join('');
-    grid.querySelectorAll('.chooser-item').forEach(item=>{
-        const cb=item.querySelector('input');
-        cb.addEventListener('change',()=>item.classList.toggle('active',cb.checked));
+    grid.querySelectorAll('.chooser-item').forEach(item => {
+        const cb = item.querySelector('input');
+        cb.addEventListener('change', () => item.classList.toggle('active', cb.checked));
     });
 }
-document.getElementById('chooserNavBtn').addEventListener('click',()=>{
+
+document.getElementById('chooserNavBtn').addEventListener('click', () => {
     document.getElementById('chooserPanel').classList.toggle('open');
 });
-document.getElementById('saveChooserBtn').addEventListener('click',async()=>{
-    const items=document.querySelectorAll('.chooser-item');
-    const promises=[];
-    items.forEach(item=>{
-        const id=item.dataset.id;
-        const checked=item.querySelector('input').checked?1:0;
-        promises.push(fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({update_visibility:1,product_id:id,visible_input:checked,visible_dashboard:checked})}));
+
+document.getElementById('saveChooserBtn').addEventListener('click', async () => {
+    const items    = document.querySelectorAll('.chooser-item');
+    const promises = [];
+    items.forEach(item => {
+        const id      = item.dataset.id;
+        const checked = item.querySelector('input').checked ? 1 : 0;
+        promises.push(fetch(API, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ update_visibility: 1, product_id: id, visible_input: checked, visible_dashboard: checked })
+        }));
     });
     await Promise.all(promises);
-    alert2('Product visibility saved!');
+    toast('Product visibility saved!');
     document.getElementById('chooserPanel').classList.remove('open');
     await fetchAllProducts();
 });
 
-function buildSeDropdowns(){
+// ── Supplier / product dropdowns ─────────────────────────────────────────────
+function buildSeDropdowns() {
     const pSel = document.getElementById('seProduct');
     const sSel = document.getElementById('seSupplier');
-    pSel.innerHTML = '<option value="">Select product…</option>' + allProducts.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
-    if (suppliers.length) {
-        sSel.innerHTML = '<option value="">Select supplier…</option>' + suppliers.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
-    } else { sSel.innerHTML = '<option value="">⚠ No suppliers in DB yet</option>'; }
+    pSel.innerHTML = '<option value="">Select product…</option>' +
+        allProducts.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+    sSel.innerHTML = suppliers.length
+        ? '<option value="">Select supplier…</option>' + suppliers.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('')
+        : '<option value="">⚠ No suppliers in DB yet</option>';
 }
 
-async function loadDate(d, silent=false){
-    if(!d) return;
+// ── Load date ─────────────────────────────────────────────────────────────────
+async function loadDate(d, silent = false) {
+    if (!d || isLoading) return;
+    setLoading(true);
     setHero(d);
-    try{
-        const [res, expRes, seRes] = await Promise.all([
+    try {
+        // Fetch current date + expenses + stock entries + previous day all at once
+        const [res, expRes, seRes, prevRes] = await Promise.all([
             fetch(`${API}?date=${d}&for=input`),
             fetch(`${API}?expenses=${d}`),
-            fetch(`${API}?stock_entries=${d}`)
+            fetch(`${API}?stock_entries=${d}`),
+            fetch(`${API}?date=${prevDate(d)}&for=input`)
         ]);
         const data    = await res.json();
         const expData = await expRes.json();
         const seData  = await seRes.json();
-        expenses     = expData.expenses      || [];
-        stockEntries = seData.stock_entries  || [];
+        const prevData = await prevRes.json();
 
-        const prevDateStr = prevDate(d);
-        let prevRemaining = {};
-        try {
-            const prevRes = await fetch(`${API}?date=${prevDateStr}&for=input`);
-            const prevData = await prevRes.json();
-            if (prevData.records) {
-                prevData.records.forEach(r => {
-                    prevRemaining[r.product_id] = parseInt(r.remaining_qty) || 0;
-                });
-            }
-        } catch(e) { console.warn('Could not fetch previous day', e); }
+        expenses     = expData.expenses     || [];
+        stockEntries = seData.stock_entries || [];
 
+        // Build previous-day remaining map
+        const prevRemaining = {};
+        (prevData.records || []).forEach(r => {
+            prevRemaining[r.product_id] = parseInt(r.remaining_qty) || 0;
+        });
+
+        // Build current-day map (stock_in + remaining)
         const currentMap = {};
-        if (data.records) {
-            data.records.forEach(r => {
-                currentMap[r.product_id] = {
-                    stockIn: parseInt(r.stock_in) || 0,
-                    remaining: parseInt(r.remaining_qty) || 0
-                };
-            });
-        }
-
-        masterRecords = masterProducts.map(p => {
-            const prevRem = prevRemaining[p.id] || 0;
-            const curr = currentMap[p.id];
-            return {
-                ...p,
-                yesterday: prevRem,
-                stockIn: curr ? curr.stockIn : 0,
-                remaining: curr ? curr.remaining : 0,
-                yesterdayFromPrev: true
+        (data.records || []).forEach(r => {
+            currentMap[r.product_id] = {
+                stockIn:   parseInt(r.stock_in)      || 0,
+                remaining: parseInt(r.remaining_qty) || 0
             };
         });
 
-        const hasAnyData = Object.keys(currentMap).length > 0;
-        setStatus(hasAnyData ? 'loaded' : 'empty');
+        // Merge into masterRecords
+        masterRecords = masterProducts.map(p => {
+            const curr = currentMap[p.id];
+            return {
+                ...p,
+                yesterday: prevRemaining[p.id] || 0,
+                stockIn:   curr ? curr.stockIn   : 0,
+                remaining: curr ? curr.remaining : 0
+            };
+        });
 
+        setStatus(Object.keys(currentMap).length > 0 ? 'loaded' : 'empty');
         renderExpenses();
         renderStockEntries();
         renderSections();
 
-        if(!silent);
-    } catch(e){ 
+        if (!silent) toast(`Loaded data for ${d}`);
+    } catch (e) {
         console.error(e);
-        alert2('Failed to load data. Check your server connection.', true);
+        toast('Failed to load data. Check server connection.', true);
+    } finally {
+        setLoading(false);
     }
 }
 
-function renderSections(){
-    const search = document.getElementById('searchInput').value.toLowerCase();
-    const cat    = document.getElementById('catFilter').value;
-    const chicken = masterRecords.filter(r => r.category==='Chicken' && r.name.toLowerCase().includes(search) && (!cat || r.category===cat));
-    const frozen  = masterRecords.filter(r => r.category==='Frozen'  && r.name.toLowerCase().includes(search) && (!cat || r.category===cat));
-    document.getElementById('chickenCount').textContent = `${chicken.length} item${chicken.length!==1?'s':''}`;
-    document.getElementById('frozenCount').textContent  = `${frozen.length} item${frozen.length!==1?'s':''}`;
-    document.getElementById('chickenSection').style.display = (!cat || cat==='Chicken') ? '' : 'none';
-    document.getElementById('frozenSection').style.display  = (!cat || cat==='Frozen')  ? '' : 'none';
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderSections() {
+    const search  = document.getElementById('searchInput').value.toLowerCase();
+    const cat     = document.getElementById('catFilter').value;
+    const chicken = masterRecords.filter(r => r.category === 'Chicken' && r.name.toLowerCase().includes(search) && (!cat || r.category === cat));
+    const frozen  = masterRecords.filter(r => r.category === 'Frozen'  && r.name.toLowerCase().includes(search) && (!cat || r.category === cat));
+    document.getElementById('chickenCount').textContent = `${chicken.length} item${chicken.length !== 1 ? 's' : ''}`;
+    document.getElementById('frozenCount').textContent  = `${frozen.length} item${frozen.length !== 1 ? 's' : ''}`;
+    document.getElementById('chickenSection').style.display = (!cat || cat === 'Chicken') ? '' : 'none';
+    document.getElementById('frozenSection').style.display  = (!cat || cat === 'Frozen')  ? '' : 'none';
     renderTableBody('chickenBody', chicken);
     renderTableBody('frozenBody',  frozen);
     updateSummary();
     attachInputListeners();
 }
 
-function renderTableBody(bodyId, recs){
+function renderTableBody(bodyId, recs) {
     const tbody = document.getElementById(bodyId);
     tbody.innerHTML = '';
-    if(!recs.length){
+    if (!recs.length) {
         tbody.innerHTML = `<tr><td colspan="7" class="empty-section">No products to show. Use "☰ Choose Products" in the sidebar to enable products.</td></tr>`;
         return;
     }
-    let rowsHtml = '';
+    let html = '';
     recs.forEach(r => {
-        const sold = calcSold(r);
-        const val = sold * r.price;
-        const soldCls = sold<0 ? 'sold-warn' : 'sold-ok';
-        rowsHtml += `<tr data-product-id="${r.id}">
+        const sold    = calcSold(r);
+        const val     = sold * r.price;
+        const soldCls = sold < 0 ? 'sold-warn' : 'sold-ok';
+        html += `<tr data-product-id="${r.id}">
             <td><span class="prod-name">${esc(r.name)}</span><span class="prod-id">#${r.id}</span></td>
-            <td><span class="price-ro">₱${(r.price||0).toFixed(2)}</span></td>
+            <td><span class="price-ro">₱${(r.price || 0).toFixed(2)}</span></td>
             <td class="yest-cell">${r.yesterday}</td>
-            <td><input class="num-input stockIn-input" type="number" min="0" value="${r.stockIn}" data-id="${r.id}" data-field="stockIn"></td>
-            <td><input class="num-input remaining-input" type="number" min="0" value="${r.remaining}" data-id="${r.id}" data-field="remaining"></td>
-            <td class="sold-cell ${soldCls}" data-sold="${r.id}">${sold}</td>
-            <td class="total-cell-val" data-sales="${r.id}">${peso(val)}</td>
+            <td><input class="num-input stockIn-input" type="number" min="0" value="${r.stockIn || ''}" data-id="${r.id}" data-field="stockIn"></td>
+            <td><input class="num-input remaining-input" type="number" min="0" value="${r.remaining || ''}" data-id="${r.id}" data-field="remaining"></td>
+            <td class="sold-cell ${soldCls}">${sold}</td>
+            <td class="total-cell-val">${peso(val)}</td>
         </tr>`;
     });
-    const totalSold = recs.reduce((sum, r) => sum + calcSold(r), 0);
-    const totalVal  = recs.reduce((sum, r) => sum + (calcSold(r) * r.price), 0);
-    rowsHtml += `<tr class="total-row"><td colspan="5" class="total-label">Totals</td><td>${totalSold}</td><td>${peso(totalVal)}</td></tr>`;
-    tbody.innerHTML = rowsHtml;
+    const totalSold = recs.reduce((s, r) => s + calcSold(r), 0);
+    const totalVal  = recs.reduce((s, r) => s + calcSold(r) * r.price, 0);
+    html += `<tr class="total-row"><td colspan="5" class="total-label">Totals</td><td>${totalSold}</td><td>${peso(totalVal)}</td></tr>`;
+    tbody.innerHTML = html;
 }
 
 function attachInputListeners(){
-    document.querySelectorAll('.stockIn-input, .remaining-input').forEach(inp => {
+    const inputs = Array.from(document.querySelectorAll('.num-input'));
+    inputs.forEach(inp => {
         inp.removeEventListener('input', handleInputChange);
         inp.addEventListener('input', handleInputChange);
+
+        inp.removeEventListener('keydown', inp._navHandler);
+        inp._navHandler = e => {
+            if (!['ArrowRight','ArrowLeft','ArrowUp','ArrowDown','Enter'].includes(e.key)) return;
+            e.preventDefault();
+
+            const allInputs  = Array.from(document.querySelectorAll('.num-input'));
+            const rows       = Array.from(document.querySelectorAll('tbody tr:not(.total-row)'));
+            const curRow     = inp.closest('tr');
+            const curRowIdx  = rows.indexOf(curRow);
+            const curColIdx  = Array.from(curRow.querySelectorAll('.num-input')).indexOf(inp);
+            const colCount   = curRow.querySelectorAll('.num-input').length; // = 2 (stockIn, remaining)
+
+            let targetInput = null;
+
+            if (e.key === 'ArrowRight' || e.key === 'Enter') {
+                // Move to next column, or wrap to first column of next row
+                if (curColIdx < colCount - 1) {
+                    targetInput = curRow.querySelectorAll('.num-input')[curColIdx + 1];
+                } else if (curRowIdx < rows.length - 1) {
+                    targetInput = rows[curRowIdx + 1].querySelectorAll('.num-input')[0];
+                }
+            } else if (e.key === 'ArrowLeft') {
+                // Move to prev column, or wrap to last column of prev row
+                if (curColIdx > 0) {
+                    targetInput = curRow.querySelectorAll('.num-input')[curColIdx - 1];
+                } else if (curRowIdx > 0) {
+                    const prevRowInputs = rows[curRowIdx - 1].querySelectorAll('.num-input');
+                    targetInput = prevRowInputs[prevRowInputs.length - 1];
+                }
+            } else if (e.key === 'ArrowDown') {
+                // Move to same column in next row
+                if (curRowIdx < rows.length - 1) {
+                    targetInput = rows[curRowIdx + 1].querySelectorAll('.num-input')[curColIdx];
+                }
+            } else if (e.key === 'ArrowUp') {
+                // Move to same column in prev row
+                if (curRowIdx > 0) {
+                    targetInput = rows[curRowIdx - 1].querySelectorAll('.num-input')[curColIdx];
+                }
+            }
+
+            if (targetInput) { targetInput.focus(); targetInput.select(); }
+        };
+        inp.addEventListener('keydown', inp._navHandler);
     });
 }
 
-function handleInputChange(e){
-    const inp = e.target;
-    const id = parseInt(inp.dataset.id);
+function handleInputChange(e) {
+    const inp   = e.target;
+    const id    = parseInt(inp.dataset.id);
     const field = inp.dataset.field;
-    let val = parseInt(inp.value);
-    if(isNaN(val) || val < 0) val = 0;
+    let   val   = parseInt(inp.value);
+    if (isNaN(val) || val < 0) val = 0;
     const record = masterRecords.find(r => r.id === id);
-    if(record){
+    if (record) {
         record[field] = val;
         const row = inp.closest('tr');
-        if(row){
-            const sold = calcSold(record);
-            const soldCell = row.querySelector('.sold-cell');
+        if (row) {
+            const sold      = calcSold(record);
+            const soldCell  = row.querySelector('.sold-cell');
             const salesCell = row.querySelector('.total-cell-val');
-            if(soldCell){
-                soldCell.textContent = sold;
-                soldCell.className = `sold-cell ${sold<0 ? 'sold-warn' : 'sold-ok'}`;
-            }
-            if(salesCell) salesCell.textContent = peso(sold * record.price);
+            if (soldCell)  { soldCell.textContent = sold; soldCell.className = `sold-cell ${sold < 0 ? 'sold-warn' : 'sold-ok'}`; }
+            if (salesCell)   salesCell.textContent = peso(sold * record.price);
             updateSummary();
         }
         triggerAutoSave();
     }
 }
 
-function updateSummary(){
-    let stockIn=0, sold=0, remaining=0;
-    masterRecords.forEach(r=>{
-        stockIn += r.stockIn * r.price;
-        sold    += calcSold(r) * r.price;
-        remaining += r.remaining * r.price;
+function updateSummary() {
+    let stockInVal = 0, soldVal = 0, remainingVal = 0;
+    masterRecords.forEach(r => {
+        stockInVal   += r.stockIn * r.price;
+        soldVal      += calcSold(r) * r.price;
+        remainingVal += r.remaining * r.price;
     });
-    const expTotal = expenses.reduce((s,e)=>s+parseFloat(e.amount||0),0);
-    const seTotal  = stockEntries.reduce((s,e)=>s+parseFloat(e.total_cost||0),0);
-    const net = sold - expTotal - seTotal;
-    document.getElementById('sumStockIn').textContent = peso(stockIn);
+    const expTotal = expenses.reduce((s, e) => s + parseFloat(e.amount || 0), 0);
+    const seTotal  = stockEntries.reduce((s, e) => s + parseFloat(e.total_cost || 0), 0);
+    const net      = soldVal - expTotal - seTotal;
+
+    document.getElementById('sumStockIn').textContent      = peso(stockInVal);
     document.getElementById('sumSupplierCost').textContent = peso(seTotal);
-    document.getElementById('sumSold').textContent = peso(sold);
-    document.getElementById('sumRemaining').textContent = peso(remaining);
-    document.getElementById('sumExpenses').textContent = peso(expTotal);
+    document.getElementById('sumSold').textContent         = peso(soldVal);
+    document.getElementById('sumRemaining').textContent    = peso(remainingVal);
+    document.getElementById('sumExpenses').textContent     = peso(expTotal);
     const netEl = document.getElementById('sumNet');
     netEl.textContent = peso(net);
-    netEl.className = 'sum-val '+(net>=0?'green':'red');
-    // Update table totals rows
+    netEl.className   = 'sum-val ' + (net >= 0 ? 'green' : 'red');
+
+    // Update table total rows
     ['chickenBody', 'frozenBody'].forEach(bodyId => {
         const tbody = document.getElementById(bodyId);
-        if(!tbody) return;
-        const rows = Array.from(tbody.querySelectorAll('tr:not(.total-row)'));
+        if (!tbody) return;
         let totalSold = 0, totalVal = 0;
-        rows.forEach(row => {
-            const id = parseInt(row.dataset.productId);
-            if(id){
-                const rec = masterRecords.find(r=>r.id===id);
-                if(rec){
-                    const sold = calcSold(rec);
-                    totalSold += sold;
-                    totalVal  += sold * rec.price;
-                }
-            }
+        tbody.querySelectorAll('tr:not(.total-row)').forEach(row => {
+            const id  = parseInt(row.dataset.productId);
+            const rec = masterRecords.find(r => r.id === id);
+            if (rec) { totalSold += calcSold(rec); totalVal += calcSold(rec) * rec.price; }
         });
         const totalRow = tbody.querySelector('.total-row');
-        if(totalRow){
+        if (totalRow) {
             const cells = totalRow.querySelectorAll('td');
-            if(cells.length >= 2){
-                cells[cells.length-2].textContent = totalSold;
-                cells[cells.length-1].textContent = peso(totalVal);
+            if (cells.length >= 2) {
+                cells[cells.length - 2].textContent = totalSold;
+                cells[cells.length - 1].textContent = peso(totalVal);
             }
         }
     });
 }
 
-// Stock entries
-async function loadStockEntries(date){
-    try{
-        const r=await fetch(`${API}?stock_entries=${date}`);
-        const d=await r.json();
-        stockEntries=d.stock_entries||[];
-    } catch(e){
-        stockEntries=[];
-    }
+// ── Stock entries ─────────────────────────────────────────────────────────────
+async function loadStockEntries(date) {
+    try {
+        const r = await fetch(`${API}?stock_entries=${date}`);
+        const d = await r.json();
+        stockEntries = d.stock_entries || [];
+    } catch { stockEntries = []; }
     renderStockEntries();
 }
-function renderStockEntries(){
-    const list=document.getElementById('seList');
-    const total=stockEntries.reduce((s,e)=>s+parseFloat(e.total_cost||0),0);
-    document.getElementById('seTotalVal').textContent=peso(total);
-    document.getElementById('seCount').textContent=`${stockEntries.length} entr${stockEntries.length!==1?'ies':'y'}`;
-    if(!stockEntries.length){
-        list.innerHTML='<div class="se-empty">No stock entries recorded yet.</div>';
-        return;
-    }
-    list.innerHTML=stockEntries.map(e=>`
+
+function renderStockEntries() {
+    const list  = document.getElementById('seList');
+    const total = stockEntries.reduce((s, e) => s + parseFloat(e.total_cost || 0), 0);
+    document.getElementById('seTotalVal').textContent = peso(total);
+    document.getElementById('seCount').textContent    = `${stockEntries.length} entr${stockEntries.length !== 1 ? 'ies' : 'y'}`;
+    if (!stockEntries.length) { list.innerHTML = '<div class="se-empty">No stock entries recorded yet.</div>'; return; }
+    list.innerHTML = stockEntries.map(e => `
         <div class="se-item">
             <span class="se-supplier-badge">${esc(e.supplier_name)}</span>
             <span class="se-product">${esc(e.product_name)}</span>
@@ -756,64 +908,59 @@ function renderStockEntries(){
             <button class="se-del" onclick="delStockEntry(${e.id})" title="Delete">✕</button>
         </div>`).join('');
 }
-document.getElementById('addSeBtn').addEventListener('click',async()=>{
+
+document.getElementById('addSeBtn').addEventListener('click', async () => {
     const date  = document.getElementById('recordDate').value;
     const pid   = document.getElementById('seProduct').value;
     const sid   = document.getElementById('seSupplier').value;
-    const qty   = parseInt(document.getElementById('seQty').value)||0;
-    const cost  = parseFloat(document.getElementById('seCost').value)||0;
+    const qty   = parseInt(document.getElementById('seQty').value) || 0;
+    const cost  = parseFloat(document.getElementById('seCost').value) || 0;
     const notes = document.getElementById('seNotes').value;
-    if(!date)  return alert2('Please load a date first.',true);
-    if(!pid)   return alert2('Select a product.',true);
-    if(!sid)   return alert2('Select a supplier.',true);
-    if(qty<=0) return alert2('Qty must be greater than 0.',true);
-    try{
-        const res  = await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({save_stock_entry:1,entry_date:date,product_id:pid,supplier_id:sid,qty,cost_price:cost,notes})});
+    if (!date)  return toast('Please load a date first.', true);
+    if (!pid)   return toast('Select a product.', true);
+    if (!sid)   return toast('Select a supplier.', true);
+    if (qty <= 0) return toast('Qty must be greater than 0.', true);
+    try {
+        const res  = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ save_stock_entry: 1, entry_date: date, product_id: pid, supplier_id: sid, qty, cost_price: cost, notes }) });
         const data = await res.json();
-        if(data.success){
-            document.getElementById('seQty').value='';
-            document.getElementById('seCost').value='';
-            document.getElementById('seNotes').value='';
+        if (data.success) {
+            document.getElementById('seQty').value   = '';
+            document.getElementById('seCost').value  = '';
+            document.getElementById('seNotes').value = '';
             await loadStockEntries(date);
             updateSummary();
-            alert2('Stock entry saved!');
-        } else { alert2('Failed to save stock entry: '+(data.error||'Unknown error'),true); }
-    } catch(e) { alert2('Network error. Check the server connection.',true); }
+            toast('Stock entry saved!');
+        } else { toast('Failed: ' + (data.error || 'Unknown error'), true); }
+    } catch { toast('Network error.', true); }
 });
-async function delStockEntry(id){
-    modal('Delete this stock entry?',async()=>{
-        const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({delete_stock_entry:id})});
-        const data=await res.json();
-        if(data.success){
-            stockEntries=stockEntries.filter(e=>e.id!=id);
-            renderStockEntries();
-            updateSummary();
-        } else alert2('Failed to delete.',true);
-    },null,'🗑️','Delete','Cancel');
+
+async function delStockEntry(id) {
+    modal('Delete this stock entry?', async () => {
+        const res  = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ delete_stock_entry: id }) });
+        const data = await res.json();
+        if (data.success) { stockEntries = stockEntries.filter(e => e.id != id); renderStockEntries(); updateSummary(); }
+        else toast('Failed to delete.', true);
+    }, null, '🗑️', 'Delete', 'Cancel');
 }
 
-// Expenses
-async function loadExpenses(date){
-    try{
-        const r=await fetch(`${API}?expenses=${date}`);
-        const d=await r.json();
-        expenses=d.expenses||[];
-    } catch(e){
-        expenses=[];
-    }
+// ── Expenses ──────────────────────────────────────────────────────────────────
+async function loadExpenses(date) {
+    try {
+        const r = await fetch(`${API}?expenses=${date}`);
+        const d = await r.json();
+        expenses = d.expenses || [];
+    } catch { expenses = []; }
     renderExpenses();
 }
-function renderExpenses(){
-    const list=document.getElementById('expList');
-    const total=expenses.reduce((s,e)=>s+parseFloat(e.amount||0),0);
-    document.getElementById('expTotalVal').textContent=peso(total);
-    document.getElementById('expCount').textContent=`${expenses.length} item${expenses.length!==1?'s':''}`;
-    if(!expenses.length){
-        list.innerHTML='<div class="exp-empty">No expenses recorded yet.</div>';
-        return;
-    }
-    list.innerHTML=expenses.map(e=>`
+
+function renderExpenses() {
+    const list  = document.getElementById('expList');
+    const total = expenses.reduce((s, e) => s + parseFloat(e.amount || 0), 0);
+    document.getElementById('expTotalVal').textContent = peso(total);
+    document.getElementById('expCount').textContent    = `${expenses.length} item${expenses.length !== 1 ? 's' : ''}`;
+    if (!expenses.length) { list.innerHTML = '<div class="exp-empty">No expenses recorded yet.</div>'; return; }
+    list.innerHTML = expenses.map(e => `
         <div class="exp-item">
             <span class="exp-cat-badge">${esc(e.category)}</span>
             <span class="exp-desc">${esc(e.description)}</span>
@@ -821,86 +968,92 @@ function renderExpenses(){
             <button class="exp-del" onclick="delExpense(${e.id})" title="Delete">✕</button>
         </div>`).join('');
 }
-document.getElementById('addExpBtn').addEventListener('click',async()=>{
-    const date=document.getElementById('recordDate').value;
-    const cat=document.getElementById('expCat').value;
-    const desc=document.getElementById('expDesc').value.trim();
-    const amount=parseFloat(document.getElementById('expAmount').value);
-    if(!date) return alert2('Please load a date first.',true);
-    if(!desc) return alert2('Please enter a description.',true);
-    if(!amount||amount<=0) return alert2('Please enter a valid amount.',true);
-    const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({save_expense:1,expense_date:date,category:cat,description:desc,amount})});
-    const data=await res.json();
-    if(data.success){
-        document.getElementById('expDesc').value='';
-        document.getElementById('expAmount').value='';
-        expenses.unshift({id:data.id,category:cat,description:desc,amount});
+
+document.getElementById('addExpBtn').addEventListener('click', async () => {
+    const date   = document.getElementById('recordDate').value;
+    const cat    = document.getElementById('expCat').value;
+    const desc   = document.getElementById('expDesc').value.trim();
+    const amount = parseFloat(document.getElementById('expAmount').value);
+    if (!date)              return toast('Please load a date first.', true);
+    if (!desc)              return toast('Please enter a description.', true);
+    if (!amount || amount <= 0) return toast('Please enter a valid amount.', true);
+    const res  = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ save_expense: 1, expense_date: date, category: cat, description: desc, amount }) });
+    const data = await res.json();
+    if (data.success) {
+        document.getElementById('expDesc').value   = '';
+        document.getElementById('expAmount').value = '';
+        expenses.unshift({ id: data.id, category: cat, description: desc, amount });
         renderExpenses();
         updateSummary();
-    }else alert2('Failed to save expense.',true);
+    } else { toast('Failed to save expense.', true); }
 });
-async function delExpense(id){
-    modal('Delete this expense?',async()=>{
-        const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({delete_expense:id})});
-        const data=await res.json();
-        if(data.success){
-            expenses=expenses.filter(e=>e.id!==id);
-            renderExpenses();
-            updateSummary();
-        } else alert2('Failed to delete.',true);
-    },null,'🗑️','Delete','Cancel');
+
+async function delExpense(id) {
+    modal('Delete this expense?', async () => {
+        const res  = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ delete_expense: id }) });
+        const data = await res.json();
+        if (data.success) { expenses = expenses.filter(e => e.id !== id); renderExpenses(); updateSummary(); }
+        else toast('Failed to delete.', true);
+    }, null, '🗑️', 'Delete', 'Cancel');
 }
 
-// Date navigation
+// ── Date navigation ───────────────────────────────────────────────────────────
 document.getElementById('prevDayBtn').addEventListener('click', async () => {
     let d = document.getElementById('recordDate').value;
     if (!d) d = new Date().toISOString().split('T')[0];
-    const newDate = addDays(d, -1);
+    const newDate = prevDate(d);
     document.getElementById('recordDate').value = newDate;
     localStorage.setItem('janeth_date', newDate);
-    await loadDate(newDate, true);
+    await loadDate(newDate, true);   // silent = true → no toast, just loads
 });
 
 document.getElementById('nextDayBtn').addEventListener('click', async () => {
     let d = document.getElementById('recordDate').value;
     if (!d) d = new Date().toISOString().split('T')[0];
-    const newDate = addDays(d, 1);
+    const newDate = nextDate(d);
     document.getElementById('recordDate').value = newDate;
     localStorage.setItem('janeth_date', newDate);
-    await loadDate(newDate, true);
+    await loadDate(newDate, true);   // silent = true → no toast, just loads
 });
-document.getElementById('recordDate').addEventListener('change',async()=>{
-    const d=document.getElementById('recordDate').value;
-    localStorage.setItem('janeth_date',d);
-    await loadDate(d,true);
+
+document.getElementById('recordDate').addEventListener('change', async () => {
+    const d = document.getElementById('recordDate').value;
+    localStorage.setItem('janeth_date', d);
+    await loadDate(d, true);
 });
-document.getElementById('loadBtn').addEventListener('click',async()=>{
-    const d=document.getElementById('recordDate').value;
-    if(!d) return alert2('Please select a date.',true);
-    await loadDate(d,false);
+
+document.getElementById('loadBtn').addEventListener('click', async () => {
+    const d = document.getElementById('recordDate').value;
+    if (!d) return toast('Please select a date.', true);
+    await loadDate(d, false);   // Load button shows toast
 });
-document.getElementById('manualSaveBtn').addEventListener('click',async()=>{
-    const date=document.getElementById('recordDate').value;
-    if(!date) return alert2('Please select a date first.',true);
-    const ok=await doSave();
-    if(ok) alert2('Data saved successfully!');
-    else alert2('Failed to save. Please try again.',true);
+
+document.getElementById('manualSaveBtn').addEventListener('click', async () => {
+    const date = document.getElementById('recordDate').value;
+    if (!date) return toast('Please select a date first.', true);
+    const ok = await doSave();
+    if (ok) toast('Data saved successfully!');
+    else    toast('Failed to save. Please try again.', true);
 });
-document.getElementById('printNavBtn').addEventListener('click',()=>{
-    if(!document.getElementById('recordDate').value) return alert2('Please select a date first.',true);
+
+document.getElementById('printNavBtn').addEventListener('click', () => {
+    if (!document.getElementById('recordDate').value) return toast('Please select a date first.', true);
     window.print();
 });
-document.getElementById('logoutBtn').addEventListener('click',()=>{
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
     modal('Are you sure you want to sign out? Any unsaved changes will be lost.',
-        ()=>{ window.location.href='logout.php'; },
-        null,'👋','Yes, sign out','Stay');
+        () => { window.location.href = 'logout.php'; },
+        null, '👋', 'Yes, sign out', 'Stay');
 });
+
 document.getElementById('searchInput').addEventListener('input', renderSections);
 document.getElementById('catFilter').addEventListener('change', renderSections);
 
-function esc(s){return String(s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));}
+function esc(s) { return String(s).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
 
+// Boot
 fetchAllProducts();
 </script>
 

@@ -15,7 +15,7 @@ class Product
         $this->pdo = Database::getInstance();
     }
 
-    // ── Products (controller-friendly names) ─────────────────────────────
+    // ── Products ─────────────────────────────────────────────────────────
 
     public function getProducts(string $page = 'all'): array
     {
@@ -34,6 +34,22 @@ class Product
     public function getSuppliers(): array
     {
         return $this->pdo->query('SELECT * FROM suppliers ORDER BY id')->fetchAll();
+    }
+
+    // ── List dates (dashboard dropdown) ─────────────────────────────────
+    // BUG FIX: this method was missing entirely — the dashboard's
+    // ?list_dates=1 endpoint had no handler, so the date selector
+    // never populated and the entire dashboard showed nothing.
+
+    public function getListDates(): array
+    {
+        $stmt = $this->pdo->query("
+            SELECT DISTINCT record_date
+            FROM janeth_records
+            ORDER BY record_date DESC
+            LIMIT 365
+        ");
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 
     // ── Stock entries ────────────────────────────────────────────────────
@@ -75,7 +91,7 @@ class Product
         }
     }
 
-    // ── Inventory records (janeth_records) ───────────────────────────────
+    // ── Inventory records ────────────────────────────────────────────────
 
     public function getRecords(string $date, string $forPage = 'input'): array
     {
@@ -97,10 +113,6 @@ class Product
         return $stmt->fetchAll();
     }
 
-    /**
-     * Saves daily inventory records.
-     * @throws \PDOException on database error
-     */
     public function saveRecords(string $date, array $records): bool
     {
         $this->pdo->beginTransaction();
@@ -112,7 +124,7 @@ class Product
                     remaining_qty = VALUES(remaining_qty),
                     sold          = VALUES(sold)";
         $stmt = $this->pdo->prepare($sql);
-        
+
         foreach ($records as $rec) {
             $yesterday = (int)($rec['yesterday_qty'] ?? 0);
             $stockIn   = (int)($rec['stock_in']      ?? 0);
@@ -161,7 +173,7 @@ class Product
         }
     }
 
-    // ── Liquidation (extended with JSON extra_data) ──────────────────────
+    // ── Liquidation ──────────────────────────────────────────────────────
 
     public function getLiquidation(string $date): array
     {
@@ -172,18 +184,16 @@ class Product
         ");
         $stmt->execute([$date]);
         $row = $stmt->fetch();
-        if (!$row) {
-            return ['liquidation' => null];
-        }
+        if (!$row) return ['liquidation' => null];
         $extra = json_decode($row['extra_data'], true) ?? [];
         return [
             'liquidation' => array_merge([
-                'opening_cash'  => (float)$row['opening_cash'],
-                'cash_sales'    => (float)$row['cash_sales'],
-                'total_expenses'=> (float)$row['total_expenses'],
-                'stock_cost'    => (float)$row['stock_cost'],
-                'actual_cash'   => (float)$row['actual_cash'],
-                'notes'         => $row['notes'],
+                'opening_cash'   => (float)$row['opening_cash'],
+                'cash_sales'     => (float)$row['cash_sales'],
+                'total_expenses' => (float)$row['total_expenses'],
+                'stock_cost'     => (float)$row['stock_cost'],
+                'actual_cash'    => (float)$row['actual_cash'],
+                'notes'          => $row['notes'],
             ], $extra)
         ];
     }
@@ -195,17 +205,17 @@ class Product
         try {
             $json = json_encode($extra, JSON_UNESCAPED_UNICODE);
             $stmt = $this->pdo->prepare("
-                INSERT INTO liquidations 
+                INSERT INTO liquidations
                     (liquidation_date, opening_cash, cash_sales, total_expenses, stock_cost, actual_cash, notes, extra_data)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE
-                    opening_cash = VALUES(opening_cash),
-                    cash_sales   = VALUES(cash_sales),
+                    opening_cash   = VALUES(opening_cash),
+                    cash_sales     = VALUES(cash_sales),
                     total_expenses = VALUES(total_expenses),
-                    stock_cost   = VALUES(stock_cost),
-                    actual_cash  = VALUES(actual_cash),
-                    notes        = VALUES(notes),
-                    extra_data   = VALUES(extra_data)
+                    stock_cost     = VALUES(stock_cost),
+                    actual_cash    = VALUES(actual_cash),
+                    notes          = VALUES(notes),
+                    extra_data     = VALUES(extra_data)
             ");
             $stmt->execute([$date, $openingCash, $cashSales, $totalExpenses, $stockCost, $actualCash, $notes, $json]);
             return true;

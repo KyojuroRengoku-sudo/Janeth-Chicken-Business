@@ -40,7 +40,9 @@ function requireAuth(?string $requiredRole = null, bool $isApi = false): void
 }
 
 /**
- * Validate a date string in Y-m-d format.
+ * Validate and return a date string in Y-m-d format, or false if invalid.
+ * FIX: was returning bool instead of the date string, causing all DB queries
+ * to receive `true` (cast to "1") as the date parameter.
  */
 function validDate(string $date): string|false
 {
